@@ -1,4 +1,4 @@
-#include "load_mesh.hh"
+#include "load_mesh.h"
 
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>

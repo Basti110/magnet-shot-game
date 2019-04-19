@@ -1,42 +1,30 @@
 #pragma once
-
+#include "starter.h"
+#include "message_bus.h"
 #include <glow/fwd.hh>
-
 #include <glow-extras/camera/Camera.hh>
 #include <glow-extras/glfw/GlfwApp.hh>
 
+
 class Game : public glow::glfw::GlfwApp
 {
-    // logic
-private:
-    glm::vec3 mCubePosition = {-2, 0, 0};
-    float mCubeSize = 1.0f;
-
-    glm::vec3 mSpherePosition = {2, 0, 0};
-    float mSphereSize = 1.0f;
-
     // gfx settings
 private:
     glm::vec3 mBackgroundColor = {.10f, .46f, .83f};
     bool mShowWireframe = false;
     bool mShowPostProcess = false;
+    float mBounceF = 0;
+    Starter* mStartManager;
+    SceneManager* mScene;
 
     // gfx objects
 private:
-    glow::camera::SharedCamera mCamera;
-
     // shaders
     glow::SharedProgram mShaderOutput;
     glow::SharedProgram mShaderObject;
 
     // meshes
     glow::SharedVertexArray mMeshQuad;
-    glow::SharedVertexArray mMeshCube;
-    glow::SharedVertexArray mMeshSphere;
-
-    // textures
-    glow::SharedTexture2D mTexCubeAlbedo;
-    glow::SharedTexture2D mTexCubeNormal;
 
     // intermediate framebuffer with color and depth texture
     glow::SharedFramebuffer mFramebuffer;
@@ -59,4 +47,9 @@ public:
     void onResize(int w, int h) override; // called when window is resized
 
     void updateCamera(float elapsedSeconds);
+    std::function<void(KeyMessage)> getNotifyFuncKey();
+    std::function<void(Message*)> getNotifyFuncGui();
+    void notifyKeyInput(KeyMessage message);
+    void notifyGuiInput(Message* message);
+    void setBackgroundColor(glm::vec3 color);
 };
