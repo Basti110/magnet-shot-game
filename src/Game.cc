@@ -24,6 +24,9 @@
 
 #include "load_mesh.hh" // helper function for loading .obj into VertexArrays
 
+#include <btBulletDynamicsCommon.h> // bullet physics
+#include "bullet_helper.hh"
+
 Game::Game() : GlfwApp(Gui::ImGui) {}
 
 void Game::init()
@@ -67,11 +70,71 @@ void Game::init()
         mShaderObject = glow::Program::createFromFile("../data/shaders/object");
         mShaderOutput = glow::Program::createFromFile("../data/shaders/output");
     }
+
+    // create bullet physics
+    {
+        mBulletBroadphase = new btDbvtBroadphase;
+        mBulletCollisionConfig = new btDefaultCollisionConfiguration;
+        mBulletCollisionDispatcher = new btCollisionDispatcher(mBulletCollisionConfig);
+        mBulletSolver = new btSequentialImpulseConstraintSolver;
+        mBulletWorld = new btDiscreteDynamicsWorld(mBulletCollisionDispatcher, mBulletBroadphase, mBulletSolver, mBulletCollisionConfig);
+        mBulletWorld->setGravity(btVector3(0, -10, 0)); // set initial gravity
+
+        // create cube
+        mCubeMotionState = new btDefaultMotionState(to_bullet(mCubeTransform));
+        mCubeCollisionShape = new btBoxShape(btVector3(1, 1, 1));
+        auto const mass = 1.0f;
+        btVector3 inertia;
+        mCubeCollisionShape->calculateLocalInertia(mass, inertia);
+        auto info = btRigidBody::btRigidBodyConstructionInfo(mass, mCubeMotionState, mCubeCollisionShape, inertia);
+        info.m_friction = 0.1f;
+        info.m_restitution = 0.0f;
+        info.m_linearDamping = 0.01f;
+        info.m_angularDamping = 0.01f;
+        mCubeRigidBody = new btRigidBody(info);
+        mBulletWorld->addRigidBody(mCubeRigidBody);
+
+        // create ground plane
+        mPlaneMotionState = new btDefaultMotionState();
+        mPlaneCollisionShape = new btStaticPlaneShape(btVector3(0, 1, 0), -3);
+        mPlaneRigidBody = new btRigidBody(0, mPlaneMotionState, mPlaneCollisionShape);
+        mBulletWorld->addRigidBody(mPlaneRigidBody);
+    }
+}
+
+Game::~Game()
+{
+    mBulletWorld->removeRigidBody(mCubeRigidBody);
+    mBulletWorld->removeRigidBody(mPlaneRigidBody);
+
+    delete mCubeRigidBody;
+    delete mCubeMotionState;
+    delete mCubeCollisionShape;
+
+    delete mPlaneRigidBody;
+    delete mPlaneMotionState;
+    delete mPlaneCollisionShape;
+
+    delete mBulletBroadphase;
+    delete mBulletCollisionConfig;
+    delete mBulletCollisionDispatcher;
+    delete mBulletSolver;
+    delete mBulletWorld;
 }
 
 void Game::update(float elapsedSeconds)
 {
     // update game in 60 Hz fixed timestep
+
+    // update physics
+    mBulletWorld->stepSimulation(elapsedSeconds, 10);
+
+    // copy cube transform to glm matrix
+    {
+        btTransform t;
+        mCubeMotionState->getWorldTransform(t);
+        mCubeTransform = to_glm(t);
+    }
 }
 
 void Game::render(float elapsedSeconds)
@@ -107,7 +170,7 @@ void Game::render(float elapsedSeconds)
         // render cube and sphere
         {
             // build model matrix
-            auto modelCube = glm::translate(mCubePosition) * glm::scale(glm::vec3(mCubeSize));
+            auto modelCube = mCubeTransform;
             auto modelSphere = glm::translate(mSpherePosition) * glm::scale(glm::vec3(mSphereSize));
 
             // let light rotate around the objects
@@ -157,11 +220,6 @@ void Game::onGui()
         ImGui::Text("Objects :");
         {
             ImGui::Indent();
-            ImGui::SliderFloat("Cube Size", &mCubeSize, 0.0f, 10.0f);
-            ImGui::SliderFloat3("Cube Position", &mCubePosition.x, -5.0f, 5.0f);
-
-            ImGui::Spacing();
-
             ImGui::SliderFloat("Sphere Radius", &mSphereSize, 0.0f, 10.0f);
             ImGui::SliderFloat3("Sphere Position", &mSpherePosition.x, -5.0f, 5.0f);
             ImGui::Unindent();

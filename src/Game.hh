@@ -5,15 +5,46 @@
 #include <glow-extras/camera/Camera.hh>
 #include <glow-extras/glfw/GlfwApp.hh>
 
+// bullet forward declarations
+class btCollisionShape;
+class btRigidBody;
+struct btDefaultMotionState;
+class btBroadphaseInterface;
+class btDefaultCollisionConfiguration;
+class btCollisionDispatcher;
+class btDiscreteDynamicsWorld;
+class btSequentialImpulseConstraintSolver;
+
 class Game : public glow::glfw::GlfwApp
 {
     // logic
 private:
-    glm::vec3 mCubePosition = {-2, 0, 0};
-    float mCubeSize = 1.0f;
-
     glm::vec3 mSpherePosition = {2, 0, 0};
     float mSphereSize = 1.0f;
+
+    // cube
+private:
+    /// Collision shape
+    btCollisionShape* mCubeCollisionShape = nullptr;
+    /// Physics body
+    btRigidBody* mCubeRigidBody = nullptr;
+    /// Physics motion state
+    btDefaultMotionState* mCubeMotionState = nullptr;
+    /// Cube transformation
+    glm::mat4 mCubeTransform = glm::translate(glm::vec3(-2, 3, 0)) * glm::rotate(glm::radians(45.f), normalize(glm::vec3(1, 1, 1)));
+
+    // ground plane
+private:
+    btCollisionShape* mPlaneCollisionShape = nullptr;
+    btRigidBody* mPlaneRigidBody = nullptr;
+    btDefaultMotionState* mPlaneMotionState = nullptr;
+
+private: // bullet physics
+    btBroadphaseInterface* mBulletBroadphase = nullptr;
+    btDefaultCollisionConfiguration* mBulletCollisionConfig = nullptr;
+    btCollisionDispatcher* mBulletCollisionDispatcher = nullptr;
+    btSequentialImpulseConstraintSolver* mBulletSolver = nullptr;
+    btDiscreteDynamicsWorld* mBulletWorld = nullptr;
 
     // gfx settings
 private:
@@ -48,6 +79,7 @@ private:
     // ctor
 public:
     Game();
+    ~Game();
 
     // events
 public:
