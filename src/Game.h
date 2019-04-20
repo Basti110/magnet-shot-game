@@ -1,9 +1,10 @@
 #pragma once
-#include "starter.h"
-#include "message_bus.h"
-#include <glow/fwd.hh>
 #include <glow-extras/camera/Camera.hh>
 #include <glow-extras/glfw/GlfwApp.hh>
+#include <glow/fwd.hh>
+#include "message_bus.h"
+#include "starter.h"
+#include "mesh_node.h"
 
 
 class Game : public glow::glfw::GlfwApp
@@ -25,6 +26,7 @@ private:
 
     // meshes
     glow::SharedVertexArray mMeshQuad;
+    MeshNode mFirstLevel;
 
     // intermediate framebuffer with color and depth texture
     glow::SharedFramebuffer mFramebuffer;

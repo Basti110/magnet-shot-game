@@ -72,11 +72,12 @@ void SceneManager::render(const glow::UsedProgram& shader, glm::mat4& projection
     shader.setUniform("lightPos", lightPos);
     shader.setUniform("viewPos", camPos);
     shader.setUniform("lightColor", lightColor);
-    mRoot->render(shader, projection, view);
+    
     for (int i = 0; i < mDynamicObjects.size(); ++i)
     {
         mDynamicObjects[i]->render(shader, projection, view);
 	}
+    mRoot->render(shader, projection, view);
 }
 
 void SceneManager::setCamera(Camera * camera)

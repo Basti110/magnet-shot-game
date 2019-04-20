@@ -57,7 +57,7 @@ void GuiManager::render()
             ImGui::SliderFloat("Cube Size", &mCubeSize.first, 0.0f, 10.0f);
             ImGui::ColorEdit3("Cube Color", &mCubeColor.first.r);
             ImGui::ColorEdit3("Background Color", &mBackgroundColor.first.r);
-            ImGui::ColorEdit3("Light Color", &mCubeColor.first.r);
+            ImGui::ColorEdit3("Light Color", &mLightColor.first.r);
             //ImGui::Unindent();
         }
     }

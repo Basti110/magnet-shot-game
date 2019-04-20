@@ -33,7 +33,6 @@ void Game::init()
 {
     setVSync(true);
     GlfwApp::init();
-
     setTitle("Game Development 2019");
     mStartManager = new Starter(window());
     mScene = mStartManager->getScene();
@@ -55,6 +54,8 @@ void Game::init()
     {
 
         mMeshQuad = glow::geometry::make_quad();
+        
+         mFirstLevel.init("../data/meshes/FirstRoom.obj", false);
 
         mShaderObject = glow::Program::createFromFile("../data/shaders/shader_node");
         mShaderOutput = glow::Program::createFromFile("../data/shaders/output");
@@ -64,6 +65,7 @@ void Game::init()
         trans = glm::translate(trans, glm::vec3(0.0f, 2.0f, -2.0f));
         Light* light = new Light(trans, Color{1.0f, 1.0f, 0.5f});
         root->addChild(light);
+        root->addChild(&mFirstLevel);
         mStartManager->getScene()->setLight(light);
         root->createBuffer();
         mScene->setSceneRoot(root);

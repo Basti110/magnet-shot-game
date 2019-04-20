@@ -143,7 +143,7 @@ glow::SharedVertexArray load_mesh_from_obj(const std::string& filename, bool int
             aTexCoord.push_back(texcoord[h]);
         }
 
-    auto abPos = glow::ArrayBuffer::create("aPosition", aPos);
+    auto abPos = glow::ArrayBuffer::create("aPos", aPos);
     auto abNormal = glow::ArrayBuffer::create("aNormal", aNormal);
     auto abTangent = glow::ArrayBuffer::create("aTangent", aTangent);
     auto abTexCoord = glow::ArrayBuffer::create("aTexCoord", aTexCoord);

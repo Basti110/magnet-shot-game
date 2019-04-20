@@ -506,7 +506,7 @@ void GlfwApp::mainLoop()
                 timeAccum = mMaxFrameSkip * dt * 0.5;
             }
 
-            glow::info() << updates << ", " << timeAccum / dt;
+            //glow::info() << updates << ", " << timeAccum / dt;
         }
 
         // Camera Update

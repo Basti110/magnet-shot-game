@@ -5,6 +5,7 @@
 class MeshNode : public AbstractNode
 {
 public:
+    MeshNode();
     MeshNode(std::string path, bool interpolate);
     ~MeshNode();
 
@@ -13,6 +14,8 @@ public:
     virtual void render(const glow::UsedProgram& shader, glm::mat4& model, glm::mat4& view) override;
     void setColorRatio(float ratio);
     void setColor(glm::vec3 color);
+    void init(std::string path, bool interpolate);
+    glow::SharedProgram mShader;
     //bool setTexture(std::string path);
 private:
     glow::SharedVertexArray mMesh;
