@@ -1,7 +1,9 @@
 #version 330 core
 in vec3 aPos; // the position variable has attribute position 0
-in vec2 aTexCoord;
 in vec3 aNormal;
+in vec3 aTagent;
+in vec2 aTexCoord;
+
 
 uniform mat4 model;
 uniform mat4 view;
