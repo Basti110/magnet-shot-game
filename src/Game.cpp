@@ -62,8 +62,8 @@ void Game::init()
 
         Node* root = new Node;
         glm::mat4 trans = glm::mat4(1.0f);
-        trans = glm::translate(trans, glm::vec3(0.0f, 2.0f, -2.0f));
-        Light* light = new Light(trans, Color{1.0f, 1.0f, 0.5f});
+        trans = glm::translate(trans, glm::vec3(0.0f, 4.0f, -2.0f));
+        Light* light = new Light(trans, Color{1.0f, 1.0f, 1.0f});
         root->addChild(light);
         root->addChild(&mFirstLevel);
         mStartManager->getScene()->setLight(light);

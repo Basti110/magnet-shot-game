@@ -9,11 +9,14 @@ GuiManager::GuiManager(MessageBus* messageBus, GLFWwindow* window) :
     mWindow(window)
 {
     mCubeColor.first = glm::vec3(1.0);
-    mCubeColor.second = glm::vec3(1.0);
-    mBackgroundColor.first = glm::vec3(1.0);
-    mBackgroundColor.second = glm::vec3(1.0);
+    mBackgroundColor.first = glm::vec3(0.2, 0.6, 0.7);
+    mLightColor.first = glm::vec3(1.0);
     mCubeSize.first = 1.0;
-    mCubeSize.second = 1.0;
+
+    sendVec3Message(mCubeColor, GuiSettings::CUBE_COLOR);
+    sendVec3Message(mBackgroundColor, GuiSettings::BACKGROUND_COLOR);
+    sendVec3Message(mLightColor, GuiSettings::LIGHT_COLOR);
+    sendFloatMessage(mCubeSize, GuiSettings::CUBE_SIZE);
 }
 
 
@@ -29,14 +32,8 @@ void GuiManager::init()
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); 
     (void)io;
-    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
-    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;   // Enable Gamepad Controls
 
-    // Setup Dear ImGui style
     ImGui::StyleColorsDark();
-    //ImGui::StyleColorsClassic();
-
-    // Setup Platform/Renderer bindings
     ImGui_ImplGlfw_InitForOpenGL(mWindow, true);
     ImGui_ImplOpenGL3_Init(glsl_version);
 
@@ -45,66 +42,47 @@ void GuiManager::init()
 
 void GuiManager::render()
 {
-    //ImGui_ImplOpenGL3_NewFrame();
-    //ImGui_ImplGlfw_NewFrame();
-    //ImGui::NewFrame();
-    //ImGui::Begin("GameDev Project", &show_another_window);
     if (ImGui::Begin("GameDev Project"))
     {
         ImGui::Text("Editor:");
         {
-            //ImGui::Indent();
             ImGui::SliderFloat("Cube Size", &mCubeSize.first, 0.0f, 10.0f);
             ImGui::ColorEdit3("Cube Color", &mCubeColor.first.r);
             ImGui::ColorEdit3("Background Color", &mBackgroundColor.first.r);
             ImGui::ColorEdit3("Light Color", &mLightColor.first.r);
-            //ImGui::Unindent();
         }
     }
-    /*ImGui::Begin("Another Window", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
-    ImGui::Text("Hello from another window!");
-    if (ImGui::Button("Close Me"))
-        show_another_window = false;*/
     ImGui::End();
-
-
-    //ImGui::Render();
-    //int display_w, display_h;
-    //glfwMakeContextCurrent(mWindow);
-    //glfwGetFramebufferSize(mWindow, &display_w, &display_h);
-    //glViewport(0, 0, display_w, display_h);
-    //glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
-    //glClear(GL_COLOR_BUFFER_BIT);
-    //ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
 void GuiManager::update()
 {
     if (mCubeColor.first != mCubeColor.second)
-    {
-        GuiVec3Message m(mCubeColor.first, GuiSettings::CUBE_COLOR);
-        mMessageBus->sendMessage(&m);
-        mCubeColor.second = mCubeColor.first;
-    }
+        sendVec3Message(mCubeColor, GuiSettings::CUBE_COLOR);
+  
      
     if (mBackgroundColor.first != mBackgroundColor.second)
-    {
-        GuiVec3Message m(mBackgroundColor.first, GuiSettings::BACKGROUND_COLOR);
-        mMessageBus->sendMessage(&m);
-        mBackgroundColor.second = mBackgroundColor.first;
-    }
+        sendVec3Message(mBackgroundColor, GuiSettings::BACKGROUND_COLOR);
+
 
     if (mCubeSize.first != mCubeSize.second)
-    {
-        GuiFloatMessage m(mCubeSize.first, GuiSettings::CUBE_SIZE);
-        mMessageBus->sendMessage(&m);
-        mCubeSize.second = mCubeSize.first;
-    }
+        sendFloatMessage(mCubeSize, GuiSettings::CUBE_SIZE);
+
     
-    if (mLightColor.first != mLightColor.second)
-    {
-        GuiVec3Message m(mLightColor.first, GuiSettings::LIGHT_COLOR);
-        mMessageBus->sendMessage(&m);
-        mLightColor.second = mLightColor.first;
-    }
+    
+    if (mLightColor.first != mLightColor.second)   
+        sendVec3Message(mLightColor, GuiSettings::LIGHT_COLOR);
+    
+}
+
+void GuiManager::sendVec3Message(std::pair<glm::vec3, glm::vec3>& v, GuiSettings s) {
+    GuiVec3Message m(v.first, s);
+    mMessageBus->sendMessage(&m);
+    v.second = v.first;
+}
+
+void GuiManager::sendFloatMessage(std::pair<float, float>& v, GuiSettings s) {
+    GuiFloatMessage m(v.first, s);
+    mMessageBus->sendMessage(&m);
+    v.second = v.first;
 }

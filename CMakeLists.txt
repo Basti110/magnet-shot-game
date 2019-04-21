@@ -11,8 +11,8 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# some dependencies want to build as shared libs
-set(BUILD_SHARED_LIBS ON CACHE BOOL " " FORCE)
+# bullet builds better with shared libraries OFF
+set(BUILD_SHARED_LIBS OFF CACHE BOOL " " FORCE)
 
 
 # ==============================================================================
@@ -73,9 +73,14 @@ add_subdirectory(extern/polymesh)
 # Add GLOW Extras lib
 add_subdirectory(extern/glow-extras)
 
+# Bullet
+# (physics engine)
+add_subdirectory(extern/bullet)
+
 
 # Folder grouping
-foreach(TARGET_NAME glfw ctracer glad glow glow-extras imgui lodepng stb polymesh)
+foreach(TARGET_NAME glfw ctracer glad glow glow-extras imgui lodepng stb polymesh BulletCollision BulletDynamics
+    BulletFileLoader BulletSoftBody BulletWorldImporter BulletXmlWorldImporter ConvexDecomposition GIMPACTUtils HACD LinearMath)
   set_property(TARGET ${TARGET_NAME} PROPERTY FOLDER "Extern") 
 endforeach()
 
@@ -105,6 +110,8 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
     glow-extras
     polymesh
     imgui
+    BulletCollision
+    BulletDynamics
 )
 
 # Compile flags

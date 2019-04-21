@@ -15,6 +15,9 @@ public:
     void render();
     void update();
 private:
+    void sendVec3Message(std::pair<glm::vec3, glm::vec3>& v, GuiSettings s);
+    void sendFloatMessage(std::pair<float, float>& v, GuiSettings s);
+
     GLFWwindow* mWindow;
     MessageBus* mMessageBus;
 
