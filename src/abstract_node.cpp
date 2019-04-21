@@ -85,6 +85,14 @@ void AbstractNode::render(const glow::UsedProgram& shader, glm::mat4& projection
     }
 }
 
+void AbstractNode::update(float elapsedSeconds) 
+{
+    for (std::vector<AbstractNode*>::iterator it = mChilds.begin(); it != mChilds.end(); ++it)
+    {
+        (*it)->update(elapsedSeconds);
+    }
+}
+
 void AbstractNode::createBuffer()
 {
     for (std::vector<AbstractNode*>::iterator it = mChilds.begin(); it != mChilds.end(); ++it)

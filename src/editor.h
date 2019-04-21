@@ -6,7 +6,7 @@
 class Editor
 {
 public:
-    Editor(MessageBus* mB, SceneManager* scene);
+    Editor(MessageBus* mB, SceneManager* scene, PhysicsManager* physics);
     ~Editor();
     void notifyMouseClickInput(MouseClickMessage message);
     void notifyMouseMoveInput(MouseMoveMessage message);
@@ -21,6 +21,7 @@ private:
     void refreshCube();
 
     SceneManager* mScene;
+    PhysicsManager* mPhysics;
     Cube* mCube;
     float mBounceClick;
     float mBounceF;

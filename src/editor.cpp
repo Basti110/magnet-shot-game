@@ -7,11 +7,13 @@
 #include "light.h"
 
 
-Editor::Editor(MessageBus* mB, SceneManager* scene) : mScene(scene)
+Editor::Editor(MessageBus* mB, SceneManager* scene, PhysicsManager* physics) : 
+    mScene(scene), 
+    mPhysics(physics)
 {
     glm::mat4 trans = glm::mat4(1.0f);
     trans = glm::translate(trans, glm::vec3(0.0f, 0.0f, 0.0f));
-    mCube = new Cube(trans, Color{1.0f, 1.0f, 1.0f});
+    mCube = new Cube(trans, Color{1.0f, 1.0f, 1.0f}, mPhysics);
     mCube->createBuffer();
     mScene->appendNode(mCube);
     mB->addMouseClickReceiver(getNotifyFuncMouseClick());
@@ -73,6 +75,7 @@ void Editor::notifyMouseClickInput(MouseClickMessage message)
             mBounceClick = glfwGetTime();
             Cube* newCube = new Cube(*mCube);
             mScene->appendNode(newCube);
+            newCube->addPhysics();
         }
     }
     if (message.getInput() == GLFW_MOUSE_BUTTON_MIDDLE && message.getAction() == 1000)

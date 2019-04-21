@@ -10,7 +10,7 @@ bool Cube::isInit = false;
 unsigned int Cube::VBO = 0;
 unsigned int Cube::VAO = 0;
 
-Cube::Cube(glm::mat4& transformation, Color color)
+Cube::Cube(glm::mat4& transformation, Color color, PhysicsManager* physics) : mPhysics(physics)
 {
     mLocalTransformation = transformation;
     mGlobalTransformation = transformation;
@@ -63,6 +63,7 @@ void Cube::deleteBuffer()
 
 void Cube::render(const glow::UsedProgram& shader, glm::mat4& projection, glm::mat4& view)
 {
+    AbstractNode::render(shader, projection, view);
     if (this->isInit)
     {
         shader.setUniform("model", mGlobalTransformation);
@@ -72,6 +73,19 @@ void Cube::render(const glow::UsedProgram& shader, glm::mat4& projection, glm::m
         glBindVertexArray(this->VAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
     }
+    
+}
+
+void Cube::update(float elapsedSeconds) 
+{
+    if (mIsPhysicsOn)
+    {
+        glm::mat4 transform;
+        if (mPhysics->getTransformation(mPhysicsID, transform))
+            mGlobalTransformation = transform;
+    }
+        
+    AbstractNode::update(elapsedSeconds);
 }
 
 void Cube::setColorRatio(float ratio)
@@ -114,6 +128,12 @@ bool Cube::setTexture(std::string path)
     std::cout << "Load texture: " << this->texture << std::endl;
     return true;*/
     return false;
+}
+
+void Cube::addPhysics() 
+{
+    mPhysicsID = mPhysics->addCube({1, 1, 1}, 1, mGlobalTransformation);
+    mIsPhysicsOn = true;
 }
 
 void Cube::setVertices()

@@ -31,6 +31,7 @@ public:
     virtual void createBuffer();
     virtual void deleteBuffer();
     virtual void render(const glow::UsedProgram& shader, glm::mat4& projection, glm::mat4& view);
+    virtual void update(float elapsedSeconds);
 
 protected:
     vector<AbstractNode*> mChilds;
