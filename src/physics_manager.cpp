@@ -49,6 +49,7 @@ void PhysicsManager::update(float elapsedSeconds)
 
 int PhysicsManager::addCube(glm::vec3 shape, float mass, const glm::mat4& transform)
 {
+    //TODO: More Cube info
     btDefaultMotionState* motionState = new btDefaultMotionState(to_bullet(transform));
     btCollisionShape* collisionShape = new btBoxShape(btVector3(1, 1, 1));
     //auto const mass = 1.0f;
@@ -71,8 +72,10 @@ int PhysicsManager::addCube(glm::vec3 shape, float mass, const glm::mat4& transf
 
 int PhysicsManager::addPlane(glm::vec3 normal, float planeConstant)
 {
+     
     btDefaultMotionState* motionState = new btDefaultMotionState();
-    btCollisionShape* collisionShape = new btStaticPlaneShape(btVector3(0, 1, 0), -3);
+    // TODO
+    btCollisionShape* collisionShape = new btStaticPlaneShape(btVector3(0, 1, 0), -0.5);
     btRigidBody* rigidBody = new btRigidBody(0, motionState, collisionShape);
     mBulletWorld->addRigidBody(rigidBody);
 
@@ -84,7 +87,7 @@ int PhysicsManager::addPlane(glm::vec3 normal, float planeConstant)
 
 bool PhysicsManager::getTransformation(int index, glm::mat4& transform)
 {
-    if (mMotionStates.size() >= index)
+    if (mMotionStates.size() <= index)
         return false;
 
     btTransform t;

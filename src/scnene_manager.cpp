@@ -58,6 +58,15 @@ void SceneManager::appendNode(AbstractNode* node)
 	mDynamicObjects.push_back(node);
 }
 
+void SceneManager::update(float elapsedSeconds) 
+{
+    for (int i = 0; i < mDynamicObjects.size(); ++i)
+    {
+        mDynamicObjects[i]->update(elapsedSeconds);
+    }
+    mRoot->update(elapsedSeconds);
+}
+
 void SceneManager::render(const glow::UsedProgram& shader, glm::mat4& projection, glm::mat4& view)
 {
     glm::vec3 camPos = this->getCamera()->getPos();

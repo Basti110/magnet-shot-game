@@ -43,3 +43,8 @@ SceneManager* Starter::getScene()
 {
     return mScene;
 }
+
+PhysicsManager* Starter::getPhysicsManager()
+{
+    return mPhysics;
+}

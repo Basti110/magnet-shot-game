@@ -11,6 +11,9 @@ Editor::Editor(MessageBus* mB, SceneManager* scene, PhysicsManager* physics) :
     mScene(scene), 
     mPhysics(physics)
 {
+    //Only test Plane 
+    physics->addPlane({0, -1, 0}, 3);
+
     glm::mat4 trans = glm::mat4(1.0f);
     trans = glm::translate(trans, glm::vec3(0.0f, 0.0f, 0.0f));
     mCube = new Cube(trans, Color{1.0f, 1.0f, 1.0f}, mPhysics);

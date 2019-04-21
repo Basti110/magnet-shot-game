@@ -19,6 +19,7 @@ public:
     MessageBus* getMessageBus();
     GuiManager* getGuiManager();
     SceneManager* getScene();
+    PhysicsManager* getPhysicsManager();
 
 private:
     // RenderSystem* mRenderSystem;

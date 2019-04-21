@@ -7,6 +7,7 @@
 #include "light.h"
 #include "node.h"
 #include "scnene_manager.h"
+#include "physics_manager.h"
 // glow OpenGL wrapper
 #include <glow/common/log.hh>
 #include <glow/common/scoped_gl.hh>
@@ -62,7 +63,7 @@ void Game::init()
 
         Node* root = new Node;
         glm::mat4 trans = glm::mat4(1.0f);
-        trans = glm::translate(trans, glm::vec3(0.0f, 4.0f, -2.0f));
+        trans = glm::translate(trans, glm::vec3(0.0f, 4.0f, -9.0f));
         Light* light = new Light(trans, Color{1.0f, 1.0f, 1.0f});
         root->addChild(light);
         root->addChild(&mFirstLevel);
@@ -75,6 +76,8 @@ void Game::init()
 void Game::update(float elapsedSeconds)
 {
     // update game in 60 Hz fixed timestep
+    mStartManager->getPhysicsManager()->update(elapsedSeconds);
+    mScene->update(elapsedSeconds);
     mStartManager->getGuiManager()->update();
     mStartManager->getIOManager()->processInput();
     mStartManager->getMessageBus()->notify();
