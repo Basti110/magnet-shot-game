@@ -2,6 +2,10 @@
 #include <btBulletDynamicsCommon.h> // bullet physics
 #include "bullet_helper.hh"
 
+#include <polymesh/Mesh.hh>
+#include <polymesh/algorithms/properties.hh>
+#include <polymesh/fields.hh>
+#include <polymesh/formats/obj.hh>
 
 PhysicsManager::PhysicsManager()
 {
@@ -10,7 +14,7 @@ PhysicsManager::PhysicsManager()
     mBulletCollisionDispatcher = new btCollisionDispatcher(mBulletCollisionConfig);
     mBulletSolver = new btSequentialImpulseConstraintSolver;
     mBulletWorld = new btDiscreteDynamicsWorld(mBulletCollisionDispatcher, mBulletBroadphase, mBulletSolver, mBulletCollisionConfig);
-    mBulletWorld->setGravity(btVector3(0, -10, 0)); // set initial gravity
+    mBulletWorld->setGravity(btVector3(0, -20, 0)); // set initial gravity
 }
 
 
@@ -83,6 +87,27 @@ int PhysicsManager::addPlane(glm::vec3 normal, float planeConstant)
     mCollisionShapes.push_back(collisionShape);
     mRigidBodies.push_back(rigidBody);
     return mMotionStates.size() - 1;
+}
+
+int PhysicsManager::addMesh(const std::string &filename)
+{
+    btTriangleMesh *triangleMesh = new btTriangleMesh();
+    pm::Mesh m;
+    pm::obj_reader<float> obj_reader(filename, m);
+    auto pos = obj_reader.get_positions().map([](std::array<float, 4> const& t) { return btVector3(t[0], t[1], t[2]); });
+
+    for (auto f : m.faces()) {
+        std::vector<btVector3> verts;
+        for (auto v : f.vertices()) {
+            verts.push_back(pos[v]);
+        }
+        triangleMesh->addTriangle(verts[0], verts[1], verts[2]);
+    }
+
+    btDefaultMotionState* motionState = new btDefaultMotionState();
+    auto trimeshShape = new btBvhTriangleMeshShape(triangleMesh, true);
+    btRigidBody* rigidBody = new btRigidBody(0, motionState, trimeshShape);
+    mBulletWorld->addRigidBody(rigidBody);
 }
 
 bool PhysicsManager::getTransformation(int index, glm::mat4& transform)
