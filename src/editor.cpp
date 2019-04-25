@@ -11,8 +11,7 @@ Editor::Editor(MessageBus* mB, SceneManager* scene, PhysicsManager* physics) :
     mScene(scene), 
     mPhysics(physics)
 {
-    //Only test Plane 
-    physics->addPlane({0, -1, 0}, 3);
+    physics->addMesh("../data/meshes/FirstRoomCollision.obj");
 
     glm::mat4 trans = glm::mat4(1.0f);
     trans = glm::translate(trans, glm::vec3(0.0f, 0.0f, 0.0f));

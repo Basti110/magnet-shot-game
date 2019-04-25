@@ -11,8 +11,6 @@ void Camera::resetPosition()
     mCameraPos = glm::vec3(-2.0f, 2.0f, 3.0f);
     mCameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
     mCameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
-    mPitch = 0;
-    mYaw = -90;
     buildTransform();
 }
 
@@ -59,8 +57,8 @@ void Camera::rotatePitch(float angleRadians)
 
 void Camera::rotateYaw(float angleRadians)
 {
-    float yawX = acos(mCameraFront.x);
-    this->rotateLocalAxis(mCameraUp, angleRadians);
+    glm::vec3 up(0, 1, 0);
+    this->rotateLocalAxis(up, angleRadians);
     /*this->yaw += angleDegree;
     this->cameraFront.x = cos(glm::radians(this->pitch)) * cos(glm::radians(this->yaw));
     this->cameraFront.y = sin(glm::radians(this->pitch));

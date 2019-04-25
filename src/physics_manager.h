@@ -1,6 +1,7 @@
 #pragma once
 #include <glm/glm.hpp>
 #include <vector>
+#include <string>
 
 class btCollisionShape;
 class btRigidBody;
@@ -29,6 +30,7 @@ public:
 
     int addCube(const glm::vec3& shape, const glm::mat4& transform, const RigidBodyInfo& info);
     int addPlane(glm::vec3 normal, float planeConstant);
+    int addMesh(const std::string &filename);
 
     bool getTransformation(int index, glm::mat4& transform);
     int pickBody(const glm::vec3& rayFromWorld, const glm::vec3& rayToWorld);

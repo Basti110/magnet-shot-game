@@ -28,8 +28,6 @@ private:
     glm::vec3 mCameraPos;
     glm::vec3 mCameraFront;
     glm::vec3 mCameraUp;
-    float mPitch;
-    float mYaw;
 };
 
 #endif // CAMERA_H
