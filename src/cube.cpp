@@ -82,7 +82,7 @@ void Cube::update(float elapsedSeconds)
     {
         glm::mat4 transform;
         if (mPhysics->getTransformation(mPhysicsID, transform))
-            mGlobalTransformation = transform;
+            mGlobalTransformation = transform * glm::scale(glm::mat4(1), mScale);
     }
         
     AbstractNode::update(elapsedSeconds);
@@ -130,9 +130,10 @@ bool Cube::setTexture(std::string path)
     return false;
 }
 
-void Cube::addPhysics() 
+void Cube::addPhysics(glm::vec3 scale, const RigidBodyInfo& info)
 {
-    mPhysicsID = mPhysics->addCube({1, 1, 1}, 1, mGlobalTransformation);
+    mScale = scale;
+    mPhysicsID = mPhysics->addCube({scale.x / 2, scale.y / 2, scale.z / 2}, mGlobalTransformation, info);
     mIsPhysicsOn = true;
 }
 

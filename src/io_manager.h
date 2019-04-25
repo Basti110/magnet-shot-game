@@ -22,5 +22,7 @@ private:
     double mMouseLastDeltaY;
     double mMousePositionX;
     double mMousePositionY;
+
+    float mBounceF;
 };
 

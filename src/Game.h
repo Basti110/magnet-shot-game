@@ -54,4 +54,6 @@ public:
     void notifyKeyInput(KeyMessage message);
     void notifyGuiInput(Message* message);
     void setBackgroundColor(glm::vec3 color);
+
+    float mLastFrame = 0;
 };

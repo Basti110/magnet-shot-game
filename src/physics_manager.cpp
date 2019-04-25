@@ -1,7 +1,7 @@
 #include "physics_manager.h"
 #include <btBulletDynamicsCommon.h> // bullet physics
 #include "bullet_helper.hh"
-
+#include "BulletCollision/NarrowPhaseCollision/btRaycastCallback.h"
 
 PhysicsManager::PhysicsManager()
 {
@@ -47,20 +47,21 @@ void PhysicsManager::update(float elapsedSeconds)
     mBulletWorld->stepSimulation(elapsedSeconds, 10);
 }
 
-int PhysicsManager::addCube(glm::vec3 shape, float mass, const glm::mat4& transform)
+int PhysicsManager::addCube(const glm::vec3& shape, const glm::mat4& transform, const RigidBodyInfo& info)
 {
     //TODO: More Cube info
     btDefaultMotionState* motionState = new btDefaultMotionState(to_bullet(transform));
-    btCollisionShape* collisionShape = new btBoxShape(btVector3(1, 1, 1));
+    btCollisionShape* collisionShape = new btBoxShape(to_bullet(shape));
     //auto const mass = 1.0f;
     btVector3 inertia;
-    collisionShape->calculateLocalInertia(mass, inertia);
-    auto info = btRigidBody::btRigidBodyConstructionInfo(mass, motionState, collisionShape, inertia);
-    info.m_friction = 0.1f;
-    info.m_restitution = 0.0f;
-    info.m_linearDamping = 0.01f;
-    info.m_angularDamping = 0.01f;
-    btRigidBody* rigidBody = new btRigidBody(info);
+    collisionShape->calculateLocalInertia(info.mass, inertia);
+    auto btInfo = btRigidBody::btRigidBodyConstructionInfo(info.mass, motionState, collisionShape, inertia);
+    btInfo.m_friction = info.friction;
+    btInfo.m_restitution = info.restitution;
+    btInfo.m_linearDamping = info.linearDamping;
+    btInfo.m_angularDamping = info.angularDamping;
+    btRigidBody* rigidBody = new btRigidBody(btInfo);
+    rigidBody->setUserIndex(mMotionStates.size());
     mBulletWorld->addRigidBody(rigidBody);
 
     mMotionStates.push_back(motionState);
@@ -83,6 +84,34 @@ int PhysicsManager::addPlane(glm::vec3 normal, float planeConstant)
     mCollisionShapes.push_back(collisionShape);
     mRigidBodies.push_back(rigidBody);
     return mMotionStates.size() - 1;
+}
+
+int PhysicsManager::pickBody(const glm::vec3& rayFromWorld, const glm::vec3& rayToWorld)
+{
+    if (mBulletWorld == nullptr)
+        return false;
+
+    btCollisionWorld::ClosestRayResultCallback rayCallback(to_bullet(rayFromWorld), to_bullet(rayToWorld));
+
+    rayCallback.m_flags |= btTriangleRaycastCallback::kF_UseGjkConvexCastRaytest;
+    mBulletWorld->rayTest(to_bullet(rayFromWorld), to_bullet(rayToWorld), rayCallback);
+
+    if (rayCallback.hasHit())
+    {
+        btVector3 pickPos = rayCallback.m_hitPointWorld;
+        btRigidBody* body = (btRigidBody*)btRigidBody::upcast(rayCallback.m_collisionObject);
+
+        if (body)
+        {
+            // other exclusions?
+            if (!(body->isStaticObject() || body->isKinematicObject()))
+            {
+                return body->getUserIndex();
+                
+            }
+        }
+    }
+    return -1;
 }
 
 bool PhysicsManager::getTransformation(int index, glm::mat4& transform)

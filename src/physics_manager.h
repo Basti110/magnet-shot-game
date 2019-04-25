@@ -11,6 +11,14 @@ class btCollisionDispatcher;
 class btDiscreteDynamicsWorld;
 class btSequentialImpulseConstraintSolver;
 
+struct RigidBodyInfo {
+    glm::vec3 shape = glm::vec3(1);
+    float mass = 0;
+    float friction = 0;
+    float restitution = 0;
+    float linearDamping = 0;
+    float angularDamping = 0;
+};
 
 class PhysicsManager
 {
@@ -19,10 +27,11 @@ public:
     ~PhysicsManager();
     void update(float elapsedSeconds);
 
-    int addCube(glm::vec3 shape, float mass, const glm::mat4& transform);
+    int addCube(const glm::vec3& shape, const glm::mat4& transform, const RigidBodyInfo& info);
     int addPlane(glm::vec3 normal, float planeConstant);
 
     bool getTransformation(int index, glm::mat4& transform);
+    int pickBody(const glm::vec3& rayFromWorld, const glm::vec3& rayToWorld);
 
 private: // bullet physics
     btBroadphaseInterface* mBulletBroadphase = nullptr;

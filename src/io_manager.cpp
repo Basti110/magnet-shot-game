@@ -35,11 +35,19 @@ void IOManager::processInput()
     float currentFrame = glfwGetTime();
     mDeltaTime = currentFrame - mLastFrame;
     mLastFrame = currentFrame;
+    //TODO: sendMessageKey with deltaTime not speed
     float cameraSpeed = 5.0f * mDeltaTime;
     //Presss
     //Close Windows
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        sendMessageKey(GLFW_KEY_ESCAPE, GLFW_PRESS, cameraSpeed);
+    {
+        if (glfwGetTime() - mBounceF > 0.5)
+        {
+            sendMessageKey(GLFW_KEY_ESCAPE, GLFW_PRESS, cameraSpeed);
+            mBounceF = glfwGetTime();
+        }
+    }
+        
 
     //TODO: Speed dependence on FPS
     //Move Camera (Position)

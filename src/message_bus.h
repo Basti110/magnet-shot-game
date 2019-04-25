@@ -16,10 +16,16 @@ enum MType {
 };
 
 enum GuiSettings {
-    CUBE_COLOR,
     BACKGROUND_COLOR,
-    CUBE_SIZE,
     LIGHT_COLOR,
+    CUBE_COLOR,
+    CUBE_SIZE,
+    CUBE_SHAPE,
+    CUBE_MASS,
+    CUBE_FRICTION,
+    CUBE_RESTITUTION,
+    CUBE_LINEAR_DAMPING,
+    CUBE_ANGULAR_DAMPING,
 };
 
 class Message

@@ -76,11 +76,22 @@ void Game::init()
 void Game::update(float elapsedSeconds)
 {
     // update game in 60 Hz fixed timestep
+    float currentFrame = glfwGetTime();
+    float deltaTime = currentFrame - mLastFrame;
+
+    float time = glfwGetTime();
     mStartManager->getPhysicsManager()->update(elapsedSeconds);
     mScene->update(elapsedSeconds);
     mStartManager->getGuiManager()->update();
     mStartManager->getIOManager()->processInput();
     mStartManager->getMessageBus()->notify();
+    time = glfwGetTime() - time;
+    
+    if (deltaTime > 1)
+    {
+        std::cout << "Update: " << time << "ms\n";
+        mLastFrame = glfwGetTime();
+    }
 }
 
 void Game::render(float elapsedSeconds)
@@ -158,17 +169,12 @@ std::function<void(Message*)> Game::getNotifyFuncGui()
 }
 
 void Game::notifyKeyInput(KeyMessage message) {
-    if (message.getInput() == GLFW_KEY_F)
+    if (message.getInput() == GLFW_KEY_ESCAPE)
     {
-        if (glfwGetTime() - mBounceF > 1)
-        {
-            if (getCursorMode() != glow::glfw::CursorMode::Disabled)            
-                setCursorMode(glow::glfw::CursorMode::Disabled);
-            else                     
-                setCursorMode(glow::glfw::CursorMode::Normal);
-
-            mBounceF = glfwGetTime();
-        }
+        if (getCursorMode() != glow::glfw::CursorMode::Disabled)            
+            setCursorMode(glow::glfw::CursorMode::Disabled);
+        else                     
+            setCursorMode(glow::glfw::CursorMode::Normal);
     }
 }
 

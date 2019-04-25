@@ -490,19 +490,20 @@ void GlfwApp::mainLoop()
             if (timeAccum > 2.5 * dt)
             {
                 ++updatesPerFrame;
-                // glow::info() << "increasing frames per sec";
+                glow::info() << "increasing frames per sec";
             }
             else if (timeAccum < -2.5 * dt)
             {
                 if (updatesPerFrame > 0)
                     --updatesPerFrame;
-                // glow::info() << "decreasing frames per sec";
+                glow::info() << "decreasing frames per sec";
             }
 
             // frameskip
             if (timeAccum > mMaxFrameSkip * dt)
             {
                 glow::warning() << "Too many updates queued, frame skip of " << timeAccum << " secs";
+                glow::info() << renderTimestep;
                 timeAccum = mMaxFrameSkip * dt * 0.5;
             }
 

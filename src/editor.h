@@ -23,8 +23,11 @@ private:
     SceneManager* mScene;
     PhysicsManager* mPhysics;
     Cube* mCube;
+    glm::vec3 mCubeScale;
+    RigidBodyInfo mCubeInfo;
     float mBounceClick;
     float mBounceF;
     float mCubeDistance;
     bool mCursorOn;
+    
 };

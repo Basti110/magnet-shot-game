@@ -60,12 +60,13 @@ void Editor::refreshCube()
     glm::vec3 front = cam->getCameraFront();
     glm::vec3 pos = cam->getCameraPosition();
     glm::vec3 movePos = front * glm::vec3(mCubeDistance) + pos;
-    int x = (int)(movePos.x + 0.5);
-    int y = (int)(movePos.y + 0.5);
-    int z = (int)(movePos.z + 0.5);
-    glm::mat4 trans = glm::mat4(1.0f);
-    trans = glm::translate(trans, glm::vec3(x, y, z));
-    mCube->setLocalTransformation(trans);
+    float x = movePos.x; //(int)(movePos.x + 0.5);
+    float y = movePos.y; //(int)(movePos.y + 0.5);
+    float z = movePos.z; //(int)(movePos.z + 0.5);
+    glm::mat4 transform = glm::translate(glm::mat4(1.0), glm::vec3(x, y, z));
+    transform *= glm::scale(glm::mat4(1.0), mCubeScale);
+    
+    mCube->setLocalTransformation(transform);
 }
 
 void Editor::notifyMouseClickInput(MouseClickMessage message)
@@ -77,8 +78,12 @@ void Editor::notifyMouseClickInput(MouseClickMessage message)
             std::cout << "click\n";
             mBounceClick = glfwGetTime();
             Cube* newCube = new Cube(*mCube);
+            auto trans = mCube->getLocalTransformation();
+            trans -= glm::scale(glm::mat4(1.0), mCubeScale);
+            trans += glm::mat4(1.0);
+            newCube->setLocalTransformation(trans);
             mScene->appendNode(newCube);
-            newCube->addPhysics();
+            newCube->addPhysics(mCubeScale, mCubeInfo);
         }
     }
     if (message.getInput() == GLFW_MOUSE_BUTTON_MIDDLE && message.getAction() == 1000)
@@ -96,6 +101,15 @@ void Editor::notifyMouseClickInput(MouseClickMessage message)
 void Editor::notifyMouseMoveInput(MouseMoveMessage message)
 {
     refreshCube();
+    Camera* cam = mScene->getCamera();
+    glm::vec3 front = cam->getCameraFront();
+    glm::vec3 pos = cam->getCameraPosition();
+    glm::mat4 projection = mScene->getCamera()->getProjectionMatrix();
+    glm::vec4 v = glm::vec4(front.x, front.y, front.z, 1) * glm::vec4(10);
+    v = projection * v;
+    int test = mPhysics->pickBody(pos, glm::vec3(v.x, v.y, v.z));
+    if (test != -1)
+        std::cout << "Hit Object!: " << test << "\n";
 }
 
 void Editor::notifyKeyInput(KeyMessage message)
@@ -105,16 +119,12 @@ void Editor::notifyKeyInput(KeyMessage message)
     {
         refreshCube();
 
-        if (message.getInput() == GLFW_KEY_F)
+        if (message.getInput() == GLFW_KEY_ESCAPE)
         {
-            if (glfwGetTime() - mBounceF > 1)
-            {
-                if (mCursorOn == true)
-                    mCursorOn = false;
-                else
-                    mCursorOn = true;
-                mBounceF = glfwGetTime();
-            }
+            if (mCursorOn == true)
+                mCursorOn = false;
+            else
+                mCursorOn = true;
         }
     }
 }
@@ -138,6 +148,16 @@ void Editor::notifyGuiInput(Message* message)
             if (light)
                 light->setColor(m->getValue());
         }
+
+        if (m->getSetting() == GuiSettings::CUBE_SHAPE)
+        {
+            auto transformation = mCube->getLocalTransformation();
+            glm::vec3 translation = glm::vec3(transformation[3]);
+            transformation = glm::translate(glm::mat4(1.0), translation);
+            transformation *= glm::scale(glm::mat4(1.0f), m->getValue());
+            mCube->setLocalTransformation(transformation);
+            mCubeScale = m->getValue();
+        }
     }
 
     if (message->getType() == MType::GUI_FLOAT)
@@ -148,6 +168,28 @@ void Editor::notifyGuiInput(Message* message)
 
         if (m->getSetting() == GuiSettings::CUBE_SIZE)
         {
+            
+        }
+
+        if (m->getSetting() == GuiSettings::CUBE_MASS)
+        {
+            mCubeInfo.mass = m->getValue();
+        }
+        if (m->getSetting() == GuiSettings::CUBE_FRICTION)
+        {
+            mCubeInfo.friction = m->getValue(); 
+        }
+        if (m->getSetting() == GuiSettings::CUBE_RESTITUTION)
+        {
+            mCubeInfo.restitution = m->getValue(); 
+        }
+        if (m->getSetting() == GuiSettings::CUBE_LINEAR_DAMPING)
+        {
+            mCubeInfo.linearDamping = m->getValue(); 
+        }
+        if (m->getSetting() == GuiSettings::CUBE_ANGULAR_DAMPING)
+        {
+            mCubeInfo.angularDamping = m->getValue();
         }
     }
 }

@@ -24,8 +24,8 @@ void InteractionController::notifyKeyInput(KeyMessage message)
     // Close Windows
     if (message.getAction() == GLFW_PRESS)
     {
-        if (message.getInput() == GLFW_KEY_ESCAPE)
-            glfwSetWindowShouldClose(window, true);
+        /*if (message.getInput() == GLFW_KEY_ESCAPE)
+            glfwSetWindowShouldClose(window, true);*/
 
         float cameraSpeed = message.getSpeed();
         // TODO: Speed dependence on FPS
