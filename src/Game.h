@@ -1,9 +1,11 @@
 #pragma once
-
-#include <glow/fwd.hh>
-
 #include <glow-extras/camera/Camera.hh>
 #include <glow-extras/glfw/GlfwApp.hh>
+#include <glow/fwd.hh>
+#include "message_bus.h"
+#include "starter.h"
+#include "mesh_node.h"
+
 
 // bullet forward declarations
 class btCollisionShape;
@@ -17,57 +19,24 @@ class btSequentialImpulseConstraintSolver;
 
 class Game : public glow::glfw::GlfwApp
 {
-    // logic
-private:
-    glm::vec3 mSpherePosition = {2, 0, 0};
-    float mSphereSize = 1.0f;
-
-    // cube
-private:
-    /// Collision shape
-    btCollisionShape* mCubeCollisionShape = nullptr;
-    /// Physics body
-    btRigidBody* mCubeRigidBody = nullptr;
-    /// Physics motion state
-    btDefaultMotionState* mCubeMotionState = nullptr;
-    /// Cube transformation
-    glm::mat4 mCubeTransform = glm::translate(glm::vec3(-2, 3, 0)) * glm::rotate(glm::radians(45.f), normalize(glm::vec3(1, 1, 1)));
-
-    // ground plane
-private:
-    btCollisionShape* mPlaneCollisionShape = nullptr;
-    btRigidBody* mPlaneRigidBody = nullptr;
-    btDefaultMotionState* mPlaneMotionState = nullptr;
-
-private: // bullet physics
-    btBroadphaseInterface* mBulletBroadphase = nullptr;
-    btDefaultCollisionConfiguration* mBulletCollisionConfig = nullptr;
-    btCollisionDispatcher* mBulletCollisionDispatcher = nullptr;
-    btSequentialImpulseConstraintSolver* mBulletSolver = nullptr;
-    btDiscreteDynamicsWorld* mBulletWorld = nullptr;
-
     // gfx settings
 private:
     glm::vec3 mBackgroundColor = {.10f, .46f, .83f};
     bool mShowWireframe = false;
     bool mShowPostProcess = false;
+    float mBounceF = 0;
+    Starter* mStartManager;
+    SceneManager* mScene;
 
     // gfx objects
 private:
-    glow::camera::SharedCamera mCamera;
-
     // shaders
     glow::SharedProgram mShaderOutput;
     glow::SharedProgram mShaderObject;
 
     // meshes
     glow::SharedVertexArray mMeshQuad;
-    glow::SharedVertexArray mMeshCube;
-    glow::SharedVertexArray mMeshSphere;
-
-    // textures
-    glow::SharedTexture2D mTexCubeAlbedo;
-    glow::SharedTexture2D mTexCubeNormal;
+    MeshNode mFirstLevel;
 
     // intermediate framebuffer with color and depth texture
     glow::SharedFramebuffer mFramebuffer;
@@ -79,7 +48,6 @@ private:
     // ctor
 public:
     Game();
-    ~Game();
 
     // events
 public:
@@ -91,4 +59,11 @@ public:
     void onResize(int w, int h) override; // called when window is resized
 
     void updateCamera(float elapsedSeconds);
+    std::function<void(KeyMessage)> getNotifyFuncKey();
+    std::function<void(Message*)> getNotifyFuncGui();
+    void notifyKeyInput(KeyMessage message);
+    void notifyGuiInput(Message* message);
+    void setBackgroundColor(glm::vec3 color);
+
+    float mLastFrame = 0;
 };

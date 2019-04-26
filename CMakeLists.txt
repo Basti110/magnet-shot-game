@@ -90,6 +90,8 @@ endforeach()
 file(GLOB_RECURSE SOURCES
     "src/*.cc"
     "src/*.hh"
+	"src/*.cpp"
+    "src/*.h"
     "data/*.*sh"
     "data/*.glsl"
 )
