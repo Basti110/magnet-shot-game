@@ -106,7 +106,8 @@ void IOManager::processInput()
     //Mouse 
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
         sendMessageMouseClick(GLFW_MOUSE_BUTTON_LEFT, GLFW_PRESS);
-    
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
+        sendMessageMouseClick(GLFW_MOUSE_BUTTON_RIGHT, GLFW_PRESS);
 }
 
 void IOManager::sendMessageKey(int key, int action, float speed) {

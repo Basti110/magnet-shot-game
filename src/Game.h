@@ -27,15 +27,18 @@ private:
     float mBounceF = 0;
     Starter* mStartManager;
     SceneManager* mScene;
+    PhysicsManager* mPhysics;
 
     // gfx objects
 private:
     // shaders
     glow::SharedProgram mShaderOutput;
     glow::SharedProgram mShaderObject;
+    glow::SharedProgram mShaderCrosshair;
 
     // meshes
     glow::SharedVertexArray mMeshQuad;
+    glow::SharedVertexArray mCrosshair;
     MeshNode mFirstLevel;
 
     // intermediate framebuffer with color and depth texture

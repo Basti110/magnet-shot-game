@@ -21,6 +21,15 @@ struct RigidBodyInfo {
     float angularDamping = 0;
 };
 
+enum CollisionGroup
+{
+    GROUP_NONE         = 0,
+    GROUP_PLAYER       = 1 << 0,
+    GROUP_WALLS        = 1 << 1,
+    GROUP_RIGID_BODIES = 1 << 2,
+};
+
+
 class PhysicsManager
 {
 public:
@@ -33,7 +42,7 @@ public:
     int addMesh(const std::string &filename);
 
     bool getTransformation(int index, glm::mat4& transform);
-    int pickBody(const glm::vec3& rayFromWorld, const glm::vec3& rayToWorld);
+    btRigidBody* pickBody(const glm::vec3& rayFromWorld, const glm::vec3& rayToWorld);
 
 private: // bullet physics
     btBroadphaseInterface* mBulletBroadphase = nullptr;

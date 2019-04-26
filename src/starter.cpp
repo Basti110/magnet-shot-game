@@ -14,10 +14,10 @@ Starter::Starter(GLFWwindow* window)
 {
     mBusManager = new MessageBus();
     mScene = new SceneManager();
-    mInteractionController = new InteractionController(mScene, window, mBusManager);
-    mIoManager = new IOManager(window, mBusManager);
     mPhysics = new PhysicsManager();
-    mEditor = new Editor(mBusManager, mScene, mPhysics);
+    mInteractionController = new InteractionController(mBusManager, mScene, mPhysics, window);
+    mIoManager = new IOManager(window, mBusManager);
+//    mEditor = new Editor(mBusManager, mScene, mPhysics);
     mGuiManager = new GuiManager(mBusManager, window);
     std::cout << "Startup finished\n";
 }

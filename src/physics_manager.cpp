@@ -92,10 +92,10 @@ int PhysicsManager::addPlane(glm::vec3 normal, float planeConstant)
     return mMotionStates.size() - 1;
 }
 
-int PhysicsManager::pickBody(const glm::vec3& rayFromWorld, const glm::vec3& rayToWorld)
+btRigidBody* PhysicsManager::pickBody(const glm::vec3& rayFromWorld, const glm::vec3& rayToWorld)
 {
     if (mBulletWorld == nullptr)
-        return false;
+        return nullptr;
 
     btCollisionWorld::ClosestRayResultCallback rayCallback(to_bullet(rayFromWorld), to_bullet(rayToWorld));
 
@@ -112,12 +112,11 @@ int PhysicsManager::pickBody(const glm::vec3& rayFromWorld, const glm::vec3& ray
             // other exclusions?
             if (!(body->isStaticObject() || body->isKinematicObject()))
             {
-                return body->getUserIndex();
-                
+                return body;
             }
         }
     }
-    return -1;
+    return nullptr;
 }
 
 int PhysicsManager::addMesh(const std::string &filename)

@@ -4,6 +4,7 @@
 #include <glm/gtc/matrix_access.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <btBulletDynamicsCommon.h>
 #include "light.h"
 
 
@@ -11,8 +12,6 @@ Editor::Editor(MessageBus* mB, SceneManager* scene, PhysicsManager* physics) :
     mScene(scene), 
     mPhysics(physics)
 {
-    physics->addMesh("../../data/meshes/FirstRoomCollision.obj");
-
     glm::mat4 trans = glm::mat4(1.0f);
     trans = glm::translate(trans, glm::vec3(0.0f, 0.0f, 0.0f));
     mCube = new Cube(trans, Color{1.0f, 1.0f, 1.0f}, mPhysics);
@@ -106,9 +105,9 @@ void Editor::notifyMouseMoveInput(MouseMoveMessage message)
     glm::mat4 projection = mScene->getCamera()->getProjectionMatrix();
     glm::vec4 v = glm::vec4(front.x, front.y, front.z, 1) * glm::vec4(10);
     v = projection * v;
-    int test = mPhysics->pickBody(pos, glm::vec3(v.x, v.y, v.z));
-    if (test != -1)
-        std::cout << "Hit Object!: " << test << "\n";
+    btRigidBody* test = mPhysics->pickBody(pos, glm::vec3(v.x, v.y, v.z));
+    if (test != nullptr)
+        std::cout << "Hit Object!: " << test->getUserIndex() << "\n";
 }
 
 void Editor::notifyKeyInput(KeyMessage message)

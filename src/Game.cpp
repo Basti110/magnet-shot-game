@@ -8,6 +8,8 @@
 #include "node.h"
 #include "scnene_manager.h"
 #include "physics_manager.h"
+#include "cube.h"
+
 // glow OpenGL wrapper
 #include <glow/common/log.hh>
 #include <glow/common/scoped_gl.hh>
@@ -37,6 +39,7 @@ void Game::init()
     setTitle("Game Development 2019");
     mStartManager = new Starter(window());
     mScene = mStartManager->getScene();
+    mPhysics = mStartManager->getPhysicsManager();
 
     mStartManager->getMessageBus()->addKeyReceiver(this->getNotifyFuncKey());
     mStartManager->getMessageBus()->addGuiReceiver(getNotifyFuncGui());
@@ -55,11 +58,21 @@ void Game::init()
     {
 
         mMeshQuad = glow::geometry::make_quad();
-        
-         mFirstLevel.init("../../data/meshes/FirstRoom.obj", false);
+
+        auto crosshairBuffer = glow::ArrayBuffer::create();
+        crosshairBuffer->defineAttribute<glm::vec4>("aPosition");
+        crosshairBuffer->bind().setData({
+            glm::vec4(0.0f, -0.1f, 0.0f, 1.f), glm::vec4(0.0f, 0.1f, 0.0f, 1.0f),
+            glm::vec4(-0.1f, 0.0f, 0.0f, 1.f), glm::vec4(0.1f, 0.0f, 0.0f, 1.0f),
+        });
+        mCrosshair = glow::VertexArray::create(crosshairBuffer, GL_LINES);
+
+        mFirstLevel.init("../../data/meshes/FirstRoom.obj", false);
+        mPhysics->addMesh("../../data/meshes/FirstRoomCollision.obj");
 
         mShaderObject = glow::Program::createFromFile("../../data/shaders/shader_node");
         mShaderOutput = glow::Program::createFromFile("../../data/shaders/output");
+        mShaderCrosshair = glow::Program::createFromFile("../../data/shaders/crosshair");
 
         Node* root = new Node;
         glm::mat4 trans = glm::mat4(1.0f);
@@ -70,6 +83,18 @@ void Game::init()
         mStartManager->getScene()->setLight(light);
         root->createBuffer();
         mScene->setSceneRoot(root);
+
+
+        // add a bunch of cubes for testing
+        RigidBodyInfo info;
+        info.mass = 1.0;
+        for (int i = 0; i < 5; i++) {
+            glm::mat4 trans = glm::translate(glm::mat4(1.0), glm::vec3(1,i*5+5, 0));
+            Cube* newCube = new Cube(trans, Color{1.0f, 1.0f, 1.0f}, mStartManager->getPhysicsManager());
+            mScene->appendNode(newCube);
+            newCube->createBuffer();
+            newCube->addPhysics(glm::vec3(1.0f), info);
+        }
     }
 }
 
@@ -86,7 +111,7 @@ void Game::update(float elapsedSeconds)
     mStartManager->getIOManager()->processInput();
     mStartManager->getMessageBus()->notify();
     time = glfwGetTime() - time;
-    
+
     if (deltaTime > 1)
     {
         std::cout << "Update: " << time << "ms\n";
@@ -132,11 +157,20 @@ void Game::render(float elapsedSeconds)
     GLOW_SCOPED(disable, GL_DEPTH_TEST);
     //GLOW_SCOPED(disable, GL_CULL_FACE);
 
-    auto shader = mShaderOutput->use();
-    shader.setTexture("uTexColor", mTargetColor);
-    shader.setTexture("uTexDepth", mTargetDepth);
-    shader.setUniform("uShowPostProcess", mShowPostProcess);
+    auto shaderOutput = mShaderOutput->use();
+    shaderOutput.setTexture("uTexColor", mTargetColor);
+    shaderOutput.setTexture("uTexDepth", mTargetDepth);
+    shaderOutput.setUniform("uShowPostProcess", mShowPostProcess);
     mMeshQuad->bind().draw();
+
+    // draw crosshair
+    int w, h;
+    glfwGetWindowSize(window(), &w, &h);
+    const float aspectRatio = w / (float)h;
+    auto shaderCrosshair = mShaderCrosshair->use();
+    shaderCrosshair.setUniform("uAspectRatio", aspectRatio);
+    shaderCrosshair.setUniform("uScale", 0.5f);
+    mCrosshair->bind().draw();
 }
 
 // Update the GUI
@@ -171,9 +205,9 @@ std::function<void(Message*)> Game::getNotifyFuncGui()
 void Game::notifyKeyInput(KeyMessage message) {
     if (message.getInput() == GLFW_KEY_ESCAPE)
     {
-        if (getCursorMode() != glow::glfw::CursorMode::Disabled)            
+        if (getCursorMode() != glow::glfw::CursorMode::Disabled)
             setCursorMode(glow::glfw::CursorMode::Disabled);
-        else                     
+        else
             setCursorMode(glow::glfw::CursorMode::Normal);
     }
 }

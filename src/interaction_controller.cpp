@@ -1,14 +1,19 @@
 #include "interaction_controller.h"
 #include <GLFW/glfw3.h>
+#include <btBulletDynamicsCommon.h>
 #include "io_manager.h"
 
 
-InteractionController::InteractionController(SceneManager* scene, GLFWwindow* window, MessageBus* messageBus) : 
-    mWindow(window), 
-    mScene(scene), 
+InteractionController::InteractionController(MessageBus* messageBus, SceneManager* scene, PhysicsManager* physics, GLFWwindow* window) :
+    mScene(scene),
+    mPhysics(physics),
+    mWindow(window),
     mCursorOn(true)
 {
     messageBus->addKeyReceiver(this->getNotifyFuncKey());
+    messageBus->addMouseClickReceiver([=](MouseClickMessage message) {
+        this->notifyMouseClickInput(message);
+    });
     messageBus->addMouseMoveReceiver(this->getNotifyFuncMouseMove());
     // this->cam = renderer->getScene()->getCamera();
 }
@@ -72,6 +77,20 @@ void InteractionController::notifyKeyInput(KeyMessage message)
 
         // IOControl
 
+    }
+}
+
+void InteractionController::notifyMouseClickInput(MouseClickMessage message)
+{
+    if (message.getInput() == GLFW_MOUSE_BUTTON_RIGHT) {
+        Camera* cam = mScene->getCamera();
+        glm::vec3 pos = cam->getCameraPosition();
+        glm::vec3 front = cam->getCameraFront();
+        btRigidBody* body = mPhysics->pickBody(pos, pos + 200.0f*front);
+        if (body != nullptr) {
+            body->activate(true);
+            body->applyCentralImpulse(btVector3(0, 1, 0));
+        }
     }
 }
 
