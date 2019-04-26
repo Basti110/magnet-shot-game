@@ -15,7 +15,7 @@ void MeshNode::init(std::string path, bool interpolate_tangents)
     mMesh = load_mesh_from_obj(path, interpolate_tangents);
     mColorRatio = 1;
     mColor = {0.5, 0.5, 0.5};
-    mShader = glow::Program::createFromFile("../data/shaders/object_test");
+    mShader = glow::Program::createFromFile("../../data/shaders/object_test");
 }
 
 MeshNode::~MeshNode()

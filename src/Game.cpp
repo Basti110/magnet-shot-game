@@ -56,10 +56,10 @@ void Game::init()
 
         mMeshQuad = glow::geometry::make_quad();
         
-         mFirstLevel.init("../data/meshes/FirstRoom.obj", false);
+         mFirstLevel.init("../../data/meshes/FirstRoom.obj", false);
 
-        mShaderObject = glow::Program::createFromFile("../data/shaders/shader_node");
-        mShaderOutput = glow::Program::createFromFile("../data/shaders/output");
+        mShaderObject = glow::Program::createFromFile("../../data/shaders/shader_node");
+        mShaderOutput = glow::Program::createFromFile("../../data/shaders/output");
 
         Node* root = new Node;
         glm::mat4 trans = glm::mat4(1.0f);

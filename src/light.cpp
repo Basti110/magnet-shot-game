@@ -8,7 +8,7 @@ glow::SharedProgram Light::mShader = glow::SharedProgram(); // glow::Program::cr
 
 Light::Light(glm::mat4& transformation, Color color)
 {
-    mShader = glow::Program::createFromFile("../data/shaders/shader_light");
+    mShader = glow::Program::createFromFile("../../data/shaders/shader_light");
     mColor = {color.red, color.green, color.blue};
 
     mLocalTransformation = transformation;
