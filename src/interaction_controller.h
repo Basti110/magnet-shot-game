@@ -8,20 +8,13 @@ struct GLFWwindow;
 class InteractionController
 {
 public:
-    InteractionController(MessageBus* messageBus, SceneManager* scene, PhysicsManager* physics, GLFWwindow* window);
-    ~InteractionController();
+    InteractionController(MessageBus* messageBus, SceneManager* scene, GLFWwindow* window);
+    void notifyGameModeChange(GameModeMessage message);
     void notifyKeyInput(KeyMessage message);
-    void notifyMouseClickInput(MouseClickMessage message);
     void notifyMouseMoveInput(MouseMoveMessage message);
 private:
-    std::function<void(KeyMessage)> getNotifyFuncKey();
-    std::function<void(MouseMoveMessage)> getNotifyFuncMouseMove();
-    
     SceneManager* mScene;
-    PhysicsManager* mPhysics;
     GLFWwindow* mWindow;
-    bool mCursorOn;
-    float mBounceMouse;
-    float mBounceF;
+    bool mIsActive;
 };
 

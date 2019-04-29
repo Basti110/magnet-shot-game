@@ -7,17 +7,13 @@ class Editor
 {
 public:
     Editor(MessageBus* mB, SceneManager* scene, PhysicsManager* physics);
-    ~Editor();
+    void notifyGameModeChange(GameModeMessage message);
     void notifyMouseClickInput(MouseClickMessage message);
     void notifyMouseMoveInput(MouseMoveMessage message);
     void notifyKeyInput(KeyMessage message);
     void notifyGuiInput(Message* message);
 
 private:
-    std::function<void(MouseClickMessage)> getNotifyFuncMouseClick();
-    std::function<void(MouseMoveMessage)> getNotifyFuncMouseMove();
-    std::function<void(KeyMessage)> getNotifyFuncKey();
-    std::function<void(Message*)> getNotifyFuncGui();
     void refreshCube();
 
     SceneManager* mScene;
@@ -25,9 +21,6 @@ private:
     Cube* mCube;
     glm::vec3 mCubeScale;
     RigidBodyInfo mCubeInfo;
-    float mBounceClick;
-    float mBounceF;
     float mCubeDistance;
-    bool mCursorOn;
-    
+    bool mIsActive;
 };

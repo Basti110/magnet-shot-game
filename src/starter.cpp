@@ -3,6 +3,7 @@
 #include "io_manager.h"
 #include "editor.h"
 #include "interaction_controller.h"
+#include "gameplay_controller.h"
 #include "message_bus.h"
 #include "scnene_manager.h"
 #include <glad/glad.h>
@@ -15,9 +16,10 @@ Starter::Starter(GLFWwindow* window)
     mBusManager = new MessageBus();
     mScene = new SceneManager();
     mPhysics = new PhysicsManager();
-    mInteractionController = new InteractionController(mBusManager, mScene, mPhysics, window);
+    mInteractionController = new InteractionController(mBusManager, mScene, window);
+    mGameplayController = new GameplayController(mBusManager, mScene, mPhysics);
+    mEditor = new Editor(mBusManager, mScene, mPhysics);
     mIoManager = new IOManager(window, mBusManager);
-//    mEditor = new Editor(mBusManager, mScene, mPhysics);
     mGuiManager = new GuiManager(mBusManager, window);
     std::cout << "Startup finished\n";
 }

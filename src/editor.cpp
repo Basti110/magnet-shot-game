@@ -10,46 +10,32 @@
 
 Editor::Editor(MessageBus* mB, SceneManager* scene, PhysicsManager* physics) : 
     mScene(scene), 
-    mPhysics(physics)
+    mPhysics(physics),
+    mIsActive(false)
 {
     glm::mat4 trans = glm::mat4(1.0f);
     trans = glm::translate(trans, glm::vec3(0.0f, 0.0f, 0.0f));
     mCube = new Cube(trans, Color{1.0f, 1.0f, 1.0f}, mPhysics);
     mCube->createBuffer();
     mScene->appendNode(mCube);
-    mB->addMouseClickReceiver(getNotifyFuncMouseClick());
-    mB->addMouseMoveReceiver(getNotifyFuncMouseMove());
-    mB->addKeyReceiver(getNotifyFuncKey());
-    mB->addGuiReceiver(getNotifyFuncGui());
-    mBounceClick = 0;
-    mCursorOn = true;
+
+    mB->addGameModeReceiver([=](GameModeMessage message) {
+        this->notifyGameModeChange(message);
+    });
+    mB->addMouseClickReceiver([=](MouseClickMessage message) {
+        if (mIsActive) this->notifyMouseClickInput(message);
+    });
+    mB->addMouseMoveReceiver([=](MouseMoveMessage message) {
+        if (mIsActive) this->notifyMouseMoveInput(message);
+    });
+    mB->addKeyReceiver([=](KeyMessage message) {
+        if (mIsActive) this->notifyKeyInput(message);
+    });
+    mB->addGuiReceiver([=](Message* message) {
+        this->notifyGuiInput(message);
+    });
+
     mCubeDistance = 2.0;
-}
-
-Editor::~Editor() {}
-
-std::function<void(MouseClickMessage)> Editor::getNotifyFuncMouseClick()
-{
-    auto messageListener = [=](MouseClickMessage message) -> void { this->notifyMouseClickInput(message); };
-    return messageListener;
-}
-
-std::function<void(MouseMoveMessage)> Editor::getNotifyFuncMouseMove()
-{
-    auto messageListener = [=](MouseMoveMessage message) -> void { this->notifyMouseMoveInput(message); };
-    return messageListener;
-}
-
-std::function<void(KeyMessage)> Editor::getNotifyFuncKey()
-{
-    auto messageListener = [=](KeyMessage message) -> void { this->notifyKeyInput(message); };
-    return messageListener;
-}
-
-std::function<void(Message*)> Editor::getNotifyFuncGui()
-{
-    auto messageListener = [=](Message* message) -> void { this->notifyGuiInput(message); };
-    return messageListener;
 }
 
 void Editor::refreshCube()
@@ -67,22 +53,23 @@ void Editor::refreshCube()
     mCube->setLocalTransformation(transform);
 }
 
+void Editor::notifyGameModeChange(GameModeMessage message)
+{
+    mIsActive = message.mode == GameMode::Editor;
+    mCube->setVisible(mIsActive);
+}
+
 void Editor::notifyMouseClickInput(MouseClickMessage message)
 {
-    if (!mCursorOn && message.getInput() == GLFW_MOUSE_BUTTON_LEFT)
+    if (message.getInput() == GLFW_MOUSE_BUTTON_LEFT)
     {
-        if (glfwGetTime() - mBounceClick > 0.2)
-        {
-            std::cout << "click\n";
-            mBounceClick = glfwGetTime();
-            Cube* newCube = new Cube(*mCube);
-            auto trans = mCube->getLocalTransformation();
-            trans -= glm::scale(glm::mat4(1.0), mCubeScale);
-            trans += glm::mat4(1.0);
-            newCube->setLocalTransformation(trans);
-            mScene->appendNode(newCube);
-            newCube->addPhysics(mCubeScale, mCubeInfo);
-        }
+        Cube* newCube = new Cube(*mCube);
+        auto trans = mCube->getLocalTransformation();
+        trans -= glm::scale(glm::mat4(1.0), mCubeScale);
+        trans += glm::mat4(1.0);
+        newCube->setLocalTransformation(trans);
+        mScene->appendNode(newCube);
+        newCube->addPhysics(mCubeScale, mCubeInfo);
     }
     if (message.getInput() == GLFW_MOUSE_BUTTON_MIDDLE && message.getAction() == 1000)
     {
@@ -93,7 +80,6 @@ void Editor::notifyMouseClickInput(MouseClickMessage message)
             mCubeDistance = 1;
         refreshCube();
     }
-    return;
 }
 
 void Editor::notifyMouseMoveInput(MouseMoveMessage message)
@@ -116,14 +102,6 @@ void Editor::notifyKeyInput(KeyMessage message)
     if (message.getAction() == GLFW_PRESS)
     {
         refreshCube();
-
-        if (message.getInput() == GLFW_KEY_ESCAPE)
-        {
-            if (mCursorOn == true)
-                mCursorOn = false;
-            else
-                mCursorOn = true;
-        }
     }
 }
 

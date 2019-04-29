@@ -14,13 +14,12 @@ public:
     void init();
     void render();
     void update();
-    void notifyKeyInput(KeyMessage message);
+
+    void notifyGameModeChange(GameModeMessage message);
 
 private:
     void sendVec3Message(std::pair<glm::vec3, glm::vec3>& v, GuiSettings s);
     void sendFloatMessage(std::pair<float, float>& v, GuiSettings s);
-    std::function<void(KeyMessage)> getNotifyFuncKey();
-
 
     GLFWwindow* mWindow;
     MessageBus* mMessageBus;

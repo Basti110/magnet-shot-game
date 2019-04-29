@@ -7,22 +7,26 @@
 #include "bullet_helper.hh"
 
 
-InteractionController::InteractionController(MessageBus* messageBus, SceneManager* scene, PhysicsManager* physics, GLFWwindow* window) :
+InteractionController::InteractionController(MessageBus* messageBus, SceneManager* scene, GLFWwindow* window) :
     mScene(scene),
-    mPhysics(physics),
     mWindow(window),
-    mCursorOn(true)
+    mIsActive(false)
 {
-    messageBus->addKeyReceiver(this->getNotifyFuncKey());
-    messageBus->addMouseClickReceiver([=](MouseClickMessage message) {
-        this->notifyMouseClickInput(message);
+    messageBus->addGameModeReceiver([=](GameModeMessage message) {
+        this->notifyGameModeChange(message);
     });
-    messageBus->addMouseMoveReceiver(this->getNotifyFuncMouseMove());
-    // this->cam = renderer->getScene()->getCamera();
+    messageBus->addKeyReceiver([=](KeyMessage message) {
+        if (mIsActive) this->notifyKeyInput(message);
+    });
+    messageBus->addMouseMoveReceiver([=](MouseMoveMessage message) {
+        if (mIsActive) this->notifyMouseMoveInput(message);
+    });
 }
 
-
-InteractionController::~InteractionController() {}
+void InteractionController::notifyGameModeChange(GameModeMessage message)
+{
+    mIsActive = (message.mode == GameMode::Gameplay || message.mode == GameMode::Editor);
+}
 
 void InteractionController::notifyKeyInput(KeyMessage message)
 {
@@ -32,9 +36,6 @@ void InteractionController::notifyKeyInput(KeyMessage message)
     // Close Windows
     if (message.getAction() == GLFW_PRESS)
     {
-        /*if (message.getInput() == GLFW_KEY_ESCAPE)
-            glfwSetWindowShouldClose(window, true);*/
-
         float cameraSpeed = message.getSpeed();
         // TODO: Speed dependence on FPS
         // Move Camera (Position)
@@ -69,49 +70,6 @@ void InteractionController::notifyKeyInput(KeyMessage message)
         // Render Control
         if (message.getInput() == GLFW_KEY_R)
             cam->resetPosition();
-        /*if (message.getInput() == GLFW_KEY_F1)
-            renderer->setRenderMode(RenderSystem::RenderMode::NORMAL);
-        if (message.getInput() == GLFW_KEY_F2)
-            renderer->setRenderMode(RenderSystem::RenderMode::MAP_VIEW);
-        if (message.getInput() == GLFW_KEY_F3)
-            renderer->setRenderMode(RenderSystem::RenderMode::CUBE);
-        if (message.getInput() == GLFW_KEY_F4)
-            renderer->setRenderMode(RenderSystem::RenderMode::SPHERICAL);*/
-
-        // IOControl
-
-    }
-}
-
-void InteractionController::notifyMouseClickInput(MouseClickMessage message)
-{
-    if (message.getInput() == GLFW_MOUSE_BUTTON_LEFT ||
-        message.getInput() == GLFW_MOUSE_BUTTON_RIGHT)
-    {
-        Camera* cam = mScene->getCamera();
-        glm::vec3 pos = cam->getCameraPosition();
-        glm::vec3 front = cam->getCameraFront();
-        glm::vec3 isect;
-        btRigidBody* body = mPhysics->pickBody(pos, pos + 200.0f*front, isect);
-        if (body != nullptr) {
-            glm::mat4 transform = glm::mat4(1.0f);
-            transform = glm::translate(transform, isect);
-            const bool red = message.getInput() == GLFW_MOUSE_BUTTON_LEFT;
-            const glm::vec3 color = red ? glm::vec3(1,0,0) : glm::vec3(0,0,1);
-            const float scale = 0.1;
-            const int id = mPhysics->addMagnet(transform, scale, body->getUserIndex(), red);
-            mScene->appendNode(new Magnet(mPhysics, id, scale, color));
-            if (!body->isStaticObject()) {
-                body->activate();
-                body->applyCentralImpulse(3*to_bullet(front));
-            }
-        }
-    }
-    else if(message.getInput() == GLFW_MOUSE_BUTTON_MIDDLE) {
-        mScene->removeNode([](AbstractNode* node) {
-            return dynamic_cast<Magnet*>(node) != nullptr;
-        });
-        mPhysics->clearMagnets();
     }
 }
 
@@ -125,16 +83,4 @@ void InteractionController::notifyMouseMoveInput(MouseMoveMessage message)
         cam->rotateYaw(-message.getDeltaPosition().x * speed);
         cam->rotatePitch(-message.getDeltaPosition().y * speed);
     }
-}
-
-std::function<void(KeyMessage)> InteractionController::getNotifyFuncKey()
-{
-    auto messageListener = [=](KeyMessage message) -> void { this->notifyKeyInput(message); };
-    return messageListener;
-}
-
-std::function<void(MouseMoveMessage)> InteractionController::getNotifyFuncMouseMove()
-{
-    auto messageListener = [=](MouseMoveMessage message) -> void { this->notifyMouseMoveInput(message); };
-    return messageListener;
 }

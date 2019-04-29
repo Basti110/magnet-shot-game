@@ -12,6 +12,7 @@ public:
     virtual void deleteBuffer() override;
     virtual void render(const glow::UsedProgram& shader, glm::mat4& model, glm::mat4& view) override;
     virtual void update(float elapsedSeconds) override;
+    void setVisible(bool value);
     void setColorRatio(float ratio);
     void setColor(glm::vec3 color);
     bool setTexture(std::string path);
@@ -28,6 +29,7 @@ private:
     int mPhysicsID;
     unsigned int mTexture;
     std::vector<float> mVertices;
+    bool mIsVisible;
     float mColorRatio;
     glm::vec3 mColor;
     glm::vec3 mScale;

@@ -1,5 +1,6 @@
 #pragma once
 class InteractionController;
+class GameplayController;
 class GuiManager;
 // class RenderSystem;
 class IOManager;
@@ -24,6 +25,7 @@ public:
 private:
     // RenderSystem* mRenderSystem;
     InteractionController* mInteractionController;
+    GameplayController* mGameplayController;
     GuiManager* mGuiManager;
     SceneManager* mScene;
     IOManager* mIoManager;

@@ -15,6 +15,7 @@ Cube::Cube(glm::mat4& transformation, Color color, PhysicsManager* physics) : mP
     mLocalTransformation = transformation;
     mGlobalTransformation = transformation;
 
+    mIsVisible = true;
     mColorRatio = 1;
     mColor = {color.red, color.green, color.blue};
     std::vector<float> colorVec = {color.red, color.green, color.blue};
@@ -63,6 +64,8 @@ void Cube::deleteBuffer()
 
 void Cube::render(const glow::UsedProgram& shader, glm::mat4& projection, glm::mat4& view)
 {
+    if (!mIsVisible) return;
+
     AbstractNode::render(shader, projection, view);
     if (this->isInit)
     {
@@ -86,6 +89,11 @@ void Cube::update(float elapsedSeconds)
     }
         
     AbstractNode::update(elapsedSeconds);
+}
+
+void Cube::setVisible(bool value)
+{
+    mIsVisible = value;
 }
 
 void Cube::setColorRatio(float ratio)

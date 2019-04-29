@@ -41,8 +41,14 @@ void Game::init()
     mScene = mStartManager->getScene();
     mPhysics = mStartManager->getPhysicsManager();
 
-    mStartManager->getMessageBus()->addKeyReceiver(this->getNotifyFuncKey());
+    mStartManager->getMessageBus()->addGameModeReceiver([=](GameModeMessage message) {
+        this->notifyGameModeChange(message);
+    });
     mStartManager->getMessageBus()->addGuiReceiver(getNotifyFuncGui());
+
+    GameModeMessage m(GameMode::Gameplay);
+    mStartManager->getMessageBus()->sendMessage(&m);
+    setCursorMode(glow::glfw::CursorMode::Disabled);
 
     {
         Camera* cam = new Camera();
@@ -190,11 +196,6 @@ void Game::onResize(int w, int h)
 
 void Game::updateCamera(float elapsedSeconds) {}
 
-std::function<void(KeyMessage)> Game::getNotifyFuncKey()
-{
-    auto messageListener = [=](KeyMessage message) -> void { this->notifyKeyInput(message); };
-    return messageListener;
-}
 
 std::function<void(Message*)> Game::getNotifyFuncGui()
 {
@@ -202,13 +203,13 @@ std::function<void(Message*)> Game::getNotifyFuncGui()
     return messageListener;
 }
 
-void Game::notifyKeyInput(KeyMessage message) {
-    if (message.getInput() == GLFW_KEY_ESCAPE)
-    {
-        if (getCursorMode() != glow::glfw::CursorMode::Disabled)
-            setCursorMode(glow::glfw::CursorMode::Disabled);
-        else
-            setCursorMode(glow::glfw::CursorMode::Normal);
+void Game::notifyGameModeChange(GameModeMessage message)
+{
+    if (message.mode == GameMode::Menu) {
+        setCursorMode(glow::glfw::CursorMode::Normal);
+    }
+    else {
+        setCursorMode(glow::glfw::CursorMode::Disabled);
     }
 }
 

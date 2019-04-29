@@ -64,7 +64,7 @@ public:
     void updateCamera(float elapsedSeconds);
     std::function<void(KeyMessage)> getNotifyFuncKey();
     std::function<void(Message*)> getNotifyFuncGui();
-    void notifyKeyInput(KeyMessage message);
+    void notifyGameModeChange(GameModeMessage message);
     void notifyGuiInput(Message* message);
     void setBackgroundColor(glm::vec3 color);
 

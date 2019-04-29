@@ -8,7 +8,9 @@ GuiManager::GuiManager(MessageBus* messageBus, GLFWwindow* window) :
     mMessageBus(messageBus),
     mWindow(window)
 {
-    messageBus->addKeyReceiver(getNotifyFuncKey());
+    messageBus->addGameModeReceiver([=](GameModeMessage message) {
+        this->notifyGameModeChange(message);
+    });
 
     //Common Settings
 
@@ -188,18 +190,9 @@ void GuiManager::update()
     
 }
 
-void GuiManager::notifyKeyInput(KeyMessage message) 
+void GuiManager::notifyGameModeChange(GameModeMessage message)
 {
-    if (message.getAction() == GLFW_PRESS)
-    {
-        if (message.getInput() == GLFW_KEY_ESCAPE)
-        {
-            if (mGuiOn)
-                mGuiOn = false;
-            else
-                mGuiOn = true;
-        }
-    }
+    mGuiOn = message.mode == GameMode::Menu;
 }
 
 void GuiManager::sendVec3Message(std::pair<glm::vec3, glm::vec3>& v, GuiSettings s) {
@@ -212,10 +205,4 @@ void GuiManager::sendFloatMessage(std::pair<float, float>& v, GuiSettings s) {
     GuiFloatMessage m(v.first, s);
     mMessageBus->sendMessage(&m);
     v.second = v.first;
-}
-
-std::function<void(KeyMessage)> GuiManager::getNotifyFuncKey()
-{
-    auto messageListener = [=](KeyMessage message) -> void { this->notifyKeyInput(message); };
-    return messageListener;
 }

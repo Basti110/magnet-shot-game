@@ -24,6 +24,9 @@ IOManager::IOManager(GLFWwindow* window, MessageBus* messageBus) :
     mMouseLastDeltaY = 0;
     glfwSetScrollCallback(window, scroll_callback);
 
+    mPrevGameMode = GameMode::Gameplay;
+    mCurrGameMode = GameMode::Gameplay;
+    mPrevEscKeyState = GLFW_RELEASE;
     mPrevLeftButtonState = GLFW_RELEASE;
     mPrevRightButtonState = GLFW_RELEASE;
     mPrevMiddleButtonState = GLFW_RELEASE;
@@ -41,17 +44,6 @@ void IOManager::processInput()
     mLastFrame = currentFrame;
     //TODO: sendMessageKey with deltaTime not speed
     float cameraSpeed = 5.0f * mDeltaTime;
-    //Presss
-    //Close Windows
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-    {
-        if (glfwGetTime() - mBounceF > 0.5)
-        {
-            sendMessageKey(GLFW_KEY_ESCAPE, GLFW_PRESS, cameraSpeed);
-            mBounceF = glfwGetTime();
-        }
-    }
-        
 
     //TODO: Speed dependence on FPS
     //Move Camera (Position)
@@ -82,21 +74,38 @@ void IOManager::processInput()
     if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
         sendMessageKey(GLFW_KEY_E, GLFW_PRESS, cameraSpeed);
 
-    //Render Control
+    // Render Control
     if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
         sendMessageKey(GLFW_KEY_R, GLFW_PRESS, cameraSpeed);
-    if (glfwGetKey(window, GLFW_KEY_F1) == GLFW_PRESS)
-        sendMessageKey(GLFW_KEY_F1, GLFW_PRESS, cameraSpeed);
-    if (glfwGetKey(window, GLFW_KEY_F2) == GLFW_PRESS)
-        sendMessageKey(GLFW_KEY_F2, GLFW_PRESS, cameraSpeed);
-    if (glfwGetKey(window, GLFW_KEY_F3) == GLFW_PRESS)
-        sendMessageKey(GLFW_KEY_F3, GLFW_PRESS, cameraSpeed);
-    if (glfwGetKey(window, GLFW_KEY_F4) == GLFW_PRESS)
-        sendMessageKey(GLFW_KEY_F4, GLFW_PRESS, cameraSpeed);
-    if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS)
-        sendMessageKey(GLFW_KEY_F, GLFW_PRESS, cameraSpeed);
 
+    // Switch GameMode
+    if (glfwGetKey(window, GLFW_KEY_F1) == GLFW_PRESS) {
+        sendMessageGameMode(GameMode::Gameplay);
+        mPrevGameMode = mCurrGameMode;
+        mCurrGameMode = GameMode::Gameplay;
+    }
+    if (glfwGetKey(window, GLFW_KEY_F2) == GLFW_PRESS) {
+        sendMessageGameMode(GameMode::Editor);
+        mPrevGameMode = mCurrGameMode;
+        mCurrGameMode = GameMode::Editor;
+    }
 
+    // Toggle menu
+    const int escKeyState = glfwGetKey(window, GLFW_KEY_ESCAPE);
+    if (escKeyState == GLFW_RELEASE && mPrevEscKeyState == GLFW_PRESS) {
+        if (mCurrGameMode == GameMode::Menu) {
+            sendMessageGameMode(mPrevGameMode);
+            mCurrGameMode = mPrevGameMode;
+        }
+        else {
+            sendMessageGameMode(GameMode::Menu);
+            mPrevGameMode = mCurrGameMode;
+            mCurrGameMode = GameMode::Menu;
+        }
+    }
+    mPrevEscKeyState = escKeyState;
+
+    // Mouse movement
     auto lastMouseX = mMousePositionX;
     auto lastMouseY = mMousePositionY;
 
@@ -123,6 +132,11 @@ void IOManager::processInput()
     mPrevLeftButtonState = leftButtonState;
     mPrevRightButtonState = rightButtonState;
     mPrevMiddleButtonState = middleButtonState;
+}
+
+void IOManager::sendMessageGameMode(GameMode mode) {
+	GameModeMessage m(mode);
+	this->messageBus->sendMessage(&m);
 }
 
 void IOManager::sendMessageKey(int key, int action, float speed) {

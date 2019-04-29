@@ -6,6 +6,7 @@
 #include <glm/glm.hpp>
 
 enum MType {
+    M_GAME_MODE,
     M_KEY,
     M_MOUSE_CLICK,
     M_MOUSE_MOVE,
@@ -28,11 +29,14 @@ enum GuiSettings {
     CUBE_ANGULAR_DAMPING,
 };
 
+enum class GameMode {
+    Menu,
+    Gameplay,
+    Editor
+};
+
 class Message
 {
-    public:
-
-
     public:
         Message() {}
         virtual ~Message();
@@ -42,6 +46,16 @@ class Message
         }
     protected:
         enum MType type;
+};
+
+class GameModeMessage: public Message
+{
+public:
+    GameModeMessage(GameMode m) : mode(m)
+    {
+        this->type = M_GAME_MODE;
+    }
+    const GameMode mode;
 };
 
 class KeyMessage: public Message
@@ -188,6 +202,12 @@ class MessageBus
     public:
         MessageBus();
         ~MessageBus();
+
+        void addGameModeReceiver(std::function<void(GameModeMessage)> messageReceiver)
+        {
+            this->gameModeReceiver.push_back(messageReceiver);
+        }
+
         void addKeyReceiver(std::function<void(KeyMessage)> messageReceiver)
         {
             this->keyReceiver.push_back(messageReceiver);
@@ -210,7 +230,13 @@ class MessageBus
 
         void sendMessage(Message* message)
         {
-            //Store KeyMessages
+            if (message->getType() == MType::M_GAME_MODE) {
+                GameModeMessage* gameModeMessage = dynamic_cast<GameModeMessage*>(message);
+                if (!gameModeMessage)
+                    return; //TODO: Error
+                gameModeMessage = new GameModeMessage(*gameModeMessage);
+                this->gameModeMessages.push(gameModeMessage);
+            }
             if (message->getType() == MType::M_KEY) {
                 KeyMessage* keyMessage = dynamic_cast<KeyMessage*>(message);
                 if (!keyMessage)
@@ -250,7 +276,15 @@ class MessageBus
 
         void notify()
         {
-            //Send KeyMessages
+            while (!gameModeMessages.empty()) {
+                for (auto iter = gameModeReceiver.begin(); iter != gameModeReceiver.end(); iter++) {
+                    (*iter)(GameModeMessage(*gameModeMessages.front()));
+                }
+                GameModeMessage* m = gameModeMessages.front();
+                gameModeMessages.pop();
+                delete m;
+            }
+
             while (!keyMessages.empty()) {
                 for (auto iter = keyReceiver.begin(); iter != keyReceiver.end(); iter++) {
                     (*iter)(KeyMessage(*keyMessages.front()));
@@ -289,12 +323,14 @@ class MessageBus
         }
 
         private:
+            std::vector<std::function<void(GameModeMessage)>> gameModeReceiver;
             std::vector<std::function<void(KeyMessage)>> keyReceiver;
-			std::vector<std::function<void(MouseClickMessage)>> mouseClickReceiver;
+            std::vector<std::function<void(MouseClickMessage)>> mouseClickReceiver;
             std::vector<std::function<void(MouseMoveMessage)>> mouseMoveReceiver; 
             std::vector<std::function<void(Message*)>> guiReceiver;
+            std::queue<GameModeMessage*> gameModeMessages;
             std::queue<KeyMessage*> keyMessages;
-			std::queue<MouseClickMessage*> mouseClickMessages;
+            std::queue<MouseClickMessage*> mouseClickMessages;
             std::queue<MouseMoveMessage*> mouseMoveMessages;
             std::queue<Message*> guiMessages;
 

@@ -3,6 +3,9 @@
 //#include <GLFW/glfw3.h>
 struct GLFWwindow;
 class MessageBus;
+enum class GameMode;
+
+
 class IOManager
 {
 public:
@@ -10,6 +13,7 @@ public:
     ~IOManager();
     void processInput();
 private:
+    void sendMessageGameMode(GameMode mode);
     void sendMessageKey(int key, int action, float speed);
     void sendMessageMouseMove();
     void sendMessageMouseClick(int input, int action);
@@ -23,7 +27,9 @@ private:
     double mMousePositionX;
     double mMousePositionY;
 
-    float mBounceF;
+    GameMode mPrevGameMode;
+    GameMode mCurrGameMode;
+    int mPrevEscKeyState;
     int mPrevLeftButtonState;
     int mPrevRightButtonState;
     int mPrevMiddleButtonState;
