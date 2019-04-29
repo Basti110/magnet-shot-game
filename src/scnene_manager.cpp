@@ -1,6 +1,5 @@
 #include "scnene_manager.h"
-//#include "abstract_node.h"
-
+#include <algorithm>
 
 
 SceneManager::SceneManager()
@@ -56,6 +55,14 @@ void SceneManager::setLight(Light * light)
 void SceneManager::appendNode(AbstractNode* node)
 {
 	mDynamicObjects.push_back(node);
+}
+
+void SceneManager::removeNode(std::function<bool(AbstractNode*)> predicate)
+{
+    auto invertedPredicate = std::not1(predicate);
+    auto firstToRemove = std::stable_partition(mDynamicObjects.begin(), mDynamicObjects.end(), invertedPredicate);
+    std::for_each(firstToRemove, mDynamicObjects.end(), [](AbstractNode* n){ delete n; });
+    mDynamicObjects.erase(firstToRemove, mDynamicObjects.end());
 }
 
 void SceneManager::update(float elapsedSeconds) 

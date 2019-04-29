@@ -15,7 +15,7 @@ class AbstractNode
 {
 public:
     AbstractNode();
-    ~AbstractNode();
+    virtual ~AbstractNode();
     void addChild(AbstractNode* child);
     void removeChild(AbstractNode* child);
     void isAddedTo(AbstractNode* parent);

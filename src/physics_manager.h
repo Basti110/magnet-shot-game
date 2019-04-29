@@ -11,8 +11,19 @@ class btDefaultCollisionConfiguration;
 class btCollisionDispatcher;
 class btDiscreteDynamicsWorld;
 class btSequentialImpulseConstraintSolver;
+class btTypedConstraint;
 
-struct RigidBodyInfo {
+
+enum CollisionGroup
+{
+    GROUP_NONE            = 0,
+    GROUP_PLAYER          = 1,
+    GROUP_STATIC_OBJECTS  = 1 << 1,
+    GROUP_DYNAMIC_OBJECTS = 1 << 2,
+};
+
+struct RigidBodyInfo
+{
     glm::vec3 shape = glm::vec3(1);
     float mass = 0;
     float friction = 0;
@@ -21,38 +32,42 @@ struct RigidBodyInfo {
     float angularDamping = 0;
 };
 
-enum CollisionGroup
-{
-    GROUP_NONE         = 0,
-    GROUP_PLAYER       = 1 << 0,
-    GROUP_WALLS        = 1 << 1,
-    GROUP_RIGID_BODIES = 1 << 2,
-};
-
-
 class PhysicsManager
 {
 public:
     PhysicsManager();
     ~PhysicsManager();
+
     void update(float elapsedSeconds);
 
-    int addCube(const glm::vec3& shape, const glm::mat4& transform, const RigidBodyInfo& info);
     int addPlane(glm::vec3 normal, float planeConstant);
+    int addCube(const glm::vec3& shape, const glm::mat4& transform, const RigidBodyInfo& info);
     int addMesh(const std::string &filename);
+    int addMagnet(const glm::mat4& transform, float radius, int parent, bool red);
 
-    bool getTransformation(int index, glm::mat4& transform);
+    void clearMagnets();
+
     btRigidBody* pickBody(const glm::vec3& rayFromWorld, const glm::vec3& rayToWorld);
+    btRigidBody* pickBody(const glm::vec3& rayFromWorld, const glm::vec3& rayToWorld, glm::vec3& isect);
 
-private: // bullet physics
+    bool getTransformation(int idx, glm::mat4& transform);
+
+private:
+    int addRigidBody(btRigidBody* body, short group = GROUP_NONE, short mask = GROUP_NONE);
+    void removeRigidBody(btRigidBody* body);
+    void removeRigidBody(int idx);
+
+private:
     btBroadphaseInterface* mBulletBroadphase = nullptr;
     btDefaultCollisionConfiguration* mBulletCollisionConfig = nullptr;
     btCollisionDispatcher* mBulletCollisionDispatcher = nullptr;
     btSequentialImpulseConstraintSolver* mBulletSolver = nullptr;
     btDiscreteDynamicsWorld* mBulletWorld = nullptr;
 
-    std::vector<btCollisionShape*> mCollisionShapes;
     std::vector<btRigidBody*> mRigidBodies;
-    std::vector<btDefaultMotionState*> mMotionStates;
+
+    std::vector<btRigidBody*> mRedMagnets;
+    std::vector<btRigidBody*> mBlueMagnets;
+    std::vector<btTypedConstraint*> mMagnetConstraints;
 };
 

@@ -23,6 +23,10 @@ IOManager::IOManager(GLFWwindow* window, MessageBus* messageBus) :
     mMouseLastDeltaX = 0;
     mMouseLastDeltaY = 0;
     glfwSetScrollCallback(window, scroll_callback);
+
+    mPrevLeftButtonState = GLFW_RELEASE;
+    mPrevRightButtonState = GLFW_RELEASE;
+    mPrevMiddleButtonState = GLFW_RELEASE;
 }
 
 
@@ -103,11 +107,22 @@ void IOManager::processInput()
 
     sendMessageMouseMove();
 
-    //Mouse 
-    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+    // Mouse buttons
+    const int leftButtonState = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT);
+    const int rightButtonState = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT);
+    const int middleButtonState = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE);
+    if (leftButtonState == GLFW_RELEASE && mPrevLeftButtonState == GLFW_PRESS) {
         sendMessageMouseClick(GLFW_MOUSE_BUTTON_LEFT, GLFW_PRESS);
-    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
+    }
+    if (rightButtonState == GLFW_RELEASE && mPrevRightButtonState == GLFW_PRESS) {
         sendMessageMouseClick(GLFW_MOUSE_BUTTON_RIGHT, GLFW_PRESS);
+    }
+    if (middleButtonState == GLFW_RELEASE && mPrevMiddleButtonState == GLFW_PRESS) {
+        sendMessageMouseClick(GLFW_MOUSE_BUTTON_MIDDLE, GLFW_PRESS);
+    }
+    mPrevLeftButtonState = leftButtonState;
+    mPrevRightButtonState = rightButtonState;
+    mPrevMiddleButtonState = middleButtonState;
 }
 
 void IOManager::sendMessageKey(int key, int action, float speed) {

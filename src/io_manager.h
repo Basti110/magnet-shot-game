@@ -24,5 +24,8 @@ private:
     double mMousePositionY;
 
     float mBounceF;
+    int mPrevLeftButtonState;
+    int mPrevRightButtonState;
+    int mPrevMiddleButtonState;
 };
 
