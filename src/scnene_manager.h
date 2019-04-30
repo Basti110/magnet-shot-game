@@ -3,6 +3,7 @@
 #include "camera.h"
 #include "light.h"
 #include <glow/objects/Program.hh>
+#include <functional>
 //class Camera;
 
 class SceneManager
