@@ -1,6 +1,7 @@
 #include "interaction_controller.h"
 
 #include "Cube.h"
+#include "bullet_helper.hh"
 #include "magnet.h"
 #include "physics_manager.h"
 
@@ -10,41 +11,39 @@
 #include <GLFW/glfw3.h>
 #include <glm/gtc/matrix_transform.hpp>
 
-InteractionController::InteractionController(MessageBus* messageBus, SceneManager* scene, GLFWwindow* window, PhysicsManager* physics) :
-    mScene(scene),
-    mWindow(window),
-    mIsActive(false), 
-    mPhysics(physics)
+InteractionController::InteractionController(MessageBus* messageBus, SceneManager* scene, GLFWwindow* window, PhysicsManager* physics)
+  : mScene(scene), mWindow(window), mGameMode(GameMode::Gameplay), mPhysics(physics)
 {
-    messageBus->addGameModeReceiver([=](GameModeMessage message) {
-        this->notifyGameModeChange(message);
-    });
+    messageBus->addGameModeReceiver([=](GameModeMessage message) { this->notifyGameModeChange(message); });
     messageBus->addKeyReceiver([=](KeyMessage message) {
-        if (mIsActive) this->notifyKeyInput(message);
+        if (mGameMode == GameMode::Editor || mGameMode == GameMode::Gameplay)
+            this->notifyKeyInput(message);
     });
     messageBus->addMouseMoveReceiver([=](MouseMoveMessage message) {
-        if (mIsActive) this->notifyMouseMoveInput(message);
+        if (mGameMode == GameMode::Editor || mGameMode == GameMode::Gameplay)
+            this->notifyMouseMoveInput(message);
     });
 
     RigidBodyInfo info;
     info.mass = 70.0;
     info.friction = 0.5;
- 
+
     glm::mat4 trans = glm::translate(glm::mat4(1.0), glm::vec3(-3.0f, 2.0f, 0.0f));
     mCube = new Cube(trans, Color{1.0f, 1.0f, 1.0f}, mPhysics);
+
     mScene->appendNode(mCube);
     mCube->addPhysics(glm::vec3(1.0f), info);
     mCube->addChild(mScene->getCamera());
 
-    
+
     trans = glm::translate(glm::mat4(1.0), glm::vec3(0.0f, 2.0f, 0.0f));
     mCubeX = new Cube(trans, Color{1.0f, 1.0f, 1.0f}, mPhysics);
-    //mCube->addChild(mCubeX);
+    // mCube->addChild(mCubeX);
 }
 
 void InteractionController::notifyGameModeChange(GameModeMessage message)
 {
-    mIsActive = (message.mode == GameMode::Gameplay || message.mode == GameMode::Editor);
+    mGameMode = message.mode;
 }
 
 void InteractionController::notifyKeyInput(KeyMessage message)
@@ -55,40 +54,89 @@ void InteractionController::notifyKeyInput(KeyMessage message)
     // Close Windows
     if (message.getAction() == GLFW_PRESS)
     {
+        btRigidBody* body = mPhysics->getRigidBody(mCube->getPhysicsID());
+        body->activate(true);
+        // body->activate(true);
+        glm::mat3 rotation = glm::mat3(cam->getGlobalTransformation());
         float cameraSpeed = message.getSpeed();
         // TODO: Speed dependence on FPS
         // Move Camera (Position)
+        // body->setWorldTransform
+        glm::mat4 trans = glm::translate(mCube->getGlobalTransformation(), glm::vec3(0.0f, 0.0f, -0.1f));
 
-        if (message.getInput() == GLFW_KEY_W)
-            cam->moveFront(cameraSpeed);
-        if (message.getInput() == GLFW_KEY_S)
-            cam->moveFront(-cameraSpeed);
-        if (message.getInput() == GLFW_KEY_A)
-            cam->moveRight(-cameraSpeed);
-        if (message.getInput() == GLFW_KEY_D)
-            cam->moveRight(cameraSpeed);
-        if (message.getInput() == GLFW_KEY_LEFT_SHIFT)
-            cam->moveUp(-cameraSpeed);
-        if (message.getInput() == GLFW_KEY_SPACE)
-            cam->moveUp(cameraSpeed);
+        if (mGameMode == GameMode::Editor)
+        {
+            if (message.getInput() == GLFW_KEY_W)
+                cam->moveFront(cameraSpeed);
+            if (message.getInput() == GLFW_KEY_S)
+                cam->moveFront(-cameraSpeed);
+            if (message.getInput() == GLFW_KEY_A)
+                cam->moveRight(-cameraSpeed);
+            if (message.getInput() == GLFW_KEY_D)
+                cam->moveRight(cameraSpeed);
+            if (message.getInput() == GLFW_KEY_LEFT_SHIFT)
+                cam->moveUp(-cameraSpeed);
+            if (message.getInput() == GLFW_KEY_SPACE)
+                cam->moveUp(cameraSpeed);
 
-        // Move Camera (Rotation)
-        if (message.getInput() == GLFW_KEY_LEFT)
-            cam->rotateYaw(cameraSpeed / 2);
-        if (message.getInput() == GLFW_KEY_UP)
-            cam->rotatePitch(-cameraSpeed / 2);
-        if (message.getInput() == GLFW_KEY_RIGHT)
-            cam->rotateYaw(-cameraSpeed / 2);
-        if (message.getInput() == GLFW_KEY_DOWN)
-            cam->rotatePitch(cameraSpeed / 2);
-        if (message.getInput() == GLFW_KEY_Q)
-            cam->rotateRoll(-cameraSpeed / 2);
-        if (message.getInput() == GLFW_KEY_E)
-            cam->rotateRoll(cameraSpeed / 2);
+            // body->a
+
+            // Move Camera (Rotation)
+            if (message.getInput() == GLFW_KEY_LEFT)
+                cam->rotateYaw(cameraSpeed / 2);
+            if (message.getInput() == GLFW_KEY_UP)
+                cam->rotatePitch(-cameraSpeed / 2);
+            if (message.getInput() == GLFW_KEY_RIGHT)
+                cam->rotateYaw(-cameraSpeed / 2);
+            if (message.getInput() == GLFW_KEY_DOWN)
+                cam->rotatePitch(cameraSpeed / 2);
+            if (message.getInput() == GLFW_KEY_Q)
+                cam->rotateRoll(-cameraSpeed / 2);
+            if (message.getInput() == GLFW_KEY_E)
+                cam->rotateRoll(cameraSpeed / 2);
+        }
+        else if (mGameMode == GameMode::Gameplay)
+        {
+            if (message.getInput() == GLFW_KEY_W)
+                // body->setWorldTransform(to_bullet(trans));
+                body->applyCentralForce(to_bullet(rotation * glm::vec3(0, 0, -800)));
+            if (message.getInput() == GLFW_KEY_S)
+                body->applyCentralForce(to_bullet(rotation * glm::vec3(0, 0, 800)));
+            if (message.getInput() == GLFW_KEY_A)
+                body->applyCentralForce(to_bullet(rotation * glm::vec3(-800, 0, 0)));
+            if (message.getInput() == GLFW_KEY_D)
+                body->applyCentralForce(to_bullet(rotation * glm::vec3(800, 0, 0)));
+            if (message.getInput() == GLFW_KEY_LEFT_SHIFT)
+                cam->moveUp(-cameraSpeed);
+            if (message.getInput() == GLFW_KEY_SPACE)
+                body->applyCentralImpulse({0, 800, 0});
+            // body->a
+
+            // Move Camera (Rotation)
+            if (message.getInput() == GLFW_KEY_LEFT)
+                body->applyTorque({0, 200, 0});
+            if (message.getInput() == GLFW_KEY_RIGHT)
+                body->applyTorque({0, -200, 0});
+        }
+
 
         // Render Control
         if (message.getInput() == GLFW_KEY_R)
             cam->resetPosition();
+
+        if (message.getInput() == GLFW_KEY_F8)
+        {
+            if (this->lineOn)
+            {
+                glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+                this->lineOn = false;
+            }
+            else
+            {
+                glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+                this->lineOn = true;
+            }
+        }
     }
 }
 
@@ -97,9 +145,15 @@ void InteractionController::notifyMouseMoveInput(MouseMoveMessage message)
     Camera* cam = mScene->getCamera();
     float speed = 0.002;
     int mode = glfwGetInputMode(mWindow, GLFW_CURSOR);
-    if (mode == GLFW_CURSOR_DISABLED)
+    if (mGameMode == GameMode::Editor)
     {
         cam->rotateYaw(-message.getDeltaPosition().x * speed);
         cam->rotatePitch(-message.getDeltaPosition().y * speed);
     }
+    else if (mGameMode == GameMode::Gameplay)
+    {
+        btRigidBody* body = mPhysics->getRigidBody(mCube->getPhysicsID());
+        body->applyTorque({0, -message.getDeltaPosition().x * 2, 0});
+    }
+
 }

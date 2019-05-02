@@ -49,6 +49,7 @@ public:
 
     btRigidBody* pickBody(const glm::vec3& rayFromWorld, const glm::vec3& rayToWorld);
     btRigidBody* pickBody(const glm::vec3& rayFromWorld, const glm::vec3& rayToWorld, glm::vec3& isect);
+    btRigidBody* getRigidBody(int id);
 
     bool getTransformation(int idx, glm::mat4& transform);
 

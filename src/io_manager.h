@@ -29,6 +29,8 @@ private:
 
     GameMode mPrevGameMode;
     GameMode mCurrGameMode;
+    int mPrevF8KeyState;
+    int mPrevSpaceKeyState;
     int mPrevEscKeyState;
     int mPrevLeftButtonState;
     int mPrevRightButtonState;

@@ -12,12 +12,7 @@ void Camera::resetPosition()
     mCameraPos = glm::vec3(0.0f, 2.0f, 2.0f);
     mCameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
     mCameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
-    //buildTransform();
-    //glm::mat4 t = glm::lookAt(mCameraPos, mCameraPos + mCameraFront, mCameraUp);
-    //AbstractNode::setLocalTransformation(t);
-    glm::mat4 trans = glm::translate(glm::mat4(1.0), glm::vec3(0.0f, 2.0f, 0.0f));
-    mLocalTransformation = trans;
-    mGlobalTransformation = trans;
+    buildTransform();
 }
 
 void Camera::rotateLocalAxis(glm::vec3 angle, float speed)
@@ -86,6 +81,10 @@ void Camera::buildTransform()
 {
     glm::mat4 t = glm::lookAt(mCameraPos, mCameraPos + mCameraFront, mCameraUp);
     AbstractNode::setLocalTransformation(glm::inverse(t));
+    //mCameraPos = glm::vec3(mGlobalTransformation[3]);
+    /*glm::mat3 model = glm::mat3(mGlobalTransformation);
+    mCameraFront = model * glm::vec3(0.0f, 0.0f, -1.0f);
+    mCameraUp = model * glm::vec3(0.0f, 1.0f, 0.0f);*/
 }
 
 glm::mat4 Camera::getViewMatrix()
@@ -95,12 +94,12 @@ glm::mat4 Camera::getViewMatrix()
 
 glm::vec3 Camera::getCameraFront()
 {
-    return mCameraFront;
+    return glm::mat3(mGlobalTransformation) * glm::vec3(0.0f, 0.0f, -1.0f);
 }
 
 glm::vec3 Camera::getCameraPosition()
 {
-    return mCameraPos;
+    return glm::vec3(mGlobalTransformation[3]);
 }
 
 glm::mat4 Camera::getProjectionMatrix()
@@ -117,8 +116,8 @@ void Camera::setViewportSize(int w, int h)
 void Camera::setLocalTransformation(glm::mat4 transformation)
 {
     //AbstractNode::setLocalTransformation(transformation);
-    mCameraPos = glm::vec3(mGlobalTransformation[3]);
-    glm::mat3 model = glm::mat3(mGlobalTransformation);
+    mCameraPos = glm::vec3(transformation[3]);
+    glm::mat3 model = glm::mat3(transformation);
     mCameraFront = model * glm::vec3(0.0f, 0.0f, -1.0f);
     mCameraUp = model * glm::vec3(0.0f, 1.0f, 0.0f);
     buildTransform();

@@ -57,8 +57,18 @@ void IOManager::processInput()
         sendMessageKey(GLFW_KEY_D, GLFW_PRESS, cameraSpeed);
     if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
         sendMessageKey(GLFW_KEY_LEFT_SHIFT, GLFW_PRESS, cameraSpeed);
-    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-        sendMessageKey(GLFW_KEY_SPACE, GLFW_PRESS, cameraSpeed);
+    if (mCurrGameMode == GameMode::Editor)
+    {
+        if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+            sendMessageKey(GLFW_KEY_SPACE, GLFW_PRESS, cameraSpeed);
+    }
+    else if (mCurrGameMode == GameMode::Gameplay)
+    {
+        const int spaceKeyState = glfwGetKey(window, GLFW_KEY_SPACE);
+        if (spaceKeyState == GLFW_RELEASE && mPrevSpaceKeyState == GLFW_PRESS)
+            sendMessageKey(GLFW_KEY_SPACE, GLFW_PRESS, cameraSpeed);
+        mPrevSpaceKeyState = glfwGetKey(window, GLFW_KEY_SPACE);
+    }
 
     //Move Camera (Rotation)
     if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
@@ -89,6 +99,11 @@ void IOManager::processInput()
         mPrevGameMode = mCurrGameMode;
         mCurrGameMode = GameMode::Editor;
     }
+
+    const int F8KeyState = glfwGetKey(window, GLFW_KEY_F8);
+    if (F8KeyState == GLFW_RELEASE && mPrevF8KeyState == GLFW_PRESS)
+        sendMessageKey(GLFW_KEY_F8, GLFW_PRESS, cameraSpeed);
+    mPrevF8KeyState = glfwGetKey(window, GLFW_KEY_F8);
 
     // Toggle menu
     const int escKeyState = glfwGetKey(window, GLFW_KEY_ESCAPE);

@@ -17,6 +17,7 @@ public:
     void setColor(glm::vec3 color);
     bool setTexture(std::string path);
     void addPhysics(glm::vec3 shape, const RigidBodyInfo& info);
+    int getPhysicsID();
 
 private:
     void setVertices();
@@ -26,7 +27,7 @@ private:
     static unsigned int VAO;
 
     bool mIsPhysicsOn = false;
-    int mPhysicsID;
+    int mPhysicsID = -1;
     unsigned int mTexture;
     std::vector<float> mVertices;
     bool mIsVisible;

@@ -144,6 +144,11 @@ void Cube::addPhysics(glm::vec3 scale, const RigidBodyInfo& info)
     mIsPhysicsOn = true;
 }
 
+int Cube::getPhysicsID()
+{
+    return mPhysicsID;
+}
+
 void Cube::setVertices()
 {
     this->mVertices = {

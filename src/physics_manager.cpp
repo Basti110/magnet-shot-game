@@ -181,6 +181,13 @@ btRigidBody* PhysicsManager::pickBody(const glm::vec3& rayFromWorld, const glm::
     return nullptr;
 }
 
+btRigidBody* PhysicsManager::getRigidBody(int id)
+{
+    if (id < 0 || id > mRigidBodies.size())
+        return nullptr;
+    return mRigidBodies[id];
+}
+
 bool PhysicsManager::getTransformation(int idx, glm::mat4& transform)
 {
     if (idx < 0 || (size_t)idx >= mRigidBodies.size() || !mRigidBodies[idx]) {

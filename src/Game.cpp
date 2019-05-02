@@ -141,7 +141,7 @@ void Game::render(float elapsedSeconds)
         GLOW_SCOPED(enable, GL_DEPTH_TEST);
         //GLOW_SCOPED(enable, GL_CULL_FACE);
 
-        GLOW_SCOPED(polygonMode, GL_FILL);
+        //GLOW_SCOPED(polygonMode, GL_FILL);
 
 
         GLOW_SCOPED(clearColor, mBackgroundColor);
@@ -163,6 +163,7 @@ void Game::render(float elapsedSeconds)
     GLOW_SCOPED(disable, GL_DEPTH_TEST);
     //GLOW_SCOPED(disable, GL_CULL_FACE);
 
+    GLOW_SCOPED(polygonMode, GL_FILL);
     auto shaderOutput = mShaderOutput->use();
     shaderOutput.setTexture("uTexColor", mTargetColor);
     shaderOutput.setTexture("uTexDepth", mTargetDepth);
