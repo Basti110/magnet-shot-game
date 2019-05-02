@@ -76,7 +76,6 @@ void Cube::render(const glow::UsedProgram& shader, glm::mat4& projection, glm::m
         glBindVertexArray(this->VAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
     }
-    
 }
 
 void Cube::update(float elapsedSeconds) 
@@ -85,7 +84,7 @@ void Cube::update(float elapsedSeconds)
     {
         glm::mat4 transform;
         if (mPhysics->getTransformation(mPhysicsID, transform))
-            mGlobalTransformation = transform * glm::scale(glm::mat4(1), mScale);
+            setGlobalTransformation(transform* glm::scale(glm::mat4(1), mScale));
     }
         
     AbstractNode::update(elapsedSeconds);

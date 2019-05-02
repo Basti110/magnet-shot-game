@@ -20,6 +20,9 @@ public:
     glm::mat4 getViewMatrix();
     void setViewportSize(int w, int h);
 
+    void setLocalTransformation(glm::mat4 transformation) override;
+    void render(const glow::UsedProgram& shader, glm::mat4& projection, glm::mat4& view) override;
+
 
 private:
     void buildTransform();

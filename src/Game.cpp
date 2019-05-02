@@ -51,8 +51,8 @@ void Game::init()
     setCursorMode(glow::glfw::CursorMode::Disabled);
 
     {
-        Camera* cam = new Camera();
-        mScene->setCamera(cam);
+        //Camera* cam = new Camera();
+        //mScene->setCamera(cam);
 
         // create framebuffer (16bit color + 32bit depth)
         // size is 1x1 for now and is changed onResize

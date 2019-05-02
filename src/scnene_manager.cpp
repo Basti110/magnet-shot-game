@@ -7,6 +7,7 @@ SceneManager::SceneManager()
 	//this->root.createBuffer();
 	mRoot = new Node();
     mLight = nullptr;
+    mViewCamera = new Camera();
 }
 
 

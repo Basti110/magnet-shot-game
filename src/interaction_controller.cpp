@@ -1,16 +1,20 @@
 #include "interaction_controller.h"
-#include <GLFW/glfw3.h>
-#include <glm/gtc/matrix_transform.hpp>
-#include <btBulletDynamicsCommon.h>
-#include "io_manager.h"
+
+#include "Cube.h"
 #include "magnet.h"
+#include "physics_manager.h"
+
+#include <btBulletDynamicsCommon.h>
 #include "bullet_helper.hh"
 
+#include <GLFW/glfw3.h>
+#include <glm/gtc/matrix_transform.hpp>
 
-InteractionController::InteractionController(MessageBus* messageBus, SceneManager* scene, GLFWwindow* window) :
+InteractionController::InteractionController(MessageBus* messageBus, SceneManager* scene, GLFWwindow* window, PhysicsManager* physics) :
     mScene(scene),
     mWindow(window),
-    mIsActive(false)
+    mIsActive(false), 
+    mPhysics(physics)
 {
     messageBus->addGameModeReceiver([=](GameModeMessage message) {
         this->notifyGameModeChange(message);
@@ -21,6 +25,21 @@ InteractionController::InteractionController(MessageBus* messageBus, SceneManage
     messageBus->addMouseMoveReceiver([=](MouseMoveMessage message) {
         if (mIsActive) this->notifyMouseMoveInput(message);
     });
+
+    RigidBodyInfo info;
+    info.mass = 70.0;
+    info.friction = 0.5;
+ 
+    glm::mat4 trans = glm::translate(glm::mat4(1.0), glm::vec3(-3.0f, 2.0f, 0.0f));
+    mCube = new Cube(trans, Color{1.0f, 1.0f, 1.0f}, mPhysics);
+    mScene->appendNode(mCube);
+    mCube->addPhysics(glm::vec3(1.0f), info);
+    mCube->addChild(mScene->getCamera());
+
+    
+    trans = glm::translate(glm::mat4(1.0), glm::vec3(0.0f, 2.0f, 0.0f));
+    mCubeX = new Cube(trans, Color{1.0f, 1.0f, 1.0f}, mPhysics);
+    //mCube->addChild(mCubeX);
 }
 
 void InteractionController::notifyGameModeChange(GameModeMessage message)

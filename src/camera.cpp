@@ -1,6 +1,7 @@
 #include "camera.h"
 #include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
+#include <glm/gtc/matrix_inverse.hpp>
 Camera::Camera()
 {
     resetPosition();
@@ -8,10 +9,15 @@ Camera::Camera()
 
 void Camera::resetPosition()
 {
-    mCameraPos = glm::vec3(-2.0f, 2.0f, 3.0f);
+    mCameraPos = glm::vec3(0.0f, 2.0f, 2.0f);
     mCameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
     mCameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
-    buildTransform();
+    //buildTransform();
+    //glm::mat4 t = glm::lookAt(mCameraPos, mCameraPos + mCameraFront, mCameraUp);
+    //AbstractNode::setLocalTransformation(t);
+    glm::mat4 trans = glm::translate(glm::mat4(1.0), glm::vec3(0.0f, 2.0f, 0.0f));
+    mLocalTransformation = trans;
+    mGlobalTransformation = trans;
 }
 
 void Camera::rotateLocalAxis(glm::vec3 angle, float speed)
@@ -79,12 +85,12 @@ void Camera::rotateRoll(float angleRadians)
 void Camera::buildTransform()
 {
     glm::mat4 t = glm::lookAt(mCameraPos, mCameraPos + mCameraFront, mCameraUp);
-    this->setLocalTransformation(t);
+    AbstractNode::setLocalTransformation(glm::inverse(t));
 }
 
 glm::mat4 Camera::getViewMatrix()
 {
-    return mGlobalTransformation;
+    return glm::inverse(mGlobalTransformation);
 }
 
 glm::vec3 Camera::getCameraFront()
@@ -106,4 +112,19 @@ void Camera::setViewportSize(int w, int h)
 {
     glm::mat4 projection = glm::mat4(1.0f);
     mProjectionMatrix = glm::perspective(glm::radians(90.0f), (float)w / (float)h, 0.1f, 100.0f);
+}
+
+void Camera::setLocalTransformation(glm::mat4 transformation)
+{
+    //AbstractNode::setLocalTransformation(transformation);
+    mCameraPos = glm::vec3(mGlobalTransformation[3]);
+    glm::mat3 model = glm::mat3(mGlobalTransformation);
+    mCameraFront = model * glm::vec3(0.0f, 0.0f, -1.0f);
+    mCameraUp = model * glm::vec3(0.0f, 1.0f, 0.0f);
+    buildTransform();
+}
+
+void Camera::render(const glow::UsedProgram& shader, glm::mat4& projection, glm::mat4& view)
+{
+    AbstractNode::render(shader, projection, view);
 }

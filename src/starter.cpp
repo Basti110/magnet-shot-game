@@ -16,7 +16,7 @@ Starter::Starter(GLFWwindow* window)
     mBusManager = new MessageBus();
     mScene = new SceneManager();
     mPhysics = new PhysicsManager();
-    mInteractionController = new InteractionController(mBusManager, mScene, window);
+    mInteractionController = new InteractionController(mBusManager, mScene, window, mPhysics);
     mGameplayController = new GameplayController(mBusManager, mScene, mPhysics);
     mEditor = new Editor(mBusManager, mScene, mPhysics);
     mIoManager = new IOManager(window, mBusManager);

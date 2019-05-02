@@ -24,16 +24,17 @@ public:
     AbstractNode* getChild(unsigned int index);
     glm::vec3 getPos();
 
-    void setLocalTransformation(glm::mat4 matrix);
     const glm::mat4& getLocalTransformation();
     const glm::mat4& getGlobalTransformation();
 
     virtual void createBuffer();
+    virtual void setLocalTransformation(glm::mat4 matrix);
     virtual void deleteBuffer();
     virtual void render(const glow::UsedProgram& shader, glm::mat4& projection, glm::mat4& view);
     virtual void update(float elapsedSeconds);
 
 protected:
+    virtual void setGlobalTransformation(glm::mat4 matrix);
     vector<AbstractNode*> mChilds;
     AbstractNode* mParent;
     glm::mat4 mGlobalTransformation;

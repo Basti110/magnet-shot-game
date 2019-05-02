@@ -1,5 +1,6 @@
 #include "abstract_node.h"
 #include <glm/gtc/matrix_access.hpp>
+#include <glm/gtc/matrix_inverse.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
 AbstractNode::AbstractNode() : mParent(nullptr)
@@ -65,6 +66,10 @@ void AbstractNode::updateGlobalTransformation()
     {
         mGlobalTransformation = mLocalTransformation;
     }
+    for (std::vector<AbstractNode*>::iterator it = mChilds.begin(); it != mChilds.end(); ++it)
+    {
+        (*it)->updateGlobalTransformation();
+    }
 }
 
 const glm::mat4& AbstractNode::getLocalTransformation()
@@ -91,6 +96,16 @@ void AbstractNode::update(float elapsedSeconds)
     {
         (*it)->update(elapsedSeconds);
     }
+}
+
+void AbstractNode::setGlobalTransformation(glm::mat4 matrix) 
+{
+    glm::mat4 local;
+    if (!mParent)
+        local = matrix;
+    else
+        local = glm::inverse(mParent->getGlobalTransformation()) * matrix;
+    setLocalTransformation(local);
 }
 
 void AbstractNode::createBuffer()
