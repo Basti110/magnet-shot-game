@@ -44,6 +44,7 @@ public:
     int addCube(const glm::vec3& shape, const glm::mat4& transform, const RigidBodyInfo& info);
     int addMesh(const std::string &filename);
     int addMagnet(const glm::mat4& transform, float radius, int parent, bool red);
+    int addConstraint(btTypedConstraint* constraint);
 
     void clearMagnets();
 
@@ -66,6 +67,7 @@ private:
     btDiscreteDynamicsWorld* mBulletWorld = nullptr;
 
     std::vector<btRigidBody*> mRigidBodies;
+    std::vector<btTypedConstraint*> mConstraints;
 
     std::vector<btRigidBody*> mRedMagnets;
     std::vector<btRigidBody*> mBlueMagnets;

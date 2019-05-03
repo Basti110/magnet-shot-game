@@ -6,6 +6,7 @@
 #include "physics_manager.h"
 
 #include <btBulletDynamicsCommon.h>
+#include <BulletDynamics/Character/btCharacterControllerInterface.h>
 #include "bullet_helper.hh"
 
 #include <GLFW/glfw3.h>
@@ -28,6 +29,7 @@ InteractionController::InteractionController(MessageBus* messageBus, SceneManage
     info.mass = 70.0;
     info.friction = 0.5;
 
+    //auto controller = new btKinematik
     glm::mat4 trans = glm::translate(glm::mat4(1.0), glm::vec3(-3.0f, 2.0f, 0.0f));
     mCube = new Cube(trans, Color{1.0f, 1.0f, 1.0f}, mPhysics);
 
@@ -35,10 +37,20 @@ InteractionController::InteractionController(MessageBus* messageBus, SceneManage
     mCube->addPhysics(glm::vec3(1.0f), info);
     mCube->addChild(mScene->getCamera());
 
+    btRigidBody* body = mPhysics->getRigidBody(mCube->getPhysicsID());
+    bool useLinearReferenceFrameA = true;
+    btTransform frameInB;
+    frameInB = btTransform::getIdentity();
+    frameInB.setOrigin(btVector3(0., 0., 0.));
+    mConstraint = new btGeneric6DofConstraint(*body, frameInB, useLinearReferenceFrameA);
+    mConstraint->setLinearLowerLimit(btVector3(-50, -50, -50));
+    mConstraint->setLinearUpperLimit(btVector3(50, 50, 50));
+    mConstraint->setAngularLowerLimit(btVector3(0, 0, 0));
+    mConstraint->setAngularUpperLimit(btVector3(0, 0, 0));
+    physics->addConstraint(mConstraint);
 
     trans = glm::translate(glm::mat4(1.0), glm::vec3(0.0f, 2.0f, 0.0f));
     mCubeX = new Cube(trans, Color{1.0f, 1.0f, 1.0f}, mPhysics);
-    // mCube->addChild(mCubeX);
 }
 
 void InteractionController::notifyGameModeChange(GameModeMessage message)
@@ -50,11 +62,15 @@ void InteractionController::notifyKeyInput(KeyMessage message)
 {
     GLFWwindow* window = mWindow;
     Camera* cam = mScene->getCamera();
+    
 
     // Close Windows
     if (message.getAction() == GLFW_PRESS)
     {
+
+
         btRigidBody* body = mPhysics->getRigidBody(mCube->getPhysicsID());
+        //body->setAngularFactor(0.0);
         body->activate(true);
         // body->activate(true);
         glm::mat3 rotation = glm::mat3(cam->getGlobalTransformation());
@@ -109,6 +125,7 @@ void InteractionController::notifyKeyInput(KeyMessage message)
             if (message.getInput() == GLFW_KEY_LEFT_SHIFT)
                 cam->moveUp(-cameraSpeed);
             if (message.getInput() == GLFW_KEY_SPACE)
+                //mConstraint->setAngularOnly(true);
                 body->applyCentralImpulse({0, 800, 0});
             // body->a
 
@@ -145,15 +162,15 @@ void InteractionController::notifyMouseMoveInput(MouseMoveMessage message)
     Camera* cam = mScene->getCamera();
     float speed = 0.002;
     int mode = glfwGetInputMode(mWindow, GLFW_CURSOR);
-    if (mGameMode == GameMode::Editor)
+    if (mGameMode == GameMode::Editor || mGameMode == GameMode::Gameplay)
     {
         cam->rotateYaw(-message.getDeltaPosition().x * speed);
         cam->rotatePitch(-message.getDeltaPosition().y * speed);
     }
-    else if (mGameMode == GameMode::Gameplay)
+    /*else if (mGameMode == GameMode::Gameplay)
     {
         btRigidBody* body = mPhysics->getRigidBody(mCube->getPhysicsID());
         body->applyTorque({0, -message.getDeltaPosition().x * 2, 0});
-    }
+    }*/
 
 }

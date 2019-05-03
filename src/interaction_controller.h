@@ -4,6 +4,7 @@
 #include "physics_manager.h"
 #include "scnene_manager.h"
 struct GLFWwindow;
+class btGeneric6DofConstraint;
 class Cube;
 
 class InteractionController
@@ -15,6 +16,7 @@ public:
     void notifyMouseMoveInput(MouseMoveMessage message);
 
 private:
+    btGeneric6DofConstraint* mConstraint;
     SceneManager* mScene;
     GLFWwindow* mWindow;
     PhysicsManager* mPhysics;

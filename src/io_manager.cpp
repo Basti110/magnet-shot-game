@@ -30,6 +30,7 @@ IOManager::IOManager(GLFWwindow* window, MessageBus* messageBus) :
     mPrevLeftButtonState = GLFW_RELEASE;
     mPrevRightButtonState = GLFW_RELEASE;
     mPrevMiddleButtonState = GLFW_RELEASE;
+    mPrevSpaceKeyState = GLFW_RELEASE;
 }
 
 
@@ -65,9 +66,13 @@ void IOManager::processInput()
     else if (mCurrGameMode == GameMode::Gameplay)
     {
         const int spaceKeyState = glfwGetKey(window, GLFW_KEY_SPACE);
-        if (spaceKeyState == GLFW_RELEASE && mPrevSpaceKeyState == GLFW_PRESS)
+        if (spaceKeyState == GLFW_PRESS && mPrevSpaceKeyState == GLFW_RELEASE)
+        {
             sendMessageKey(GLFW_KEY_SPACE, GLFW_PRESS, cameraSpeed);
-        mPrevSpaceKeyState = glfwGetKey(window, GLFW_KEY_SPACE);
+            mPrevSpaceKeyState = spaceKeyState;
+        }
+        if (spaceKeyState == GLFW_RELEASE && mPrevSpaceKeyState == GLFW_PRESS)
+            mPrevSpaceKeyState = GLFW_RELEASE;
     }
 
     //Move Camera (Rotation)

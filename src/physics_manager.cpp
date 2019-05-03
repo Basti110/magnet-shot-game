@@ -130,6 +130,13 @@ int PhysicsManager::addMagnet(const glm::mat4& transform, float radius, int pare
     return addRigidBody(magnetRigidBody, GROUP_NONE, GROUP_NONE);
 }
 
+int PhysicsManager::addConstraint(btTypedConstraint* constraint)
+{
+    mConstraints.push_back(constraint);
+    mBulletWorld->addConstraint(constraint);
+    return mConstraints.size() - 1;
+}
+
 void PhysicsManager::clearMagnets()
 {
     for (auto c : mMagnetConstraints) {
@@ -204,6 +211,7 @@ int PhysicsManager::addRigidBody(btRigidBody* body, short group, short mask)
 {
     body->setUserIndex(mRigidBodies.size());
     mBulletWorld->addRigidBody(body, group, mask);
+    //mBulletWorld->addRigidBody(body);
     mRigidBodies.push_back(body);
     return mRigidBodies.size() - 1;
 }
