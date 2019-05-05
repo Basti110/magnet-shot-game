@@ -64,6 +64,7 @@ void Game::init()
     {
 
         mMeshQuad = glow::geometry::make_quad();
+        mSkybox = glow::geometry::make_uv_sphere();
 
         auto crosshairBuffer = glow::ArrayBuffer::create();
         crosshairBuffer->defineAttribute<glm::vec4>("aPosition");
@@ -78,6 +79,7 @@ void Game::init()
 
         mShaderObject = glow::Program::createFromFile("../../data/shaders/shader_node");
         mShaderOutput = glow::Program::createFromFile("../../data/shaders/output");
+        mShaderSkybox = glow::Program::createFromFile("../../data/shaders/skybox");
         mShaderCrosshair = glow::Program::createFromFile("../../data/shaders/crosshair");
 
         Node* root = new Node;
@@ -131,6 +133,7 @@ void Game::render(float elapsedSeconds)
 
     // camera update here because it should be coupled tightly to rendering!
     updateCamera(elapsedSeconds);
+
     // TODO: Add window size to parameter
     int SCR_WIDTH = 1080;
     int SCR_HEIGHT = 800;
@@ -144,20 +147,26 @@ void Game::render(float elapsedSeconds)
         //GLOW_SCOPED(polygonMode, GL_FILL);
 
 
-        GLOW_SCOPED(clearColor, mBackgroundColor);
+        GLOW_SCOPED(clearColor, mBackgroundColor1);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        glm::mat4 view = mScene->getCamera()->getViewMatrix();
+        glm::mat4 projection = mScene->getCamera()->getProjectionMatrix();
         {
             auto shader = mShaderObject->use();
-            glm::mat4 view = mScene->getCamera()->getViewMatrix();
-
-            // TODO: Add rojection matrix to Camera class
-            glm::mat4 projection = mScene->getCamera()->getProjectionMatrix();
-
             shader.setUniform("projection", projection);
             shader.setUniform("view", view);
             mScene->render(shader, projection, view);
         }
+
+        // draw skybox
+        view = glm::mat4(glm::mat3(view));
+        GLOW_SCOPED(depthFunc, GL_LEQUAL);
+        auto shaderSkybox = mShaderSkybox->use();
+        shaderSkybox.setUniform("uTransform", projection * view);
+        shaderSkybox.setUniform("uColor1", mBackgroundColor1);
+        shaderSkybox.setUniform("uColor2", mBackgroundColor2);
+        mSkybox->bind().draw();
     }
 
     GLOW_SCOPED(disable, GL_DEPTH_TEST);
@@ -223,13 +232,12 @@ void Game::notifyGuiInput(Message* message)
     if (m == nullptr)
         return;
 
-    if (m->getSetting() == GuiSettings::BACKGROUND_COLOR)
+    if (m->getSetting() == GuiSettings::BACKGROUND_COLOR1)
     {
-        setBackgroundColor(m->getValue());
+        mBackgroundColor1 = glm::vec4(m->getValue(), 1.0f);
     }
-}
-
-void Game::setBackgroundColor(glm::vec3 color)
-{
-    mBackgroundColor = color;
+    if (m->getSetting() == GuiSettings::BACKGROUND_COLOR2)
+    {
+        mBackgroundColor2 = glm::vec4(m->getValue(), 1.0f);
+    }
 }

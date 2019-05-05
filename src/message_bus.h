@@ -17,7 +17,8 @@ enum MType {
 };
 
 enum GuiSettings {
-    BACKGROUND_COLOR,
+    BACKGROUND_COLOR1,
+    BACKGROUND_COLOR2,
     LIGHT_COLOR,
     CUBE_COLOR,
     CUBE_SIZE,

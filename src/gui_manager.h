@@ -27,7 +27,8 @@ private:
     bool mGuiOn = true;
     std::pair<float, float> mCubeSize;
     std::pair<glm::vec3, glm::vec3> mCubeColor;
-    std::pair<glm::vec3, glm::vec3> mBackgroundColor;
+    std::pair<glm::vec3, glm::vec3> mBackgroundColor1;
+    std::pair<glm::vec3, glm::vec3> mBackgroundColor2;
     std::pair<glm::vec3, glm::vec3> mLightColor;
 
     //------------------------------------------------
