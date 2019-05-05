@@ -1,6 +1,6 @@
 #include "interaction_controller.h"
 
-#include "Cube.h"
+#include "cube.h"
 #include "bullet_helper.hh"
 #include "magnet.h"
 #include "physics_manager.h"
