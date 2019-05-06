@@ -14,10 +14,12 @@ GuiManager::GuiManager(MessageBus* messageBus, GLFWwindow* window) :
 
     //Common Settings
 
-    mBackgroundColor.first = glm::vec3(0.2, 0.6, 0.7);
+    mBackgroundColor1.first = glm::vec3(  9/255.0,  65/255.0, 152/255.0);
+    mBackgroundColor2.first = glm::vec3(102/255.0, 169/255.0, 222/255.0);
     mLightColor.first = glm::vec3(1.0);
     
-    sendVec3Message(mBackgroundColor, GuiSettings::BACKGROUND_COLOR);
+    sendVec3Message(mBackgroundColor1, GuiSettings::BACKGROUND_COLOR1);
+    sendVec3Message(mBackgroundColor2, GuiSettings::BACKGROUND_COLOR2);
     sendVec3Message(mLightColor, GuiSettings::LIGHT_COLOR);
     
     //Cube Settings
@@ -73,7 +75,8 @@ void GuiManager::render()
         {
             ImGui::SliderFloat("Cube Size", &mCubeSize.first, 0.0f, 10.0f);
             ImGui::ColorEdit3("Cube Color", &mCubeColor.first.r);
-            ImGui::ColorEdit3("Background Color", &mBackgroundColor.first.r);
+            ImGui::ColorEdit3("Background Color 1", &mBackgroundColor1.first.r);
+            ImGui::ColorEdit3("Background Color 2", &mBackgroundColor2.first.r);
             ImGui::ColorEdit3("Light Color", &mLightColor.first.r);
         }
     }
@@ -156,10 +159,10 @@ void GuiManager::update()
     if (mCubeColor.first != mCubeColor.second)
         sendVec3Message(mCubeColor, GuiSettings::CUBE_COLOR);
   
-     
-    if (mBackgroundColor.first != mBackgroundColor.second)
-        sendVec3Message(mBackgroundColor, GuiSettings::BACKGROUND_COLOR);
-
+    if (mBackgroundColor1.first != mBackgroundColor1.second)
+        sendVec3Message(mBackgroundColor1, GuiSettings::BACKGROUND_COLOR1);
+    if (mBackgroundColor2.first != mBackgroundColor2.second)
+        sendVec3Message(mBackgroundColor2, GuiSettings::BACKGROUND_COLOR2);
 
     if (mCubeSize.first != mCubeSize.second)
         sendFloatMessage(mCubeSize, GuiSettings::CUBE_SIZE);

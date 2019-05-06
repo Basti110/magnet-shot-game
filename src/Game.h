@@ -21,7 +21,8 @@ class Game : public glow::glfw::GlfwApp
 {
     // gfx settings
 private:
-    glm::vec3 mBackgroundColor = {.10f, .46f, .83f};
+    glm::vec4 mBackgroundColor1;
+    glm::vec4 mBackgroundColor2;
     bool mShowWireframe = false;
     bool mShowPostProcess = false;
     float mBounceF = 0;
@@ -34,10 +35,12 @@ private:
     // shaders
     glow::SharedProgram mShaderOutput;
     glow::SharedProgram mShaderObject;
+    glow::SharedProgram mShaderSkybox;
     glow::SharedProgram mShaderCrosshair;
 
     // meshes
     glow::SharedVertexArray mMeshQuad;
+    glow::SharedVertexArray mSkybox;
     glow::SharedVertexArray mCrosshair;
     MeshNode mFirstLevel;
 
@@ -66,7 +69,6 @@ public:
     std::function<void(Message*)> getNotifyFuncGui();
     void notifyGameModeChange(GameModeMessage message);
     void notifyGuiInput(Message* message);
-    void setBackgroundColor(glm::vec3 color);
 
     float mLastFrame = 0;
 };
