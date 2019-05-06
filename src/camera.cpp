@@ -9,7 +9,7 @@ Camera::Camera()
 
 void Camera::resetPosition()
 {
-    mCameraPos = glm::vec3(0.0f, 2.0f, 0.0f);
+    mCameraPos = glm::vec3(0.0f, 1.0f, 0.0f);
     mCameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
     mCameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
     buildTransform();

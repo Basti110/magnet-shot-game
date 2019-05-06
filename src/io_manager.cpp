@@ -49,13 +49,53 @@ void IOManager::processInput()
     //TODO: Speed dependence on FPS
     //Move Camera (Position)
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+    {
+        mPressW = true;
         sendMessageKey(GLFW_KEY_W, GLFW_PRESS, cameraSpeed);
+    }
+        
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+    {
+        mPressS = true;
         sendMessageKey(GLFW_KEY_S, GLFW_PRESS, cameraSpeed);
+    }
+        
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+    {
+        mPressA = true;
         sendMessageKey(GLFW_KEY_A, GLFW_PRESS, cameraSpeed);
+    }
+        
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+    {
+        mPressD = true;
         sendMessageKey(GLFW_KEY_D, GLFW_PRESS, cameraSpeed);
+    }
+       
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_RELEASE && mPressW)
+    {
+        sendMessageKey(GLFW_KEY_W, GLFW_RELEASE, cameraSpeed);
+        mPressW = false;
+    }
+        
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_RELEASE && mPressS)
+    {
+        sendMessageKey(GLFW_KEY_S, GLFW_RELEASE, cameraSpeed);
+        mPressS = false;
+    }
+        
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_RELEASE && mPressA)
+    {
+        sendMessageKey(GLFW_KEY_A, GLFW_RELEASE, cameraSpeed);
+        mPressA = false;
+    }
+        
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_RELEASE && mPressD)
+    {
+        sendMessageKey(GLFW_KEY_D, GLFW_RELEASE, cameraSpeed);
+        mPressD = false;
+    }
+        
     if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
         sendMessageKey(GLFW_KEY_LEFT_SHIFT, GLFW_PRESS, cameraSpeed);
     if (mCurrGameMode == GameMode::Editor)

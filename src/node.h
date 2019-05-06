@@ -1,6 +1,8 @@
 #pragma once
 #include "abstract_node.h"
 
+class PhysicsManager;
+
 class Node : public AbstractNode
 {
 public:
@@ -9,5 +11,11 @@ public:
     void createBuffer() { AbstractNode::createBuffer(); }
     void deleteBuffer() { AbstractNode::deleteBuffer(); }
     void render(const glow::UsedProgram& shader, glm::mat4& projection, glm::mat4& view) { AbstractNode::render(shader, projection, view); }
-    void update(float elapsedSeconds) { AbstractNode::update(elapsedSeconds); }
+    void update(float elapsedSeconds);
+    void setRigidBody(int bodyId, PhysicsManager* physics);
+    int getPhysicsID() { return mPhysicsID; }
+
+private:
+    PhysicsManager* mPhysics;
+    int mPhysicsID = -1;
 };

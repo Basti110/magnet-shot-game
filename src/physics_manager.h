@@ -42,6 +42,7 @@ public:
 
     int addPlane(glm::vec3 normal, float planeConstant);
     int addCube(const glm::vec3& shape, const glm::mat4& transform, const RigidBodyInfo& info);
+    int addCapsule(const glm::vec2& shape, const glm::mat4& transform, const RigidBodyInfo& info);
     int addMesh(const std::string &filename);
     int addMagnet(const glm::mat4& transform, float radius, int parent, bool red);
     int addConstraint(btTypedConstraint* constraint);

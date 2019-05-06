@@ -35,5 +35,10 @@ private:
     int mPrevLeftButtonState;
     int mPrevRightButtonState;
     int mPrevMiddleButtonState;
+
+    bool mPressW = false;
+    bool mPressS = false;
+    bool mPressA = false;
+    bool mPressD = false;
 };
 

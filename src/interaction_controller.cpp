@@ -30,14 +30,20 @@ InteractionController::InteractionController(MessageBus* messageBus, SceneManage
     info.friction = 0.5;
 
     //auto controller = new btKinematik
-    glm::mat4 trans = glm::translate(glm::mat4(1.0), glm::vec3(-3.0f, 2.0f, 0.0f));
-    mCube = new Cube(trans, Color{1.0f, 1.0f, 1.0f}, mPhysics);
+    glm::mat4 trans = glm::translate(glm::mat4(1.0), glm::vec3(-3.0f, 10.0f, 0.0f));
 
-    mScene->appendNode(mCube);
-    mCube->addPhysics(glm::vec3(1.0f), info);
-    mCube->addChild(mScene->getCamera());
+    mNode = new Node();
+    mNode->setLocalTransformation(trans);
+    
+    int bodyID = physics->addCapsule({0.25, 1.0}, trans, info);
+    mNode->setRigidBody(bodyID, physics);
+    //mCube = new Cube(trans, Color{1.0f, 1.0f, 1.0f}, mPhysics);
 
-    btRigidBody* body = mPhysics->getRigidBody(mCube->getPhysicsID());
+    mScene->appendNode(mNode);
+    //mCube->addPhysics(glm::vec3(1.0f), info);
+    mNode->addChild(mScene->getCamera());
+
+    btRigidBody* body = mPhysics->getRigidBody(mNode->getPhysicsID());
     bool useLinearReferenceFrameA = true;
     btTransform frameInB;
     frameInB = btTransform::getIdentity();
@@ -63,22 +69,27 @@ void InteractionController::notifyKeyInput(KeyMessage message)
     GLFWwindow* window = mWindow;
     Camera* cam = mScene->getCamera();
     
-
-    // Close Windows
-    if (message.getAction() == GLFW_PRESS)
+    btRigidBody* body = mPhysics->getRigidBody(mNode->getPhysicsID());
+    if (message.getAction() == GLFW_RELEASE)
     {
+        if (mGameMode == GameMode::Gameplay)
+        {
+            if (message.getInput() == GLFW_KEY_W ||
+                message.getInput() == GLFW_KEY_S ||
+                message.getInput() == GLFW_KEY_A ||
+                message.getInput() == GLFW_KEY_D)
+            {
+                body->setLinearVelocity(to_bullet(glm::vec3(0, 0, 0)));
+            }
+        }
+    }
 
-
-        btRigidBody* body = mPhysics->getRigidBody(mCube->getPhysicsID());
-        //body->setAngularFactor(0.0);
+    if (message.getAction() == GLFW_PRESS)
+    {    
         body->activate(true);
-        // body->activate(true);
         glm::mat3 rotation = glm::mat3(cam->getGlobalTransformation());
         float cameraSpeed = message.getSpeed();
-        // TODO: Speed dependence on FPS
-        // Move Camera (Position)
-        // body->setWorldTransform
-        glm::mat4 trans = glm::translate(mCube->getGlobalTransformation(), glm::vec3(0.0f, 0.0f, -0.1f));
+        glm::mat4 trans = glm::translate(mNode->getGlobalTransformation(), glm::vec3(0.0f, 0.0f, -0.1f));
 
         if (mGameMode == GameMode::Editor)
         {
@@ -114,26 +125,26 @@ void InteractionController::notifyKeyInput(KeyMessage message)
         else if (mGameMode == GameMode::Gameplay)
         {
             if (message.getInput() == GLFW_KEY_W)
-                // body->setWorldTransform(to_bullet(trans));
-                body->applyCentralForce(to_bullet(rotation * glm::vec3(0, 0, -800)));
+                body->setLinearVelocity(to_bullet(rotation * glm::vec3(0, 0, -5)));
             if (message.getInput() == GLFW_KEY_S)
-                body->applyCentralForce(to_bullet(rotation * glm::vec3(0, 0, 800)));
+                body->setLinearVelocity(to_bullet(rotation * glm::vec3(0, 0, 5)));
             if (message.getInput() == GLFW_KEY_A)
-                body->applyCentralForce(to_bullet(rotation * glm::vec3(-800, 0, 0)));
+                body->setLinearVelocity(to_bullet(rotation * glm::vec3(-5, 0, 0)));              
             if (message.getInput() == GLFW_KEY_D)
-                body->applyCentralForce(to_bullet(rotation * glm::vec3(800, 0, 0)));
+                body->setLinearVelocity(to_bullet(rotation * glm::vec3(5, 0, 0)));
+ 
             if (message.getInput() == GLFW_KEY_LEFT_SHIFT)
                 cam->moveUp(-cameraSpeed);
             if (message.getInput() == GLFW_KEY_SPACE)
-                //mConstraint->setAngularOnly(true);
                 body->applyCentralImpulse({0, 800, 0});
-            // body->a
+
 
             // Move Camera (Rotation)
             if (message.getInput() == GLFW_KEY_LEFT)
                 body->applyTorque({0, 200, 0});
             if (message.getInput() == GLFW_KEY_RIGHT)
                 body->applyTorque({0, -200, 0});
+
         }
 
 

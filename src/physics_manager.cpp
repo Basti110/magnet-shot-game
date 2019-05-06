@@ -83,6 +83,23 @@ int PhysicsManager::addCube(const glm::vec3& shape, const glm::mat4& transform, 
     return addRigidBody(rigidBody, GROUP_DYNAMIC_OBJECTS, GROUP_STATIC_OBJECTS | GROUP_DYNAMIC_OBJECTS);
 }
 
+int PhysicsManager::addCapsule(const glm::vec2& shape, const glm::mat4& transform, const RigidBodyInfo& info)
+{
+    btDefaultMotionState* motionState = new btDefaultMotionState(to_bullet(transform));
+    btCollisionShape* collisionShape = new btCapsuleShape(shape.x, shape.y);
+    //btCollisionShape* collisionShape = new btBoxShape(to_bullet(shape));
+    btVector3 inertia;
+    collisionShape->calculateLocalInertia(info.mass, inertia);
+    auto btInfo = btRigidBody::btRigidBodyConstructionInfo(info.mass, motionState, collisionShape, inertia);
+    btInfo.m_friction = info.friction;
+    btInfo.m_restitution = info.restitution;
+    btInfo.m_linearDamping = info.linearDamping;
+    btInfo.m_angularDamping = info.angularDamping;
+    btRigidBody* rigidBody = new btRigidBody(btInfo);
+
+    return addRigidBody(rigidBody, GROUP_DYNAMIC_OBJECTS, GROUP_STATIC_OBJECTS | GROUP_DYNAMIC_OBJECTS);
+}
+
 int PhysicsManager::addMesh(const std::string &filename)
 {
     btTriangleMesh* triangleMesh = new btTriangleMesh();

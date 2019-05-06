@@ -21,8 +21,10 @@ private:
     GLFWwindow* mWindow;
     PhysicsManager* mPhysics;
     Cube* mCube;
+    Node* mNode;
     int mCubeIndex;
     Cube* mCubeX;
     GameMode mGameMode;
     bool lineOn = false;
+    bool mMovement = false;
 };
