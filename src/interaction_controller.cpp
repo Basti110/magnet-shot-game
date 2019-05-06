@@ -87,7 +87,7 @@ void InteractionController::notifyKeyInput(KeyMessage message)
     {
         if (mGameMode == GameMode::Gameplay)
         {
-            if (!onGround && (message.getInput() == GLFW_KEY_W ||
+            if (onGround && (message.getInput() == GLFW_KEY_W ||
                 message.getInput() == GLFW_KEY_S ||
                 message.getInput() == GLFW_KEY_A ||
                 message.getInput() == GLFW_KEY_D))
