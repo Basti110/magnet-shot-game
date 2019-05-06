@@ -12,6 +12,10 @@
 #include <GLFW/glfw3.h>
 #include <glm/gtc/matrix_transform.hpp>
 
+#define CHARACTER_HEIGHT 1.5
+#define CHARACTER_EPSILON 0.1
+#define JUMP_TIMEOUT 0.2
+
 InteractionController::InteractionController(MessageBus* messageBus, SceneManager* scene, GLFWwindow* window, PhysicsManager* physics)
   : mScene(scene), mWindow(window), mGameMode(GameMode::Gameplay), mPhysics(physics)
 {
@@ -68,16 +72,25 @@ void InteractionController::notifyKeyInput(KeyMessage message)
 {
     GLFWwindow* window = mWindow;
     Camera* cam = mScene->getCamera();
+
     
     btRigidBody* body = mPhysics->getRigidBody(mNode->getPhysicsID());
+    btTransform t;
+    body->getMotionState()->getWorldTransform(t);
+    glm::vec3 pos = glm::vec3(to_glm(t)[3]);
+    //pos.z += CHARACTER_HEIGHT / 2; // half of character height
+
+    glm::vec3 to(0.0f, -10.0f, 0.0f);
+    bool onGround = mPhysics->bodyWithinReach(pos, to, CHARACTER_HEIGHT + CHARACTER_EPSILON, body);
+    
     if (message.getAction() == GLFW_RELEASE)
     {
         if (mGameMode == GameMode::Gameplay)
         {
-            if (message.getInput() == GLFW_KEY_W ||
+            if (!onGround && (message.getInput() == GLFW_KEY_W ||
                 message.getInput() == GLFW_KEY_S ||
                 message.getInput() == GLFW_KEY_A ||
-                message.getInput() == GLFW_KEY_D)
+                message.getInput() == GLFW_KEY_D))
             {
                 body->setLinearVelocity(to_bullet(glm::vec3(0, 0, 0)));
             }
@@ -124,27 +137,22 @@ void InteractionController::notifyKeyInput(KeyMessage message)
         }
         else if (mGameMode == GameMode::Gameplay)
         {
-            if (message.getInput() == GLFW_KEY_W)
-                body->setLinearVelocity(to_bullet(rotation * glm::vec3(0, 0, -5)));
-            if (message.getInput() == GLFW_KEY_S)
-                body->setLinearVelocity(to_bullet(rotation * glm::vec3(0, 0, 5)));
-            if (message.getInput() == GLFW_KEY_A)
-                body->setLinearVelocity(to_bullet(rotation * glm::vec3(-5, 0, 0)));              
-            if (message.getInput() == GLFW_KEY_D)
-                body->setLinearVelocity(to_bullet(rotation * glm::vec3(5, 0, 0)));
- 
-            if (message.getInput() == GLFW_KEY_LEFT_SHIFT)
-                cam->moveUp(-cameraSpeed);
-            if (message.getInput() == GLFW_KEY_SPACE)
-                body->applyCentralImpulse({0, 800, 0});
-
-
-            // Move Camera (Rotation)
-            if (message.getInput() == GLFW_KEY_LEFT)
-                body->applyTorque({0, 200, 0});
-            if (message.getInput() == GLFW_KEY_RIGHT)
-                body->applyTorque({0, -200, 0});
-
+            if (onGround && (glfwGetTime() - mJumpTime) > JUMP_TIMEOUT)
+            {
+                if (message.getInput() == GLFW_KEY_W)
+                    body->setLinearVelocity(to_bullet(rotation * glm::vec3(0, 0, -5)));
+                if (message.getInput() == GLFW_KEY_S)
+                    body->setLinearVelocity(to_bullet(rotation * glm::vec3(0, 0, 5)));
+                if (message.getInput() == GLFW_KEY_A)
+                    body->setLinearVelocity(to_bullet(rotation * glm::vec3(-5, 0, 0)));
+                if (message.getInput() == GLFW_KEY_D)
+                    body->setLinearVelocity(to_bullet(rotation * glm::vec3(5, 0, 0)));
+                if (message.getInput() == GLFW_KEY_SPACE) 
+                {
+                    body->applyCentralImpulse({0, 800, 0});
+                    mJumpTime = glfwGetTime();
+                }
+            }
         }
 
 

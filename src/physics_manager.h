@@ -52,7 +52,7 @@ public:
     btRigidBody* pickBody(const glm::vec3& rayFromWorld, const glm::vec3& rayToWorld);
     btRigidBody* pickBody(const glm::vec3& rayFromWorld, const glm::vec3& rayToWorld, glm::vec3& isect);
     btRigidBody* getRigidBody(int id);
-
+    bool bodyWithinReach(const glm::vec3& pos, const glm::vec3& rayToWorld, float distance, btRigidBody* excludeObject);
     bool getTransformation(int idx, glm::mat4& transform);
 
 private:

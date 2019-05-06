@@ -27,4 +27,5 @@ private:
     GameMode mGameMode;
     bool lineOn = false;
     bool mMovement = false;
+    float mJumpTime = 0;
 };
