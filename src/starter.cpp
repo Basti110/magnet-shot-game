@@ -20,7 +20,7 @@ Starter::Starter(GLFWwindow* window)
     mGameplayController = new GameplayController(mBusManager, mScene, mPhysics);
     mEditor = new Editor(mBusManager, mScene, mPhysics);
     mIoManager = new IOManager(window, mBusManager);
-    mGuiManager = new GuiManager(mBusManager, window);
+    mGuiManager = new GuiManager(mBusManager, window, mScene);
     std::cout << "Startup finished\n";
 }
 

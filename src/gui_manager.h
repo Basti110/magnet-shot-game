@@ -4,11 +4,12 @@
 #include "message_bus.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+class SceneManager;
 
 class GuiManager
 {
 public:
-    GuiManager(MessageBus* messageBus, GLFWwindow* window);
+    GuiManager(MessageBus* messageBus, GLFWwindow* window, SceneManager* scene);
     ~GuiManager();
 
     void init();
@@ -20,11 +21,15 @@ public:
 private:
     void sendVec3Message(std::pair<glm::vec3, glm::vec3>& v, GuiSettings s);
     void sendFloatMessage(std::pair<float, float>& v, GuiSettings s);
+    void renderOverlay();
+    void renderWorldSettings();
+    void renderEditorSettings();
 
     GLFWwindow* mWindow;
     MessageBus* mMessageBus;
+    SceneManager* mScene;
 
-    bool mGuiOn = true;
+    GameMode mGameMode = GameMode::Gameplay;
     std::pair<float, float> mCubeSize;
     std::pair<glm::vec3, glm::vec3> mCubeColor;
     std::pair<glm::vec3, glm::vec3> mBackgroundColor1;

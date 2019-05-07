@@ -66,6 +66,8 @@ InteractionController::InteractionController(MessageBus* messageBus, SceneManage
 void InteractionController::notifyGameModeChange(GameModeMessage message)
 {
     mGameMode = message.mode;
+    if (mGameMode == GameMode::Gameplay)
+        this->mScene->getCamera()->resetPosition();
 }
 
 void InteractionController::notifyKeyInput(KeyMessage message)
