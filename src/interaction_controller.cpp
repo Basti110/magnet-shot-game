@@ -108,6 +108,8 @@ void InteractionController::notifyKeyInput(KeyMessage message)
 
         if (mGameMode == GameMode::Editor)
         {
+            /*if (message.getInput() == GLFW_KEY_LEFT_SHIFT)
+                cam->moveUp(-cameraSpeed);*/
             if (message.getInput() == GLFW_KEY_W)
                 cam->moveFront(cameraSpeed);
             if (message.getInput() == GLFW_KEY_S)
@@ -116,8 +118,6 @@ void InteractionController::notifyKeyInput(KeyMessage message)
                 cam->moveRight(-cameraSpeed);
             if (message.getInput() == GLFW_KEY_D)
                 cam->moveRight(cameraSpeed);
-            if (message.getInput() == GLFW_KEY_LEFT_SHIFT)
-                cam->moveUp(-cameraSpeed);
             if (message.getInput() == GLFW_KEY_SPACE)
                 cam->moveUp(cameraSpeed);
 

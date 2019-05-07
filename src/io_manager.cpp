@@ -48,6 +48,13 @@ void IOManager::processInput()
 
     //TODO: Speed dependence on FPS
     //Move Camera (Position)
+    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+    {
+        sendMessageKey(GLFW_KEY_LEFT_SHIFT, GLFW_PRESS, cameraSpeed);
+        cameraSpeed *= 3;
+    }
+        
+
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
     {
         mPressW = true;
@@ -96,8 +103,7 @@ void IOManager::processInput()
         mPressD = false;
     }
         
-    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-        sendMessageKey(GLFW_KEY_LEFT_SHIFT, GLFW_PRESS, cameraSpeed);
+
     if (mCurrGameMode == GameMode::Editor)
     {
         if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
