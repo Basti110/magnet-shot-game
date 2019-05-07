@@ -42,10 +42,10 @@ void GameplayController::notifyMouseClickInput(MouseClickMessage message)
             const float scale = 0.1;
             const int id = mPhysics->addMagnet(transform, scale, body->getUserIndex(), red);
             mScene->appendNode(new Magnet(mPhysics, id, scale, color));
-            if (!body->isStaticObject()) {
+            /*if (!body->isStaticObject()) {
                 body->activate();
                 body->applyCentralImpulse(3*to_bullet(front));
-            }
+            }*/
         }
     }
     else if(message.getInput() == GLFW_MOUSE_BUTTON_MIDDLE) {
