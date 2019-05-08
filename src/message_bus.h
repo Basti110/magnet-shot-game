@@ -30,6 +30,7 @@ enum GuiSettings {
     CUBE_RESTITUTION,
     CUBE_LINEAR_DAMPING,
     CUBE_ANGULAR_DAMPING,
+    SAVE
 };
 
 enum class GameMode {

@@ -128,6 +128,13 @@ void GuiManager::update()
 
     if (mCubeAngularDamping.first != mCubeAngularDamping.second)
         sendFloatMessage(mCubeAngularDamping, GuiSettings::CUBE_ANGULAR_DAMPING);
+
+    if (mSave)
+    {
+        GuiFloatMessage m(1.0, GuiSettings::SAVE);
+        mMessageBus->sendMessage(&m);
+        mSave = false;
+    }
     
 }
 
@@ -222,6 +229,8 @@ void GuiManager::renderEditorSettings()
             {
                 if (ImGui::MenuItem("Close"))
                     *p_open = false;
+                if (ImGui::MenuItem("Save"))
+                    mSave = true;
                 ImGui::EndMenu();
             }
             ImGui::EndMenuBar();
@@ -246,9 +255,9 @@ void GuiManager::renderEditorSettings()
         ImGui::Separator();
         if (mSelectedObject == 0)
         {
-            ImGui::SliderFloat("Cube Size X", &mCubeShape.first.x, 0.0f, 10.0f);
-            ImGui::SliderFloat("Cube Size Y", &mCubeShape.first.y, 0.0f, 10.0f);
-            ImGui::SliderFloat("Cube Size Z", &mCubeShape.first.z, 0.0f, 10.0f);
+            ImGui::SliderFloat("Cube Size X", &mCubeShape.first.x, 0.0f, 20.0f);
+            ImGui::SliderFloat("Cube Size Y", &mCubeShape.first.y, 0.0f, 20.0f);
+            ImGui::SliderFloat("Cube Size Z", &mCubeShape.first.z, 0.0f, 20.0f);
             ImGui::ColorEdit3("Cube Color", &mCubeColor.first.r);
             // ImGui::SameLine();
             ImGui::Spacing();

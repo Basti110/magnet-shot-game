@@ -38,7 +38,7 @@ InteractionController::InteractionController(MessageBus* messageBus, SceneManage
 
     mNode = new Node();
     mNode->setLocalTransformation(trans);
-    
+
     int bodyID = physics->addCapsule({0.25, 1.0}, trans, info);
     mNode->setRigidBody(bodyID, physics);
     //mCube = new Cube(trans, Color{1.0f, 1.0f, 1.0f}, mPhysics);
@@ -75,7 +75,7 @@ void InteractionController::notifyKeyInput(KeyMessage message)
     GLFWwindow* window = mWindow;
     Camera* cam = mScene->getCamera();
 
-    
+
     btRigidBody* body = mPhysics->getRigidBody(mNode->getPhysicsID());
     btTransform t;
     body->getMotionState()->getWorldTransform(t);
@@ -85,7 +85,7 @@ void InteractionController::notifyKeyInput(KeyMessage message)
     glm::vec3 to(0.0f, -10.0f, 0.0f);
     to += pos;
     bool onGround = mPhysics->bodyWithinReach(pos, to, CHARACTER_HEIGHT + CHARACTER_EPSILON, body);
-    
+
     if (message.getAction() == GLFW_RELEASE)
     {
         if (mGameMode == GameMode::Gameplay)
@@ -101,7 +101,7 @@ void InteractionController::notifyKeyInput(KeyMessage message)
     }
 
     if (message.getAction() == GLFW_PRESS)
-    {    
+    {
         body->activate(true);
         glm::mat3 rotation = glm::mat3(cam->getGlobalTransformation());
         float cameraSpeed = message.getSpeed();
@@ -152,7 +152,7 @@ void InteractionController::notifyKeyInput(KeyMessage message)
                     body->setLinearVelocity(to_bullet(right * glm::vec3(-5)));
                 if (message.getInput() == GLFW_KEY_D)
                     body->setLinearVelocity(to_bullet(right * glm::vec3(5)));
-                if (message.getInput() == GLFW_KEY_SPACE) 
+                if (message.getInput() == GLFW_KEY_SPACE)
                 {
                     body->applyCentralImpulse({0, 200, 0});
                     mJumpTime = glfwGetTime();

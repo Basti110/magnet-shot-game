@@ -123,6 +123,11 @@ void PhysicsManager::clearMagnets()
     mBlueMagnets.clear();
 }
 
+void PhysicsManager::deleteId(int id) 
+{
+
+}
+
 btDiscreteDynamicsWorld* PhysicsManager::getDynamicsWorld()
 {
     return mBulletWorld;

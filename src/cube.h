@@ -15,9 +15,13 @@ public:
     void setVisible(bool value);
     void setColorRatio(float ratio);
     void setColor(glm::vec3 color);
+    void setScale(glm::vec3 scale);
     bool setTexture(std::string path);
-    void addPhysics(glm::vec3 shape, const RigidBodyInfo& info);
+    void addPhysics(glm::vec3 scale, const RigidBodyInfo& info);
     int getPhysicsID();
+    glm::vec3 getScale();
+    glm::vec3 getColor();
+    const RigidBodyInfo& getRigidBodyInfo();
 
 private:
     void setVertices();
@@ -35,4 +39,5 @@ private:
     glm::vec3 mColor;
     glm::vec3 mScale;
     PhysicsManager* mPhysics;
+    RigidBodyInfo mRigidBodyinfo;
 };

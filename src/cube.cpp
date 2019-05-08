@@ -105,6 +105,11 @@ void Cube::setColor(glm::vec3 color)
     mColor = color;
 }
 
+void Cube::setScale(glm::vec3 scale)
+{
+    mScale = scale;
+}
+
 bool Cube::setTexture(std::string path)
 {
     /*glGenTextures(1, &this->texture);
@@ -140,6 +145,7 @@ bool Cube::setTexture(std::string path)
 void Cube::addPhysics(glm::vec3 scale, const RigidBodyInfo& info)
 {
     mScale = scale;
+    mRigidBodyinfo = RigidBodyInfo(info);
     mPhysicsID = mPhysics->addCube({scale.x / 2, scale.y / 2, scale.z / 2}, mGlobalTransformation, info);
     mIsPhysicsOn = true;
 }
@@ -147,6 +153,21 @@ void Cube::addPhysics(glm::vec3 scale, const RigidBodyInfo& info)
 int Cube::getPhysicsID()
 {
     return mPhysicsID;
+}
+
+glm::vec3 Cube::getScale()
+{
+    return mScale;
+}
+
+glm::vec3 Cube::getColor()
+{
+    return mColor;
+}
+
+const RigidBodyInfo& Cube::getRigidBodyInfo()
+{
+    return mRigidBodyinfo;
 }
 
 void Cube::setVertices()

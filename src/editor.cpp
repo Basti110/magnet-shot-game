@@ -5,8 +5,59 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <btBulletDynamicsCommon.h>
+#include <json/json.hpp>
 #include "light.h"
+#include <iostream>
+#include <fstream>
 
+namespace
+{
+    struct CubeStorage
+    {
+        std::vector<float> translation;
+        std::vector<float> color;
+        float scaleX;
+        float scaleY;
+        float scaleZ;
+        float angular_damping;
+        float friction;
+        float linear_damping;
+        float mass;
+        float restitution;
+    };
+
+    void to_json(nlohmann::json& j, const CubeStorage& p)
+    {
+        j = nlohmann::json
+        {
+            {"translation", p.translation},
+            {"color", p.color},
+            {"scaleX", p.scaleX}, 
+            {"scaleY", p.scaleY}, 
+            {"scaleZ", p.scaleZ},
+            {"angular_damping", p.angular_damping},
+            {"friction", p.friction},
+            {"linear_damping", p.linear_damping},
+            {"mass", p.mass},
+            {"restitution", p.restitution},
+        };
+    }
+
+    void from_json(const nlohmann::json& j, CubeStorage& p)
+    {
+        j.at("translation").get_to(p.translation);
+        j.at("color").get_to(p.color);
+        j.at("scaleX").get_to(p.scaleX);
+        j.at("scaleY").get_to(p.scaleY);
+        j.at("scaleZ").get_to(p.scaleZ);
+        j.at("angular_damping").get_to(p.angular_damping);
+        j.at("friction").get_to(p.friction);
+        j.at("linear_damping").get_to(p.linear_damping);
+        j.at("mass").get_to(p.mass);
+        j.at("restitution").get_to(p.restitution);
+    }
+
+}
 
 Editor::Editor(MessageBus* mB, SceneManager* scene, PhysicsManager* physics) : 
     mScene(scene), 
@@ -58,6 +109,7 @@ Editor::Editor(MessageBus* mB, SceneManager* scene, PhysicsManager* physics) :
     });
 
     mCubeDistance = 2.0;
+    load();
 }
 
 void Editor::refreshCube()
@@ -92,6 +144,8 @@ void Editor::notifyMouseClickInput(MouseClickMessage message)
         newCube->setLocalTransformation(trans);
         mScene->appendNode(newCube);
         newCube->addPhysics(mCubeScale, mCubeInfo);
+        mCubes.push_back(newCube);
+
     }
     if (message.getInput() == GLFW_MOUSE_BUTTON_MIDDLE && message.getAction() == 1000)
     {
@@ -124,6 +178,18 @@ void Editor::notifyKeyInput(KeyMessage message)
     if (message.getAction() == GLFW_PRESS)
     {
         refreshCube();
+        if (message.getInput() == GLFW_KEY_G)
+        {
+            if (glfwGetTime() - mLastDelete <= 0.5)
+                return;
+            mLastDelete = glfwGetTime();
+          
+            if (mCubes.size() <= 0)
+                return;
+            auto cube = mCubes[mCubes.size() - 1];
+            mCubes.pop_back();
+            mScene->removeNode([=](AbstractNode* node) { return dynamic_cast<Cube*>(node) == cube; });
+        }
     }
 }
 
@@ -189,5 +255,72 @@ void Editor::notifyGuiInput(Message* message)
         {
             mCubeInfo.angularDamping = m->getValue();
         }
+        if (m->getSetting() == GuiSettings::SAVE)
+        {
+            save();
+        }
+    }
+}
+
+void Editor::save() 
+{
+    nlohmann::json json;
+    for (auto cube : mCubes)
+    {
+        glm::vec3 scale = cube->getScale();
+        glm::vec3 color = cube->getColor();
+        glm::vec3 trans = glm::vec3(cube->getGlobalTransformation()[3]);
+
+        CubeStorage s;
+        s.translation = {trans.x, trans.y, trans.z};
+        s.color = {color.x, color.y, color.z};
+        s.scaleX = scale.x;
+        s.scaleY = scale.y;
+        s.scaleZ = scale.z;
+     
+        s.angular_damping = cube->getRigidBodyInfo().angularDamping;
+        s.friction = cube->getRigidBodyInfo().friction;
+        s.linear_damping = cube->getRigidBodyInfo().linearDamping;
+        s.mass = cube->getRigidBodyInfo().mass;
+        s.restitution = cube->getRigidBodyInfo().restitution;
+        nlohmann::json j = s;
+        //j["shape"] = cube->getRigidBodyInfo().shape;
+        json += j;
+    }
+    //std::cout << json;
+
+    std::ofstream myfile;
+    myfile.open("../../data/world.json");
+    myfile << json;
+    myfile.close();
+}
+
+void Editor::load() {
+    std::ifstream infile;
+    infile.open("../../data/world.json");
+    std::string worldString;
+
+    infile >> worldString;
+    std::cout << worldString;
+
+    nlohmann::json newJson = nlohmann::json::parse(worldString);
+    for (auto j : newJson)
+    {
+        auto storage = j.get<CubeStorage>();
+        auto t = storage.translation;
+        auto c = storage.color;
+        glm::vec3 scale = {storage.scaleX, storage.scaleY, storage.scaleX};
+        RigidBodyInfo info;
+        info.friction = storage.friction;
+        info.mass = storage.mass;
+
+        glm::mat4 trans = glm::mat4(1.0f);
+        trans = glm::translate(trans, glm::vec3(t[0], t[1], t[2]));
+        trans = glm::scale(trans, scale);
+        Cube* newCube = new Cube(trans, Color{c[0], c[1], c[2]}, mPhysics);
+        newCube->setScale(scale);
+        mScene->appendNode(newCube);
+        //newCube->addPhysics(mCubeScale, mCubeInfo);
+        mCubes.push_back(newCube);
     }
 }
