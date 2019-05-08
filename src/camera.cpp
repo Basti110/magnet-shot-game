@@ -115,7 +115,7 @@ glm::mat4 Camera::getProjectionMatrix()
 void Camera::setViewportSize(int w, int h) 
 {
     glm::mat4 projection = glm::mat4(1.0f);
-    mProjectionMatrix = glm::perspective(glm::radians(90.0f), (float)w / (float)h, 0.1f, 500.0f);
+    mProjectionMatrix = glm::perspective(glm::radians(75.0f), (float)w / (float)h, 0.1f, 500.0f);
 }
 
 void Camera::setLocalTransformation(glm::mat4 transformation)
