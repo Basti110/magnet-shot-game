@@ -22,7 +22,7 @@ void main()
     vec3 objectColor = vec3(texture(ourTexture, TexCoord)) * (1 - colorRatio) + color * colorRatio;
 
     // ambient
-    float ambientStrength = 0.1;
+    float ambientStrength = 0.2;
     vec3 ambient = ambientStrength * lightColor;
 
     // diffuse 
@@ -32,13 +32,11 @@ void main()
     vec3 diffuse = diff * lightColor;
 
     // specular
-    float specularStrength = 0.5;
+    float specularStrength = 0.2;
     vec3 viewDir = normalize(viewPos - FragPos);
     vec3 reflectDir = reflect(-lightDir, norm);  
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
     vec3 specular = specularStrength * spec * lightColor;  
-
-    vec3 result = (ambient + diffuse + specular) * objectColor;
 
     // shadows
     vec4 shadowPos = shadowTransform * vec4(FragPos, 1.0);
@@ -74,5 +72,6 @@ void main()
         }
     }
 
-    FragColor = vec4(result * (shadowFactor*0.5+0.5), 1.0);
+    vec3 result = (ambient + (0.5+0.5*shadowFactor) * diffuse + specular) * objectColor;
+    FragColor = vec4(result, 1.0);
 }

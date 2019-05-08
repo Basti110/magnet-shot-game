@@ -108,6 +108,29 @@ void Game::init()
         );
         root->addChild(level);
 
+        // add trees
+        auto treeParams = {
+            std::make_pair(glm::vec3(-4.35f, 0.27f, -6.2f), -45.0f),
+            std::make_pair(glm::vec3(-4.35f, 0.27f, -9.5f), -45.0f),
+            std::make_pair(glm::vec3(11.25f, 0.27f, -12.18f), 0.0f)
+        };
+        for (const auto& param : treeParams) {
+            glm::mat4 transform = glm::translate(glm::mat4(1), param.first);
+            transform = glm::rotate(transform, glm::radians(param.second), glm::vec3(0,1,0));
+            MeshNode* base = new MeshNode(
+                transform, "../../data/meshes/TreeBase.obj", dynamicsWorld,
+                GROUP_NONE, GROUP_NONE, 0.0f
+            );
+            base->setColor(glm::vec3(151/255.0f, 103/255.0f, 48/255.0f));
+            root->addChild(base);
+            MeshNode* top = new MeshNode(
+                transform, "../../data/meshes/TreeTop.obj", dynamicsWorld,
+                GROUP_NONE, GROUP_NONE, 0.0f
+            );
+            top->setColor(glm::vec3(99/255.0f, 194/255.0f, 47/255.0f));
+            root->addChild(top);
+        }
+
         // add dispenser
         root->addChild(new Dispenser(glm::vec3(2.5f, 0.0f, -14.0f), dynamicsWorld));
 
@@ -118,8 +141,8 @@ void Game::init()
         RigidBodyInfo info;
         info.mass = 5.0;
         info.friction = 0.5;
-        for (int i = 0; i < 5; i++) {
-            glm::mat4 trans = glm::translate(glm::mat4(1.0), glm::vec3(1,i*5+5, 0));
+        for (int i = 0; i < 4; i++) {
+            glm::mat4 trans = glm::translate(glm::mat4(1.0), glm::vec3(1,i*5+5, -7));
             Cube* newCube = new Cube(trans, Color{1.0f, 1.0f, 1.0f}, mStartManager->getPhysicsManager());
             mScene->appendNode(newCube);
             newCube->createBuffer();

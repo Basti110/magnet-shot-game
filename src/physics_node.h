@@ -14,6 +14,7 @@ public:
     void render(const glow::UsedProgram& shader, glm::mat4& projection, glm::mat4& view) override;
 
     btRigidBody* getRigidBody() { return mRigidBody; }
+    void setColor(const glm::vec3& color) { mColor = color; }
 
 protected:
     btDynamicsWorld* mWorld;

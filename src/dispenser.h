@@ -16,8 +16,9 @@ public:
             world,
             GROUP_DYNAMIC_OBJECTS,
             GROUP_DYNAMIC_OBJECTS,
-            100.0f
+            10.0f
         );
+        top->setColor(glm::vec3(234/255.0f, 22/255.0f, 22/255.0f));
 
         // restrict movement to rotation around the y-axis
         top->getRigidBody()->setLinearFactor(btVector3(0,0,0));
@@ -40,6 +41,7 @@ public:
             GROUP_STATIC_OBJECTS | GROUP_DYNAMIC_OBJECTS,
             1.0f
         );
+        sphere->setColor(glm::vec3(189/255.0f, 51/255.0f, 208/255.0f));
 
         addChild(top);
         addChild(base);

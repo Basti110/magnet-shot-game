@@ -5,7 +5,7 @@
 PhysicsNode::PhysicsNode(btDynamicsWorld* world) :
     mWorld(world),
     mRigidBody(nullptr),
-    mColor(glm::vec3(0.5))
+    mColor(glm::vec3(1))
 {
 
 }
