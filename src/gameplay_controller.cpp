@@ -35,16 +35,13 @@ void GameplayController::notifyMouseClickInput(MouseClickMessage message)
         glm::vec3 isect;
         btRigidBody* body = mPhysics->pickBody(pos, pos + 200.0f*front, isect);
         if (body != nullptr) {
-            glm::mat4 transform = glm::mat4(1.0f);
-            transform = glm::translate(transform, isect);
             const bool red = message.getInput() == GLFW_MOUSE_BUTTON_LEFT;
-            const glm::vec3 color = red ? glm::vec3(1,0,0) : glm::vec3(0,0,1);
-            const float scale = 0.1;
-            const int id = mPhysics->addMagnet(transform, scale, body->getUserIndex(), red);
-            mScene->appendNode(new Magnet(mPhysics, id, scale, color));
+            const float radius = 0.1;
+            mScene->appendNode(new Magnet(isect, radius, mPhysics, body, red));
             if (!body->isStaticObject()) {
+                const auto direction = to_bullet(front);
                 body->activate();
-                body->applyCentralImpulse(3*to_bullet(front));
+                body->applyCentralImpulse(3 * direction);
             }
         }
     }

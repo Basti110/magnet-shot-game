@@ -21,14 +21,6 @@ PhysicsManager::PhysicsManager()
 
 PhysicsManager::~PhysicsManager()
 {
-    for (size_t i = 0; i < mRigidBodies.size(); ++i) {
-        removeRigidBody(i);
-    }
-    for (auto c : mMagnetConstraints) {
-        mBulletWorld->removeConstraint(c);
-        delete c;
-    }
-
     delete mBulletBroadphase;
     delete mBulletCollisionConfig;
     delete mBulletCollisionDispatcher;
@@ -83,77 +75,20 @@ int PhysicsManager::addCube(const glm::vec3& shape, const glm::mat4& transform, 
     return addRigidBody(rigidBody, GROUP_DYNAMIC_OBJECTS, GROUP_STATIC_OBJECTS | GROUP_DYNAMIC_OBJECTS);
 }
 
-int PhysicsManager::addMesh(const std::string &filename)
-{
-    btTriangleMesh* triangleMesh = new btTriangleMesh();
-    pm::Mesh m;
-    pm::obj_reader<float> obj_reader(filename, m);
-    auto pos = obj_reader.get_positions().map([](std::array<float, 4> const& t) { return btVector3(t[0], t[1], t[2]); });
-
-    for (auto f : m.faces()) {
-        std::vector<btVector3> verts;
-        for (auto v : f.vertices()) {
-            verts.push_back(pos[v]);
-        }
-        triangleMesh->addTriangle(verts[0], verts[1], verts[2]);
-    }
-
-    btDefaultMotionState* motionState = new btDefaultMotionState();
-    btCollisionShape* collisionShape = new btBvhTriangleMeshShape(triangleMesh, true);
-    btRigidBody* rigidBody = new btRigidBody(0, motionState, collisionShape);
-
-    return addRigidBody(rigidBody, GROUP_STATIC_OBJECTS, GROUP_DYNAMIC_OBJECTS);
-}
-
-int PhysicsManager::addMagnet(const glm::mat4& transform, float radius, int parent, bool red)
-{
-    btRigidBody* parentRigidBody = mRigidBodies[parent];
-    const float mass = parentRigidBody->isStaticObject() ? 0.0f : 0.000001f;
-
-    btDefaultMotionState* motionState = new btDefaultMotionState(to_bullet(transform));
-    btCollisionShape* collisionShape = new btSphereShape(radius);
-    btRigidBody* magnetRigidBody = new btRigidBody(mass, motionState, collisionShape);
-
+void PhysicsManager::addMagnet(btRigidBody* body, bool red) {
     auto& magnets = red ? mRedMagnets : mBlueMagnets;
-    magnets.push_back(magnetRigidBody);
-
-    if (!parentRigidBody->isStaticObject()) {
-        auto magnetCenter = magnetRigidBody->getCenterOfMassPosition();
-        auto pivotInParent = parentRigidBody->getWorldTransform().inverse() * magnetCenter;
-        auto pivotInMagnet = btVector3(0,0,0);
-
-        auto* constraint = new btPoint2PointConstraint(*parentRigidBody, *magnetRigidBody, pivotInParent, pivotInMagnet);
-        mBulletWorld->addConstraint(constraint, true);
-        mMagnetConstraints.push_back(constraint);
-    }
-
-    return addRigidBody(magnetRigidBody, GROUP_NONE, GROUP_NONE);
-}
-
-int PhysicsManager::addConstraint(btTypedConstraint* constraint)
-{
-    mConstraints.push_back(constraint);
-    mBulletWorld->addConstraint(constraint);
-    return mConstraints.size() - 1;
+    magnets.push_back(body);
 }
 
 void PhysicsManager::clearMagnets()
 {
-    for (auto c : mMagnetConstraints) {
-        mBulletWorld->removeConstraint(c);
-        delete c;
-    }
-    mMagnetConstraints.clear();
-
-    for (auto m : mRedMagnets) {
-        removeRigidBody(m->getUserIndex());
-    }
     mRedMagnets.clear();
-
-    for (auto m : mBlueMagnets) {
-        removeRigidBody(m->getUserIndex());
-    }
     mBlueMagnets.clear();
+}
+
+btDiscreteDynamicsWorld* PhysicsManager::getDynamicsWorld()
+{
+    return mBulletWorld;
 }
 
 btRigidBody* PhysicsManager::pickBody(const glm::vec3& rayFromWorld, const glm::vec3& rayToWorld)
@@ -215,23 +150,3 @@ int PhysicsManager::addRigidBody(btRigidBody* body, short group, short mask)
     mRigidBodies.push_back(body);
     return mRigidBodies.size() - 1;
 }
-
-void PhysicsManager::removeRigidBody(btRigidBody* body)
-{
-    removeRigidBody(body->getUserIndex());
-}
-
-void PhysicsManager::removeRigidBody(int idx)
-{
-    if (idx < 0 || (size_t)idx >= mRigidBodies.size() || !mRigidBodies[idx]) {
-        return;
-    }
-
-    btRigidBody* body = mRigidBodies[idx];
-    mBulletWorld->removeRigidBody(body);
-    delete body->getMotionState();
-    delete body->getCollisionShape();
-    delete body;
-    mRigidBodies[idx] = nullptr;
-}
-
