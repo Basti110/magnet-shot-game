@@ -67,6 +67,9 @@ add_subdirectory(extern/glfw)
 # Add ImGui
 add_subdirectory(extern/imgui)
 
+# Add nlohmann/json
+add_subdirectory(extern/json)
+
 # Add PolyMesh
 add_subdirectory(extern/polymesh)
 
@@ -79,7 +82,7 @@ add_subdirectory(extern/bullet)
 
 
 # Folder grouping
-foreach(TARGET_NAME glfw ctracer glad glow glow-extras imgui lodepng stb polymesh BulletCollision BulletDynamics
+foreach(TARGET_NAME glfw ctracer glad glow glow-extras imgui json lodepng stb polymesh BulletCollision BulletDynamics
     BulletFileLoader BulletSoftBody BulletWorldImporter BulletXmlWorldImporter ConvexDecomposition GIMPACTUtils HACD LinearMath)
   set_property(TARGET ${TARGET_NAME} PROPERTY FOLDER "Extern") 
 endforeach()
@@ -110,6 +113,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
     glow-extras
     polymesh
     imgui
+	json
     BulletCollision
     BulletDynamics
 )
