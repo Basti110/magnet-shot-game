@@ -116,7 +116,8 @@ void Game::init()
 
         // add a bunch of cubes for testing
         RigidBodyInfo info;
-        info.mass = 1.0;
+        info.mass = 5.0;
+        info.friction = 0.5;
         for (int i = 0; i < 5; i++) {
             glm::mat4 trans = glm::translate(glm::mat4(1.0), glm::vec3(1,i*5+5, 0));
             Cube* newCube = new Cube(trans, Color{1.0f, 1.0f, 1.0f}, mStartManager->getPhysicsManager());

@@ -34,21 +34,35 @@ void PhysicsManager::update(float elapsedSeconds)
     for (auto r : mRedMagnets)
     {
         auto pr = r->getCenterOfMassPosition();
+        r->clearForces();
+        r->setLinearVelocity({0, 0, 0});
+        r->setAngularVelocity({0, 0, 0});
         for (auto b : mBlueMagnets)
         {
             auto pb = b->getCenterOfMassPosition();
-            r->setLinearVelocity((pb - pr) * 20);
-            r->applyCentralForce((pb - pr));
+            // r->setLinearVelocity((pb - pr) * 20);
+            glm::vec3 glmB = to_glm(pb);
+            glm::vec3 glmR = to_glm(pr);
+            float d = glm::distance(glmB, glmR);
+            r->applyCentralForce((to_bullet(glm::normalize(glmB - glmR)) * 100) / glm::max(d, 1.0f));
+            // r->setLinearVelocity((pb - pr) * 20);
         }
     }
     for (auto b : mBlueMagnets)
     {
         auto pb = b->getCenterOfMassPosition();
+        b->clearForces();
+        b->setLinearVelocity({0, 0, 0});
+        b->setAngularVelocity({0, 0, 0});
         for (auto r : mRedMagnets)
         {
             auto pr = r->getCenterOfMassPosition();
-            //r->setLinearVelocity((pr - pb) * 20);
-            b->applyCentralForce((pr - pb));
+            glm::vec3 glmB = to_glm(pb);
+            glm::vec3 glmR = to_glm(pr);
+            float d = glm::distance(glmB, glmR);
+            // r->setLinearVelocity((pr - pb) * 20);
+            b->applyCentralForce((to_bullet(glm::normalize(glmR - glmB)) * 100) / glm::max(d, 1.0f));
+            // r->setLinearVelocity((pb - pr) * 20);
         }
     }
 
