@@ -20,7 +20,6 @@
 #include <glow/objects/Framebuffer.hh>
 #include <glow/objects/Program.hh>
 #include <glow/objects/Texture2D.hh>
-#include <glow/objects/TextureRectangle.hh>
 
 // extra functionality of glow
 #include <GLFW/glfw3.h>  // window/input framework
@@ -58,9 +57,20 @@ void Game::init()
 
         // create framebuffer (16bit color + 32bit depth)
         // size is 1x1 for now and is changed onResize
-        mTargets.push_back(mTargetColor = glow::TextureRectangle::create(1, 1, GL_RGB16F));
-        mTargets.push_back(mTargetDepth = glow::TextureRectangle::create(1, 1, GL_DEPTH_COMPONENT32F));
+        mTargets.push_back(mTargetColor = glow::Texture2D::create(1, 1, GL_RGB16F));
+        mTargets.push_back(mTargetDepth = glow::Texture2D::create(1, 1, GL_DEPTH_COMPONENT32));
+        mTargetColor->bind().setFilter(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+        mTargetDepth->bind().setFilter(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+        mTargetColor->bind().generateMipmaps();
+        mTargetDepth->bind().generateMipmaps();
         mFramebuffer = glow::Framebuffer::create("fColor", mTargetColor, mTargetDepth);
+    }
+    {
+        mShadowMap = glow::Texture2D::create(8192, 8192, GL_DEPTH_COMPONENT32);
+        mShadowMap->bind().generateMipmaps();
+        mShadowMap->bind().setWrap(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
+        mShadowMap->bind().setFilter(GL_LINEAR, GL_LINEAR);
+        mShadowFramebuffer = glow::Framebuffer::createDepthOnly(mShadowMap);
     }
 
     {
@@ -76,6 +86,7 @@ void Game::init()
         });
         mCrosshair = glow::VertexArray::create(crosshairBuffer, GL_LINES);
 
+        mShaderShadow = glow::Program::createFromFile("../../data/shaders/shadow");
         mShaderObject = glow::Program::createFromFile("../../data/shaders/shader_node");
         mShaderOutput = glow::Program::createFromFile("../../data/shaders/output");
         mShaderSkybox = glow::Program::createFromFile("../../data/shaders/skybox");
@@ -85,7 +96,7 @@ void Game::init()
 
         // add light
         glm::mat4 trans = glm::mat4(1.0f);
-        trans = glm::translate(trans, glm::vec3(0.0f, 4.0f, -9.0f));
+        trans = glm::translate(trans, glm::vec3(30.0f, 25.0f, 25.0f));
         Light* light = new Light(trans, Color{1.0f, 1.0f, 1.0f});
         root->addChild(light);
         mScene->setLight(light);
@@ -139,6 +150,24 @@ void Game::update(float elapsedSeconds)
 
 void Game::render(float elapsedSeconds)
 {
+    // shadow pass
+    glm::vec3 camPos = mStartManager->getScene()->getCamera()->getPos();
+    glm::vec3 lightPos = camPos + glm::vec3(10);
+    glm::mat4 shadowView = glm::lookAt(lightPos, camPos, glm::vec3(0, 1, 0));
+    glm::mat4 shadowProj = glm::ortho(-25.0f, 25.0f, -25.0f, 25.0f, 1.0f, 50.0f);
+    glm::mat4 shadowTransform = shadowProj * shadowView;
+    {
+        GLOW_SCOPED(enable, GL_DEPTH_TEST);
+        GLOW_SCOPED(cullFace, GL_FRONT);
+
+        auto fb = mShadowFramebuffer->bind();
+        glClear(GL_DEPTH_BUFFER_BIT);
+        auto shader = mShaderShadow->use();
+        shader.setUniform("projection", shadowProj);
+        shader.setUniform("view", shadowView);
+        mScene->render(shader, shadowProj, shadowView);
+    }
+
     // render game variable timestep
 
     // camera update here because it should be coupled tightly to rendering!
@@ -166,6 +195,8 @@ void Game::render(float elapsedSeconds)
             auto shader = mShaderObject->use();
             shader.setUniform("projection", projection);
             shader.setUniform("view", view);
+            shader.setUniform("shadowTransform", shadowTransform);
+            shader.setTexture("shadowMap", mShadowMap);
             mScene->render(shader, projection, view);
         }
 
@@ -211,7 +242,7 @@ void Game::onResize(int w, int h)
     mScene->getCamera()->setViewportSize(w, h);
 
     for (auto const& t : mTargets)
-        t->bind().resize(w, h);
+        t->bind().resize(2 * w, 2 * h);
 }
 
 void Game::updateCamera(float elapsedSeconds) {}
@@ -235,19 +266,28 @@ void Game::notifyGameModeChange(GameModeMessage message)
 
 void Game::notifyGuiInput(Message* message)
 {
-    if (message->getType() != MType::GUI_VEC3)
-        return;
-
-    GuiVec3Message* m = dynamic_cast<GuiVec3Message*>(message);
-    if (m == nullptr)
-        return;
-
-    if (m->getSetting() == GuiSettings::BACKGROUND_COLOR1)
+    if (auto m = dynamic_cast<GuiVec3Message*>(message))
     {
-        mBackgroundColor1 = glm::vec4(m->getValue(), 1.0f);
+        if (m->getSetting() == GuiSettings::BACKGROUND_COLOR1)
+        {
+            mBackgroundColor1 = glm::vec4(m->getValue(), 1.0f);
+        }
+        if (m->getSetting() == GuiSettings::BACKGROUND_COLOR2)
+        {
+            mBackgroundColor2 = glm::vec4(m->getValue(), 1.0f);
+        }
     }
-    if (m->getSetting() == GuiSettings::BACKGROUND_COLOR2)
+    if (auto m = dynamic_cast<GuiFloatMessage*>(message))
     {
-        mBackgroundColor2 = glm::vec4(m->getValue(), 1.0f);
+        if (m->getSetting() == GuiSettings::SHADOW_OFFSET)
+        {
+            auto shader = mShaderObject->use();
+            shader.setUniform("shadowOffset", m->getValue());
+        }
+        if (m->getSetting() == GuiSettings::SHADOW_SMOOTHNESS)
+        {
+            auto shader = mShaderObject->use();
+            shader.setUniform("shadowSmoothness", m->getValue());
+        }
     }
 }

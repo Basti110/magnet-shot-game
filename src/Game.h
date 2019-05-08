@@ -32,6 +32,7 @@ private:
     // gfx objects
 private:
     // shaders
+    glow::SharedProgram mShaderShadow;
     glow::SharedProgram mShaderOutput;
     glow::SharedProgram mShaderObject;
     glow::SharedProgram mShaderSkybox;
@@ -44,10 +45,14 @@ private:
 
     // intermediate framebuffer with color and depth texture
     glow::SharedFramebuffer mFramebuffer;
-    glow::SharedTextureRectangle mTargetColor;
-    glow::SharedTextureRectangle mTargetDepth;
+    glow::SharedTexture2D mTargetColor;
+    glow::SharedTexture2D mTargetDepth;
 
-    std::vector<glow::SharedTextureRectangle> mTargets;
+    std::vector<glow::SharedTexture2D> mTargets;
+
+    // shadow map
+    glow::SharedFramebuffer mShadowFramebuffer;
+    glow::SharedTexture2D mShadowMap;
 
     // ctor
 public:

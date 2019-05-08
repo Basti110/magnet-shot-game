@@ -35,6 +35,8 @@ private:
     std::pair<glm::vec3, glm::vec3> mBackgroundColor1;
     std::pair<glm::vec3, glm::vec3> mBackgroundColor2;
     std::pair<glm::vec3, glm::vec3> mLightColor;
+    std::pair<float, float> mShadowOffset;
+    std::pair<float, float> mShadowSmoothness;
 
     //------------------------------------------------
     // ------------- Object Selection ----------------

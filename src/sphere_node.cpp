@@ -9,18 +9,19 @@ SphereNode::SphereNode(const glm::vec3& position, float radius, btDynamicsWorld*
     PhysicsNode(world),
     mRadius(radius)
 {
-    mLocalTransformation = glm::translate(glm::mat4(1), position);
+    glm::mat4 translation = glm::translate(glm::mat4(1), position);
+    mLocalTransformation = glm::scale(translation, glm::vec3(radius));
     mGlobalTransformation = mLocalTransformation;
     mVertexArray = glow::geometry::make_uv_sphere();
 
-    btDefaultMotionState* motionState = new btDefaultMotionState(to_bullet(mGlobalTransformation));
+    btDefaultMotionState* motionState = new btDefaultMotionState(to_bullet(translation));
     btCollisionShape* collisionShape = new btSphereShape(radius);
     mRigidBody = new btRigidBody(mass, motionState, collisionShape);
     mWorld->addRigidBody(mRigidBody, collisionGroup, collisionMask);
 }
 
-void SphereNode::render(const glow::UsedProgram& shader, glm::mat4& projection, glm::mat4& view)
+void SphereNode::update(float elapsedSeconds)
 {
+    PhysicsNode::update(elapsedSeconds);
     mGlobalTransformation = glm::scale(mGlobalTransformation, glm::vec3(mRadius));
-    PhysicsNode::render(shader, projection, view);
 }

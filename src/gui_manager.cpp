@@ -20,10 +20,14 @@ GuiManager::GuiManager(MessageBus* messageBus, GLFWwindow* window, SceneManager*
     mBackgroundColor1.first = glm::vec3(  9/255.0,  65/255.0, 152/255.0);
     mBackgroundColor2.first = glm::vec3(102/255.0, 169/255.0, 222/255.0);
     mLightColor.first = glm::vec3(1.0);
+    mShadowOffset.first = 0.0005;
+    mShadowSmoothness.first = 0.0006;
     
     sendVec3Message(mBackgroundColor1, GuiSettings::BACKGROUND_COLOR1);
     sendVec3Message(mBackgroundColor2, GuiSettings::BACKGROUND_COLOR2);
     sendVec3Message(mLightColor, GuiSettings::LIGHT_COLOR);
+    sendFloatMessage(mShadowOffset, GuiSettings::SHADOW_OFFSET);
+    sendFloatMessage(mShadowSmoothness, GuiSettings::SHADOW_SMOOTHNESS);
     
     //Cube Settings
 
@@ -93,6 +97,11 @@ void GuiManager::update()
         sendVec3Message(mBackgroundColor1, GuiSettings::BACKGROUND_COLOR1);
     if (mBackgroundColor2.first != mBackgroundColor2.second)
         sendVec3Message(mBackgroundColor2, GuiSettings::BACKGROUND_COLOR2);
+
+    if (mShadowOffset.first != mShadowOffset.second)
+        sendFloatMessage(mShadowOffset, GuiSettings::SHADOW_OFFSET);
+    if (mShadowSmoothness.first != mShadowSmoothness.second)
+        sendFloatMessage(mShadowSmoothness, GuiSettings::SHADOW_SMOOTHNESS);
 
     if (mCubeSize.first != mCubeSize.second)
         sendFloatMessage(mCubeSize, GuiSettings::CUBE_SIZE);
@@ -195,6 +204,8 @@ void GuiManager::renderWorldSettings()
             ImGui::ColorEdit3("Background Color 1", &mBackgroundColor1.first.r);
             ImGui::ColorEdit3("Background Color 2", &mBackgroundColor2.first.r);
             ImGui::ColorEdit3("Light Color", &mLightColor.first.r);
+            ImGui::SliderFloat("Shadow Offset", &mShadowOffset.first, 0.0f, 0.0025f, "%.5f");
+            ImGui::SliderFloat("Shadow Smoothness", &mShadowSmoothness.first, 0.0f, 0.0025f, "%.5f");
         }
     }
     ImGui::End();
