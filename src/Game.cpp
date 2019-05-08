@@ -10,6 +10,7 @@
 #include "node.h"
 #include "light.h"
 #include "mesh_node.h"
+#include "dispenser.h"
 #include "cube.h"
 
 // glow OpenGL wrapper
@@ -96,9 +97,11 @@ void Game::init()
         );
         root->addChild(level);
 
+        // add dispenser
+        root->addChild(new Dispenser(glm::vec3(2.5f, 0.0f, -14.0f), dynamicsWorld));
+
         root->createBuffer();
         mScene->setSceneRoot(root);
-
 
         // add a bunch of cubes for testing
         RigidBodyInfo info;
