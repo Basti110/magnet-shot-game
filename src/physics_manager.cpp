@@ -37,7 +37,8 @@ void PhysicsManager::update(float elapsedSeconds)
         for (auto b : mBlueMagnets)
         {
             auto pb = b->getCenterOfMassPosition();
-            r->applyCentralForce(pb - pr);
+            r->setLinearVelocity((pb - pr) * 20);
+            r->applyCentralForce((pb - pr));
         }
     }
     for (auto b : mBlueMagnets)
@@ -46,7 +47,8 @@ void PhysicsManager::update(float elapsedSeconds)
         for (auto r : mRedMagnets)
         {
             auto pr = r->getCenterOfMassPosition();
-            b->applyCentralForce(pr - pb);
+            //r->setLinearVelocity((pr - pb) * 20);
+            b->applyCentralForce((pr - pb));
         }
     }
 

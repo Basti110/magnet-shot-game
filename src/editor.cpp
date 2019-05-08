@@ -19,6 +19,28 @@ Editor::Editor(MessageBus* mB, SceneManager* scene, PhysicsManager* physics) :
     mCube->createBuffer();
     mScene->appendNode(mCube);
 
+    // ADD BRIDGE ------------------------------------------------
+    trans = glm::mat4(1.0f);
+    trans = glm::translate(trans, glm::vec3(-3.25f, -0.5f, -27.75f));
+    Cube* newCube = new Cube(trans, Color{1.0f, 1.0f, 1.0f}, mPhysics);
+    mScene->appendNode(newCube);
+
+    RigidBodyInfo info;
+    info.mass = 1.0;
+    info.friction = 0.5;
+    newCube->addPhysics({4.0, 1.0, 6.0}, info);
+    btRigidBody* body = mPhysics->getRigidBody(newCube->getPhysicsID());
+    body->setActivationState(DISABLE_DEACTIVATION);
+    const btVector3 btPivotA(0.0, -0.5f, -3.0f); // right next to the door slightly outside
+    btVector3 btAxisA(1.0f, 0.0f, 0.0f);       // pointing upwards, aka Y-axis
+
+    btHingeConstraint* spDoorHinge = new btHingeConstraint(*body, btPivotA, btAxisA);
+    spDoorHinge->setLimit(-SIMD_PI * 0.5f, SIMD_PI * 0.5f);
+    //spDoorHinge->
+    mPhysics->getDynamicsWorld()->addConstraint(spDoorHinge);
+    spDoorHinge->setDbgDrawSize(btScalar(5.f));
+    // -----------------------------------------------------------
+
     mB->addGameModeReceiver([=](GameModeMessage message) {
         this->notifyGameModeChange(message);
     });

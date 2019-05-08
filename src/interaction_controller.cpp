@@ -34,7 +34,7 @@ InteractionController::InteractionController(MessageBus* messageBus, SceneManage
     info.friction = 0.5;
 
     //auto controller = new btKinematik
-    glm::mat4 trans = glm::translate(glm::mat4(1.0), glm::vec3(-3.0f, 10.0f, 0.0f));
+    glm::mat4 trans = glm::translate(glm::mat4(1.0), glm::vec3(-3.0f, 10.0f, -24.0f));
 
     mNode = new Node();
     mNode->setLocalTransformation(trans);
@@ -83,6 +83,7 @@ void InteractionController::notifyKeyInput(KeyMessage message)
     //pos.z += CHARACTER_HEIGHT / 2; // half of character height
 
     glm::vec3 to(0.0f, -10.0f, 0.0f);
+    to += pos;
     bool onGround = mPhysics->bodyWithinReach(pos, to, CHARACTER_HEIGHT + CHARACTER_EPSILON, body);
     
     if (message.getAction() == GLFW_RELEASE)

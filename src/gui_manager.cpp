@@ -4,7 +4,6 @@
 #include "imgui/imgui_impl_opengl3.h"
 #include "scnene_manager.h"
 
-
 GuiManager::GuiManager(MessageBus* messageBus, GLFWwindow* window, SceneManager* scene) : 
     mMessageBus(messageBus),
     mWindow(window), 
@@ -155,7 +154,7 @@ void GuiManager::renderOverlay()
     bool* p_open = new bool(true);
     int corner = 0;
 
-    glm::vec3 pos = mScene->getCamera()->getPos() + mScene->getCamera()->getCameraFront();
+    glm::vec3 pos = mScene->getCamera()->getPos() + glm::vec3(2.0) * mScene->getCamera()->getCameraFront();
     ImVec2 window_pos
         = ImVec2((corner & 1) ? ImGui::GetIO().DisplaySize.x - DISTANCE : DISTANCE, (corner & 2) ? ImGui::GetIO().DisplaySize.y - DISTANCE : DISTANCE);
     ImVec2 window_pos_pivot = ImVec2((corner & 1) ? 1.0f : 0.0f, (corner & 2) ? 1.0f : 0.0f);
