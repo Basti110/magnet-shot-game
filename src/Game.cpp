@@ -4,10 +4,13 @@
 
 #include "gui_manager.h"
 #include "io_manager.h"
-#include "light.h"
-#include "node.h"
 #include "scnene_manager.h"
 #include "physics_manager.h"
+
+#include "node.h"
+#include "light.h"
+#include "mesh_node.h"
+#include "dispenser.h"
 #include "cube.h"
 
 // glow OpenGL wrapper
@@ -18,7 +21,6 @@
 #include <glow/objects/Program.hh>
 #include <glow/objects/Texture2D.hh>
 #include <glow/objects/TextureRectangle.hh>
-#include <glow/objects/VertexArray.hh>
 
 // extra functionality of glow
 #include <GLFW/glfw3.h>  // window/input framework
@@ -27,7 +29,6 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glow-extras/geometry/Quad.hh>
 #include <glow-extras/geometry/UVSphere.hh>
-#include "load_mesh.h" // helper function for loading .obj into VertexArrays
 
 
 Game::Game() : GlfwApp(Gui::ImGui) {}
@@ -40,6 +41,7 @@ void Game::init()
     mStartManager = new Starter(window());
     mScene = mStartManager->getScene();
     mPhysics = mStartManager->getPhysicsManager();
+    auto dynamicsWorld = mPhysics->getDynamicsWorld();
 
     mStartManager->getMessageBus()->addGameModeReceiver([=](GameModeMessage message) {
         this->notifyGameModeChange(message);
@@ -74,24 +76,32 @@ void Game::init()
         });
         mCrosshair = glow::VertexArray::create(crosshairBuffer, GL_LINES);
 
-        mFirstLevel.init("../../data/meshes/FirstRoom.obj", false);
-        mPhysics->addMesh("../../data/meshes/FirstRoomCollision.obj");
-
         mShaderObject = glow::Program::createFromFile("../../data/shaders/shader_node");
         mShaderOutput = glow::Program::createFromFile("../../data/shaders/output");
         mShaderSkybox = glow::Program::createFromFile("../../data/shaders/skybox");
         mShaderCrosshair = glow::Program::createFromFile("../../data/shaders/crosshair");
 
         Node* root = new Node;
+
+        // add light
         glm::mat4 trans = glm::mat4(1.0f);
         trans = glm::translate(trans, glm::vec3(0.0f, 4.0f, -9.0f));
         Light* light = new Light(trans, Color{1.0f, 1.0f, 1.0f});
         root->addChild(light);
-        root->addChild(&mFirstLevel);
-        mStartManager->getScene()->setLight(light);
+        mScene->setLight(light);
+
+        // add level
+        MeshNode* level = new MeshNode(
+            glm::mat4(1), "../../data/meshes/FirstRoom.obj", dynamicsWorld,
+            GROUP_STATIC_OBJECTS, GROUP_DYNAMIC_OBJECTS, 0.0f
+        );
+        root->addChild(level);
+
+        // add dispenser
+        root->addChild(new Dispenser(glm::vec3(2.5f, 0.0f, -14.0f), dynamicsWorld));
+
         root->createBuffer();
         mScene->setSceneRoot(root);
-
 
         // add a bunch of cubes for testing
         RigidBodyInfo info;

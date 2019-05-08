@@ -37,7 +37,7 @@ Editor::Editor(MessageBus* mB, SceneManager* scene, PhysicsManager* physics) :
     btHingeConstraint* spDoorHinge = new btHingeConstraint(*body, btPivotA, btAxisA);
     spDoorHinge->setLimit(-SIMD_PI * 0.5f, SIMD_PI * 0.5f);
     //spDoorHinge->
-    mPhysics->addConstraint(spDoorHinge);
+    mPhysics->getDynamicsWorld()->addConstraint(spDoorHinge);
     spDoorHinge->setDbgDrawSize(btScalar(5.f));
     // -----------------------------------------------------------
 

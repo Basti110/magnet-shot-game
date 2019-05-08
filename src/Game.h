@@ -4,7 +4,6 @@
 #include <glow/fwd.hh>
 #include "message_bus.h"
 #include "starter.h"
-#include "mesh_node.h"
 
 
 // bullet forward declarations
@@ -42,7 +41,6 @@ private:
     glow::SharedVertexArray mMeshQuad;
     glow::SharedVertexArray mSkybox;
     glow::SharedVertexArray mCrosshair;
-    MeshNode mFirstLevel;
 
     // intermediate framebuffer with color and depth texture
     glow::SharedFramebuffer mFramebuffer;

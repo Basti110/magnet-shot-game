@@ -29,7 +29,7 @@ struct UVSphereVertex
     static std::vector<ArrayBufferAttribute> attributes()
     {
         return {
-            {&UVSphereVertex::pos, "aPosition"},    //
+            {&UVSphereVertex::pos, "aPos"},    //
             {&UVSphereVertex::normal, "aNormal"},   //
             {&UVSphereVertex::tangent, "aTangent"}, //
             {&UVSphereVertex::texCoord, "aTexCoord"},
