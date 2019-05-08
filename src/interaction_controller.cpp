@@ -34,7 +34,7 @@ InteractionController::InteractionController(MessageBus* messageBus, SceneManage
     info.friction = 0.5;
 
     //auto controller = new btKinematik
-    glm::mat4 trans = glm::translate(glm::mat4(1.0), glm::vec3(-3.0f, 10.0f, -24.0f));
+    glm::mat4 trans = glm::translate(glm::mat4(1.0), glm::vec3(-3.0f, 10.0f, -3.0f));
 
     mNode = new Node();
     mNode->setLocalTransformation(trans);

@@ -132,6 +132,8 @@ void IOManager::processInput()
         sendMessageKey(GLFW_KEY_DOWN, GLFW_PRESS, cameraSpeed);
     if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
         sendMessageKey(GLFW_KEY_Q, GLFW_PRESS, cameraSpeed);
+    if (glfwGetKey(window, GLFW_KEY_G) == GLFW_PRESS)
+        sendMessageKey(GLFW_KEY_G, GLFW_PRESS, cameraSpeed);
     if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
         sendMessageKey(GLFW_KEY_E, GLFW_PRESS, cameraSpeed);
 

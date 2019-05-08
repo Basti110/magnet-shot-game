@@ -42,6 +42,7 @@ public:
 
     void addMagnet(btRigidBody* body, bool red);
     void clearMagnets();
+    void deleteId(int id);
 
     btDiscreteDynamicsWorld* getDynamicsWorld();
     btRigidBody* pickBody(const glm::vec3& rayFromWorld, const glm::vec3& rayToWorld);

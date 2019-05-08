@@ -56,5 +56,7 @@ private:
     std::pair<float, float> mCubeRestitution;
     std::pair<float, float> mCubeLinearDamping;
     std::pair<float, float> mCubeAngularDamping;
+
+    bool mSave = false;
 };
 

@@ -1,4 +1,5 @@
 #pragma once
+//#include <utility>
 #include "cube.h"
 #include "message_bus.h"
 #include "scnene_manager.h"
@@ -12,6 +13,9 @@ public:
     void notifyMouseMoveInput(MouseMoveMessage message);
     void notifyKeyInput(KeyMessage message);
     void notifyGuiInput(Message* message);
+    void save();
+
+    void load();
 
 private:
     void refreshCube();
@@ -23,4 +27,6 @@ private:
     RigidBodyInfo mCubeInfo;
     float mCubeDistance;
     bool mIsActive;
+    std::vector<Cube*> mCubes;
+    float mLastDelete = 0;
 };
