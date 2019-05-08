@@ -40,25 +40,20 @@ public:
 
     void update(float elapsedSeconds);
 
+    void addMagnet(btRigidBody* body, bool red);
+    void clearMagnets();
+
+    btDiscreteDynamicsWorld* getDynamicsWorld();
+    btRigidBody* pickBody(const glm::vec3& rayFromWorld, const glm::vec3& rayToWorld);
+    btRigidBody* pickBody(const glm::vec3& rayFromWorld, const glm::vec3& rayToWorld, glm::vec3& isect);
+    bool bodyWithinReach(const glm::vec3& pos, const glm::vec3& rayToWorld, float distance, btRigidBody* excludeObject);
+
     int addPlane(glm::vec3 normal, float planeConstant);
     int addCube(const glm::vec3& shape, const glm::mat4& transform, const RigidBodyInfo& info);
     int addCapsule(const glm::vec2& shape, const glm::mat4& transform, const RigidBodyInfo& info);
-    int addMesh(const std::string &filename);
-    int addMagnet(const glm::mat4& transform, float radius, int parent, bool red);
-    int addConstraint(btTypedConstraint* constraint);
-
-    void clearMagnets();
-
-    btRigidBody* pickBody(const glm::vec3& rayFromWorld, const glm::vec3& rayToWorld);
-    btRigidBody* pickBody(const glm::vec3& rayFromWorld, const glm::vec3& rayToWorld, glm::vec3& isect);
-    btRigidBody* getRigidBody(int id);
-    bool bodyWithinReach(const glm::vec3& pos, const glm::vec3& rayToWorld, float distance, btRigidBody* excludeObject);
-    bool getTransformation(int idx, glm::mat4& transform);
-
-private:
     int addRigidBody(btRigidBody* body, short group = GROUP_NONE, short mask = GROUP_NONE);
-    void removeRigidBody(btRigidBody* body);
-    void removeRigidBody(int idx);
+    bool getTransformation(int idx, glm::mat4& transform);
+    btRigidBody* getRigidBody(int id);
 
 private:
     btBroadphaseInterface* mBulletBroadphase = nullptr;
@@ -68,10 +63,6 @@ private:
     btDiscreteDynamicsWorld* mBulletWorld = nullptr;
 
     std::vector<btRigidBody*> mRigidBodies;
-    std::vector<btTypedConstraint*> mConstraints;
-
     std::vector<btRigidBody*> mRedMagnets;
     std::vector<btRigidBody*> mBlueMagnets;
-    std::vector<btTypedConstraint*> mMagnetConstraints;
 };
-

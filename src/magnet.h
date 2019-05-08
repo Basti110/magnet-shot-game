@@ -1,22 +1,23 @@
 #pragma once
-#include "abstract_node.h"
+#include "sphere_node.h"
 #include "physics_manager.h"
 
 
-class Magnet : public AbstractNode
+class Magnet : public SphereNode
 {
 public:
-    Magnet(PhysicsManager* physics, int physicsId, float scale, glm::vec3 color);
-    ~Magnet() override;
-    void render(const glow::UsedProgram& currentShader, glm::mat4& model, glm::mat4& view) override;
-    void update(float elapsedSeconds) override;
-
-private:
-    glow::SharedVertexArray mVertexArray;
-    glow::SharedProgram mShader;
-
-    PhysicsManager* mPhysics;
-    int mPhysicsId;
-    float mScale;
-    glm::vec3 mColor;
+    Magnet(const glm::vec3& position, float radius, PhysicsManager* physics, btRigidBody* parent, bool red) :
+        SphereNode(position, radius, physics->getDynamicsWorld(), GROUP_NONE, GROUP_NONE, parent->isStaticObject() ? 0.0f : 0.000001f)
+    {
+        mColor = red ? glm::vec3(1,0,0) : glm::vec3(0,0,1);
+        physics->addMagnet(mRigidBody, red);
+        if (!parent->isStaticObject()) {
+            auto magnetCenter = mRigidBody->getCenterOfMassPosition();
+            auto pivotInParent = parent->getWorldTransform().inverse() * magnetCenter;
+            auto pivotInMagnet = btVector3(0,0,0);
+            auto constraint = new btPoint2PointConstraint(*parent, *mRigidBody, pivotInParent, pivotInMagnet);
+            mWorld->addConstraint(constraint, true);
+            mConstraints.push_back(constraint);
+        }
+    }
 };

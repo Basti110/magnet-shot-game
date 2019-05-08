@@ -57,7 +57,7 @@ InteractionController::InteractionController(MessageBus* messageBus, SceneManage
     mConstraint->setLinearUpperLimit(btVector3(50, 50, 50));
     mConstraint->setAngularLowerLimit(btVector3(0, 0, 0));
     mConstraint->setAngularUpperLimit(btVector3(0, 0, 0));
-    physics->addConstraint(mConstraint);
+    mPhysics->getDynamicsWorld()->addConstraint(mConstraint);
 
     trans = glm::translate(glm::mat4(1.0), glm::vec3(0.0f, 2.0f, 0.0f));
     mCubeX = new Cube(trans, Color{1.0f, 1.0f, 1.0f}, mPhysics);

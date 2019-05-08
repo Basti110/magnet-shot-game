@@ -1,10 +1,10 @@
 uniform mat4 uTransform;
 
-in vec3 aPosition;
+in vec3 aPos;
 out vec3 vPosition;
 
 
 void main() {
-    vPosition = 250 * aPosition;
+    vPosition = 250 * aPos;
     gl_Position = uTransform * vec4(vPosition, 1.0);
 }
