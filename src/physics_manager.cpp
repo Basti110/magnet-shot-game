@@ -16,7 +16,7 @@ PhysicsManager::PhysicsManager()
     mBulletCollisionDispatcher = new btCollisionDispatcher(mBulletCollisionConfig);
     mBulletSolver = new btSequentialImpulseConstraintSolver;
     mBulletWorld = new btDiscreteDynamicsWorld(mBulletCollisionDispatcher, mBulletBroadphase, mBulletSolver, mBulletCollisionConfig);
-    mBulletWorld->setGravity(btVector3(0, -20, 0)); // set initial gravity
+    mBulletWorld->setGravity(btVector3(0, -10, 0)); // set initial gravity
 }
 
 PhysicsManager::~PhysicsManager()

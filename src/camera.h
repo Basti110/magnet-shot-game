@@ -15,6 +15,7 @@ public:
     void moveUp(float speed);
     void resetPosition();
     glm::vec3 getCameraFront();
+    glm::vec3 getCameraRight();
     glm::vec3 getCameraPosition();
     glm::mat4 getProjectionMatrix();
     glm::mat4 getViewMatrix();

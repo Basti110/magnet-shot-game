@@ -97,6 +97,11 @@ glm::vec3 Camera::getCameraFront()
     return glm::mat3(mGlobalTransformation) * glm::vec3(0.0f, 0.0f, -1.0f);
 }
 
+glm::vec3 Camera::getCameraRight()
+{
+    return glm::normalize(glm::cross(mCameraFront, mCameraUp));
+}
+
 glm::vec3 Camera::getCameraPosition()
 {
     return glm::vec3(mGlobalTransformation[3]);

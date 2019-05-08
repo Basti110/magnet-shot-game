@@ -12,7 +12,7 @@
 #include <GLFW/glfw3.h>
 #include <glm/gtc/matrix_transform.hpp>
 
-#define CHARACTER_HEIGHT 1.5
+#define CHARACTER_HEIGHT 0.7
 #define CHARACTER_EPSILON 0.1
 #define JUMP_TIMEOUT 0.2
 
@@ -30,7 +30,7 @@ InteractionController::InteractionController(MessageBus* messageBus, SceneManage
     });
 
     RigidBodyInfo info;
-    info.mass = 70.0;
+    info.mass = 30.0;
     info.friction = 0.5;
 
     //auto controller = new btKinematik
@@ -142,17 +142,19 @@ void InteractionController::notifyKeyInput(KeyMessage message)
         {
             if (onGround && (glfwGetTime() - mJumpTime) > JUMP_TIMEOUT)
             {
+                glm::vec3 right = cam->getCameraRight();
+                glm::vec3 front = glm::normalize(glm::cross(right, {0, 1, 0}));
                 if (message.getInput() == GLFW_KEY_W)
-                    body->setLinearVelocity(to_bullet(rotation * glm::vec3(0, 0, -5)));
+                    body->setLinearVelocity(to_bullet(front * glm::vec3(-5)));
                 if (message.getInput() == GLFW_KEY_S)
-                    body->setLinearVelocity(to_bullet(rotation * glm::vec3(0, 0, 5)));
+                    body->setLinearVelocity(to_bullet(front * glm::vec3(5)));
                 if (message.getInput() == GLFW_KEY_A)
-                    body->setLinearVelocity(to_bullet(rotation * glm::vec3(-5, 0, 0)));
+                    body->setLinearVelocity(to_bullet(right * glm::vec3(-5)));
                 if (message.getInput() == GLFW_KEY_D)
-                    body->setLinearVelocity(to_bullet(rotation * glm::vec3(5, 0, 0)));
+                    body->setLinearVelocity(to_bullet(right * glm::vec3(5)));
                 if (message.getInput() == GLFW_KEY_SPACE) 
                 {
-                    body->applyCentralImpulse({0, 800, 0});
+                    body->applyCentralImpulse({0, 200, 0});
                     mJumpTime = glfwGetTime();
                 }
             }
