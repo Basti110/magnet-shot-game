@@ -119,13 +119,13 @@ void Game::init()
             transform = glm::rotate(transform, glm::radians(param.second), glm::vec3(0,1,0));
             MeshNode* base = new MeshNode(
                 transform, "../../data/meshes/TreeBase.obj", dynamicsWorld,
-                GROUP_NONE, GROUP_NONE, 0.0f
+                GROUP_STATIC_OBJECTS, GROUP_DYNAMIC_OBJECTS, 0.0f
             );
             base->setColor(glm::vec3(151/255.0f, 103/255.0f, 48/255.0f));
             root->addChild(base);
             MeshNode* top = new MeshNode(
                 transform, "../../data/meshes/TreeTop.obj", dynamicsWorld,
-                GROUP_NONE, GROUP_NONE, 0.0f
+                GROUP_STATIC_OBJECTS, GROUP_DYNAMIC_OBJECTS, 0.0f
             );
             top->setColor(glm::vec3(99/255.0f, 194/255.0f, 47/255.0f));
             root->addChild(top);
