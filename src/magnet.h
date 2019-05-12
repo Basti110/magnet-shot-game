@@ -7,7 +7,8 @@ class Magnet : public SphereNode
 {
 public:
     Magnet(const glm::vec3& position, float radius, PhysicsManager* physics, btRigidBody* parent, bool red) :
-        SphereNode(position, radius, physics->getDynamicsWorld(), GROUP_NONE, GROUP_NONE, parent->isStaticObject() ? 0.0f : 0.1f)
+        SphereNode(position, radius, physics->getDynamicsWorld(), GROUP_NONE, GROUP_NONE, parent->isStaticObject() ? 0.0f : 0.1f),
+        mParent(parent)
     {
         mColor = red ? glm::vec3(1,0,0) : glm::vec3(0,0,1);
         physics->addMagnet(mRigidBody, red);
@@ -22,4 +23,14 @@ public:
             mConstraints.push_back(constraint);
         }
     }
+
+    ~Magnet()
+    {
+        if (!mParent->isStaticObject()) {
+            mParent->activate();
+        }
+    }
+
+private:
+    btRigidBody* mParent;
 };
