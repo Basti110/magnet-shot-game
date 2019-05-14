@@ -53,8 +53,8 @@ InteractionController::InteractionController(MessageBus* messageBus, SceneManage
     frameInB = btTransform::getIdentity();
     frameInB.setOrigin(btVector3(0., 0., 0.));
     mConstraint = new btGeneric6DofConstraint(*body, frameInB, useLinearReferenceFrameA);
-    mConstraint->setLinearLowerLimit(btVector3(-50, -50, -50));
-    mConstraint->setLinearUpperLimit(btVector3(50, 50, 50));
+    mConstraint->setLinearLowerLimit(btVector3(-75, -75, -75));
+    mConstraint->setLinearUpperLimit(btVector3(75, 75, 75));
     mConstraint->setAngularLowerLimit(btVector3(0, 0, 0));
     mConstraint->setAngularUpperLimit(btVector3(0, 0, 0));
     mPhysics->getDynamicsWorld()->addConstraint(mConstraint);

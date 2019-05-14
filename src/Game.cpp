@@ -108,6 +108,17 @@ void Game::init()
         );
         root->addChild(level);
 
+        // add dynamic objects
+        MeshNode* obstacle = new MeshNode(
+            glm::mat4(1), "../../data/meshes/Obstacle.obj", dynamicsWorld,
+            GROUP_DYNAMIC_OBJECTS, GROUP_STATIC_OBJECTS | GROUP_DYNAMIC_OBJECTS, 1.0f
+        );
+        obstacle->setColor(glm::vec3(234/255.0f, 22/255.0f, 22/255.0f));
+        obstacle->getRigidBody()->setLinearFactor(btVector3(1,0,0));
+        obstacle->getRigidBody()->setAngularFactor(btVector3(0,0,0));
+        obstacle->getRigidBody()->setFriction(0.5f);
+        root->addChild(obstacle);
+
         // add trees
         auto treeParams = {
             std::make_pair(glm::vec3(-4.35f, 0.27f, -6.2f), -45.0f),
