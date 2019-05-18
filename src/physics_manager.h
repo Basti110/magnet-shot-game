@@ -12,6 +12,7 @@ class btCollisionDispatcher;
 class btDiscreteDynamicsWorld;
 class btSequentialImpulseConstraintSolver;
 class btTypedConstraint;
+class DebugDrawer;
 
 
 enum CollisionGroup
@@ -43,6 +44,7 @@ public:
     void addMagnet(btRigidBody* body, bool red);
     void clearMagnets();
     void deleteId(int id);
+    void renderDebug(glm::mat4& projection, glm::mat4& view, float updateRate);
 
     btDiscreteDynamicsWorld* getDynamicsWorld();
     btRigidBody* pickBody(const glm::vec3& rayFromWorld, const glm::vec3& rayToWorld);
@@ -62,8 +64,11 @@ private:
     btCollisionDispatcher* mBulletCollisionDispatcher = nullptr;
     btSequentialImpulseConstraintSolver* mBulletSolver = nullptr;
     btDiscreteDynamicsWorld* mBulletWorld = nullptr;
+    DebugDrawer* mDebugDrawer = nullptr;
 
     std::vector<btRigidBody*> mRigidBodies;
     std::vector<btRigidBody*> mRedMagnets;
     std::vector<btRigidBody*> mBlueMagnets;
+
+    float mLastPhysicsUpdate = 0;
 };

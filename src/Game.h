@@ -24,6 +24,7 @@ private:
     glm::vec4 mBackgroundColor2;
     bool mShowWireframe = false;
     bool mShowPostProcess = false;
+    bool mShowPhysicsDebug = false;
     float mBounceF = 0;
     Starter* mStartManager;
     SceneManager* mScene;
@@ -68,10 +69,10 @@ public:
     void onResize(int w, int h) override; // called when window is resized
 
     void updateCamera(float elapsedSeconds);
-    std::function<void(KeyMessage)> getNotifyFuncKey();
     std::function<void(Message*)> getNotifyFuncGui();
     void notifyGameModeChange(GameModeMessage message);
     void notifyGuiInput(Message* message);
+    void notifyKeyInput(KeyMessage message);
 
     float mLastFrame = 0;
 };

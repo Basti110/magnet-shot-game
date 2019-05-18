@@ -1,4 +1,5 @@
 #include "physics_manager.h"
+#include "debug_drawer.h"
 #include <btBulletDynamicsCommon.h> // bullet physics
 #include "BulletCollision/NarrowPhaseCollision/btRaycastCallback.h"
 #include "bullet_helper.hh"
@@ -7,6 +8,9 @@
 #include <polymesh/algorithms/properties.hh>
 #include <polymesh/fields.hh>
 #include <polymesh/formats/obj.hh>
+
+#include <GLFW/glfw3.h>
+#include <glad/glad.h>
 
 
 PhysicsManager::PhysicsManager()
@@ -17,6 +21,8 @@ PhysicsManager::PhysicsManager()
     mBulletSolver = new btSequentialImpulseConstraintSolver;
     mBulletWorld = new btDiscreteDynamicsWorld(mBulletCollisionDispatcher, mBulletBroadphase, mBulletSolver, mBulletCollisionConfig);
     mBulletWorld->setGravity(btVector3(0, -10, 0)); // set initial gravity
+    mDebugDrawer = new DebugDrawer();
+    mBulletWorld->setDebugDrawer(mDebugDrawer);
 }
 
 PhysicsManager::~PhysicsManager()
@@ -126,6 +132,18 @@ void PhysicsManager::clearMagnets()
 void PhysicsManager::deleteId(int id) 
 {
 
+}
+
+void PhysicsManager::renderDebug(glm::mat4& projection, glm::mat4& view, float updateRate)
+{
+    bool laodNew = (glfwGetTime() - mLastPhysicsUpdate) > updateRate;
+    if (laodNew)
+    {
+        mDebugDrawer->resetLines();
+        mBulletWorld->debugDrawWorld();
+        mLastPhysicsUpdate = glfwGetTime();
+    }       
+    mDebugDrawer->draw(projection, view, laodNew);
 }
 
 btDiscreteDynamicsWorld* PhysicsManager::getDynamicsWorld()

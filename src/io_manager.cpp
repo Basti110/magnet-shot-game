@@ -153,7 +153,12 @@ void IOManager::processInput()
         mCurrGameMode = GameMode::Editor;
     }
 
-    const int F8KeyState = glfwGetKey(window, GLFW_KEY_F8);
+    const int F7KeyState = glfwGetKey(window, GLFW_KEY_F7);
+    if (F7KeyState == GLFW_RELEASE && mPrevF7KeyState == GLFW_PRESS)
+        sendMessageKey(GLFW_KEY_F7, GLFW_PRESS, cameraSpeed);
+    mPrevF7KeyState = glfwGetKey(window, GLFW_KEY_F7);
+
+        const int F8KeyState = glfwGetKey(window, GLFW_KEY_F8);
     if (F8KeyState == GLFW_RELEASE && mPrevF8KeyState == GLFW_PRESS)
         sendMessageKey(GLFW_KEY_F8, GLFW_PRESS, cameraSpeed);
     mPrevF8KeyState = glfwGetKey(window, GLFW_KEY_F8);

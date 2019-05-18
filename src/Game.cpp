@@ -45,6 +45,10 @@ void Game::init()
     mStartManager->getMessageBus()->addGameModeReceiver([=](GameModeMessage message) {
         this->notifyGameModeChange(message);
     });
+    mStartManager->getMessageBus()->addKeyReceiver([=](KeyMessage message) { 
+        this->notifyKeyInput(message); 
+    });
+
     mStartManager->getMessageBus()->addGuiReceiver(getNotifyFuncGui());
 
     GameModeMessage m(GameMode::Gameplay);
@@ -226,6 +230,7 @@ void Game::render(float elapsedSeconds)
 
         glm::mat4 view = mScene->getCamera()->getViewMatrix();
         glm::mat4 projection = mScene->getCamera()->getProjectionMatrix();
+        if (!mShowPhysicsDebug)
         {
             auto shader = mShaderObject->use();
             shader.setUniform("projection", projection);
@@ -234,6 +239,12 @@ void Game::render(float elapsedSeconds)
             shader.setTexture("shadowMap", mShadowMap);
             mScene->render(shader, projection, view);
         }
+        else
+        {
+            float updateRate = 0.0;
+            mPhysics->renderDebug(projection, view, updateRate);
+        }
+        
 
         // draw skybox
         view = glm::mat4(glm::mat3(view));
@@ -323,6 +334,17 @@ void Game::notifyGuiInput(Message* message)
         {
             auto shader = mShaderObject->use();
             shader.setUniform("shadowSmoothness", m->getValue());
+        }
+    }
+}
+
+void Game::notifyKeyInput(KeyMessage message) 
+{
+    if (message.getAction() == GLFW_PRESS)
+    {
+        if (message.getInput() == GLFW_KEY_F7)
+        {
+            mShowPhysicsDebug = mShowPhysicsDebug ? false : true;
         }
     }
 }
