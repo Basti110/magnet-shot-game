@@ -1,5 +1,6 @@
 #pragma once
 #include "abstract_node.h"
+#include "message_bus.h"
 
 #include <btBulletDynamicsCommon.h>
 #include <glow/objects/VertexArray.hh>
@@ -23,4 +24,5 @@ protected:
 
     glow::SharedVertexArray mVertexArray;
     glm::vec3 mColor;
+    MessageBus* mMessageBus;
 };

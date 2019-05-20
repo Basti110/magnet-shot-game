@@ -16,9 +16,12 @@ public:
     void resetPosition();
     glm::vec3 getCameraFront();
     glm::vec3 getCameraRight();
+    glm::vec3 getCameraUp();
     glm::vec3 getCameraPosition();
     glm::mat4 getProjectionMatrix();
     glm::mat4 getViewMatrix();
+    int getWidth();
+    int getHeight();
     void setViewportSize(int w, int h);
 
     void setLocalTransformation(glm::mat4 transformation) override;
@@ -28,6 +31,8 @@ public:
 private:
     void buildTransform();
 
+    int mWidth = 0;
+    int mHeight = 0;
     glm::mat4 mProjectionMatrix;
     glm::vec3 mCameraPos;
     glm::vec3 mCameraFront;

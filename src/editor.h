@@ -19,6 +19,7 @@ public:
 
 private:
     void refreshCube();
+    glm::vec3 getRayTo(int x, int y);
 
     SceneManager* mScene;
     PhysicsManager* mPhysics;
@@ -27,6 +28,7 @@ private:
     RigidBodyInfo mCubeInfo;
     float mCubeDistance;
     bool mIsActive;
+    GameMode mGameMode = GameMode::Gameplay;
     std::vector<Cube*> mCubes;
     float mLastDelete = 0;
 };

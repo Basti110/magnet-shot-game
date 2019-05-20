@@ -114,6 +114,9 @@ Editor::Editor(MessageBus* mB, SceneManager* scene, PhysicsManager* physics) :
 
 void Editor::refreshCube()
 {
+    if (mGameMode != GameMode::Editor)
+        return;
+
     Camera* cam = mScene->getCamera();
     glm::vec3 front = cam->getCameraFront();
     glm::vec3 pos = cam->getCameraPosition();
@@ -129,13 +132,14 @@ void Editor::refreshCube()
 
 void Editor::notifyGameModeChange(GameModeMessage message)
 {
-    mIsActive = message.mode == GameMode::Editor;
-    mCube->setVisible(mIsActive);
+    mIsActive = message.mode == GameMode::Editor || message.mode == GameMode::Editor2;
+    mCube->setVisible(message.mode == GameMode::Editor);
+    mGameMode = message.mode;
 }
 
 void Editor::notifyMouseClickInput(MouseClickMessage message)
 {
-    if (message.getInput() == GLFW_MOUSE_BUTTON_LEFT)
+    if (message.getInput() == GLFW_MOUSE_BUTTON_LEFT && mGameMode == GameMode::Editor)
     {
         Cube* newCube = new Cube(*mCube);
         auto trans = mCube->getLocalTransformation();
@@ -147,7 +151,7 @@ void Editor::notifyMouseClickInput(MouseClickMessage message)
         mCubes.push_back(newCube);
 
     }
-    if (message.getInput() == GLFW_MOUSE_BUTTON_MIDDLE && message.getAction() == 1000)
+    if (message.getInput() == GLFW_MOUSE_BUTTON_MIDDLE && message.getAction() == 1000 && mGameMode == GameMode::Editor)
     {
         mCubeDistance += message.getPostion().y;
         if (mCubeDistance > 10)
@@ -156,20 +160,38 @@ void Editor::notifyMouseClickInput(MouseClickMessage message)
             mCubeDistance = 1;
         refreshCube();
     }
+    if (mGameMode == GameMode::Editor2 && message.getInput() == GLFW_MOUSE_BUTTON_LEFT)
+    {
+        glm::vec3 direction = getRayTo(message.getPostion().x, message.getPostion().y);
+        direction = glm::normalize(direction);
+        std::cout << direction.x << ", " << direction.y << ", " << direction.z << "\n";
+        
+        Camera* cam = mScene->getCamera();
+        glm::vec3 pos = cam->getCameraPosition();
+        std::cout << pos.x << ", " << pos.y << ", " << pos.z << "\n";
+        pos = pos + 2.f * glm::normalize(direction);
+        btRigidBody* test = mPhysics->pickBody(pos, direction * 200.f);
+        if (test != nullptr)
+            std::cout << "Hit Object!: " << test->getUserIndex() << "\n";
+    }
+    std::cout << "click\n";
 }
 
 void Editor::notifyMouseMoveInput(MouseMoveMessage message)
 {
-    refreshCube();
-    Camera* cam = mScene->getCamera();
-    glm::vec3 front = cam->getCameraFront();
-    glm::vec3 pos = cam->getCameraPosition();
-    glm::mat4 projection = mScene->getCamera()->getProjectionMatrix();
-    glm::vec4 v = glm::vec4(front.x, front.y, front.z, 1) * glm::vec4(10);
-    v = projection * v;
-    btRigidBody* test = mPhysics->pickBody(pos, glm::vec3(v.x, v.y, v.z));
-    if (test != nullptr)
-        std::cout << "Hit Object!: " << test->getUserIndex() << "\n";
+    if (mGameMode == GameMode::Editor)
+    {
+        refreshCube();
+        Camera* cam = mScene->getCamera();
+        glm::vec3 front = cam->getCameraFront();
+        glm::vec3 pos = cam->getCameraPosition();
+        glm::mat4 projection = mScene->getCamera()->getProjectionMatrix();
+        glm::vec4 v = glm::vec4(front.x, front.y, front.z, 1) * glm::vec4(10);
+        v = projection * v;
+        btRigidBody* test = mPhysics->pickBody(pos, glm::vec3(v.x, v.y, v.z));
+        //if (test != nullptr)
+            //std::cout << "Hit Object!: " << test->getUserIndex() << "\n";
+    }
 }
 
 void Editor::notifyKeyInput(KeyMessage message)
@@ -323,4 +345,66 @@ void Editor::load() {
         //newCube->addPhysics(mCubeScale, mCubeInfo);
         mCubes.push_back(newCube);
     }
+}
+
+glm::vec3 Editor::getRayTo(int x, int y)
+{
+    //CommonRenderInterface* renderer = m_guiHelper->getRenderInterface();
+
+    /*if (!renderer)
+    {
+        btAssert(0);
+        return btVector3(0, 0, 0);
+    }*/
+
+    float top = 1.f;
+    float bottom = -1.f;
+    float nearPlane = 0.1f;
+    float tanFov = (top - bottom) * 0.5f / nearPlane;
+    float fov = btScalar(2.0) * btAtan(tanFov);
+
+    glm::vec3 camPos, camTarget;
+
+    camPos = mScene->getCamera()->getCameraPosition();
+    //renderer->getActiveCamera()->getCameraPosition(camPos);
+    //renderer->getActiveCamera()->getCameraTargetPosition(camTarget);
+
+    glm::vec3 rayFrom = camPos;
+    glm::vec3 rayForward = glm::normalize(mScene->getCamera()->getCameraFront());
+    float farPlane = 500.f;
+    rayForward *= farPlane;
+
+    btVector3 rightOffset;
+    glm::vec3 vertical = mScene->getCamera()->getCameraUp();
+    //cameraUp[m_guiHelper->getAppInterface()->getUpAxis()] = 1;
+
+    //btVector3 vertical = cameraUp;
+
+    glm::vec3 hor;
+    hor = -glm::normalize(glm::cross(vertical, rayForward));
+    //hor.safeNormalize();
+    //vertical = hor.cross(rayForward);
+    //vertical.safeNormalize();
+
+    float tanfov = tanf(0.5f * glm::radians(75.0f));
+
+    hor *= 2.f * farPlane * tanfov;
+    vertical *= 2.f * farPlane * tanfov;
+
+    float aspect;
+    float width = float(mScene->getCamera()->getWidth());
+    float height = float(mScene->getCamera()->getHeight());
+
+    aspect = width / height;
+
+    hor *= aspect;
+
+    glm::vec3 rayToCenter = rayFrom + rayForward;
+    glm::vec3 dHor = hor * 1.f / width;
+    glm::vec3 dVert = vertical * 1.f / height;
+
+    glm::vec3 rayTo = rayToCenter - 0.5f * hor + 0.5f * vertical;
+    rayTo += float(x) * dHor;
+    rayTo -= float(y) * dVert;
+    return rayTo;
 }

@@ -104,7 +104,7 @@ void IOManager::processInput()
     }
         
 
-    if (mCurrGameMode == GameMode::Editor)
+    if (mCurrGameMode == GameMode::Editor || mCurrGameMode == GameMode::Editor2)
     {
         if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
             sendMessageKey(GLFW_KEY_SPACE, GLFW_PRESS, cameraSpeed);
@@ -143,14 +143,31 @@ void IOManager::processInput()
 
     // Switch GameMode
     if (glfwGetKey(window, GLFW_KEY_F1) == GLFW_PRESS) {
-        sendMessageGameMode(GameMode::Gameplay);
-        mPrevGameMode = mCurrGameMode;
-        mCurrGameMode = GameMode::Gameplay;
+        if (mCurrGameMode != GameMode::Gameplay)
+        {
+            sendMessageGameMode(GameMode::Gameplay);
+            mPrevGameMode = mCurrGameMode;
+            mCurrGameMode = GameMode::Gameplay;
+        }
     }
     if (glfwGetKey(window, GLFW_KEY_F2) == GLFW_PRESS) {
-        sendMessageGameMode(GameMode::Editor);
-        mPrevGameMode = mCurrGameMode;
-        mCurrGameMode = GameMode::Editor;
+        if (mCurrGameMode != GameMode::Editor)
+        {
+            sendMessageGameMode(GameMode::Editor);
+            mPrevGameMode = mCurrGameMode;
+            mCurrGameMode = GameMode::Editor;
+        }
+
+    }
+    if (glfwGetKey(window, GLFW_KEY_F3) == GLFW_PRESS)
+    {
+        if (mCurrGameMode != GameMode::Editor2)
+        {
+            sendMessageGameMode(GameMode::Editor2);
+            mPrevGameMode = mCurrGameMode;
+            mCurrGameMode = GameMode::Editor2;
+        }
+
     }
 
     const int F7KeyState = glfwGetKey(window, GLFW_KEY_F7);

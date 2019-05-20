@@ -7,7 +7,7 @@ PhysicsNode::PhysicsNode(btDynamicsWorld* world) :
     mRigidBody(nullptr),
     mColor(glm::vec3(1))
 {
-
+    mMessageBus = MessageBus::getInstance();
 }
 
 PhysicsNode::~PhysicsNode()

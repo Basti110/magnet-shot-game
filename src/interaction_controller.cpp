@@ -22,11 +22,15 @@ InteractionController::InteractionController(MessageBus* messageBus, SceneManage
 {
     messageBus->addGameModeReceiver([=](GameModeMessage message) { this->notifyGameModeChange(message); });
     messageBus->addKeyReceiver([=](KeyMessage message) {
-        if (mGameMode == GameMode::Editor || mGameMode == GameMode::Gameplay)
+        if (mGameMode == GameMode::Editor 
+            || mGameMode == GameMode::Gameplay 
+            || mGameMode == GameMode::Editor2)
             this->notifyKeyInput(message);
     });
     messageBus->addMouseMoveReceiver([=](MouseMoveMessage message) {
-        if (mGameMode == GameMode::Editor || mGameMode == GameMode::Gameplay)
+        if (mGameMode == GameMode::Editor 
+            || mGameMode == GameMode::Gameplay 
+            || mGameMode == GameMode::Editor2)
             this->notifyMouseMoveInput(message);
     });
 
@@ -117,7 +121,7 @@ void InteractionController::notifyKeyInput(KeyMessage message)
         float cameraSpeed = message.getSpeed();
         glm::mat4 trans = glm::translate(mNode->getGlobalTransformation(), glm::vec3(0.0f, 0.0f, -0.1f));
 
-        if (mGameMode == GameMode::Editor)
+        if (mGameMode == GameMode::Editor || mGameMode == GameMode::Editor2)
         {
             /*if (message.getInput() == GLFW_KEY_LEFT_SHIFT)
                 cam->moveUp(-cameraSpeed);*/

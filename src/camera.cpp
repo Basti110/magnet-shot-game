@@ -92,6 +92,16 @@ glm::mat4 Camera::getViewMatrix()
     return glm::inverse(mGlobalTransformation);
 }
 
+int Camera::getWidth()
+{
+    return mWidth;
+}
+
+int Camera::getHeight()
+{
+    return mHeight;
+}
+
 glm::vec3 Camera::getCameraFront()
 {
     return glm::mat3(mGlobalTransformation) * glm::vec3(0.0f, 0.0f, -1.0f);
@@ -100,6 +110,11 @@ glm::vec3 Camera::getCameraFront()
 glm::vec3 Camera::getCameraRight()
 {
     return glm::normalize(glm::cross(mCameraFront, mCameraUp));
+}
+
+glm::vec3 Camera::getCameraUp()
+{
+    return glm::normalize(mCameraUp);
 }
 
 glm::vec3 Camera::getCameraPosition()
@@ -114,6 +129,8 @@ glm::mat4 Camera::getProjectionMatrix()
 
 void Camera::setViewportSize(int w, int h) 
 {
+    mHeight = h;
+    mWidth = w;
     glm::mat4 projection = glm::mat4(1.0f);
     mProjectionMatrix = glm::perspective(glm::radians(75.0f), (float)w / (float)h, 0.1f, 500.0f);
 }

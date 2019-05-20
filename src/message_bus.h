@@ -1,11 +1,15 @@
 #pragma once
-#include <iostream>
 #include <functional>
+#include <glm/glm.hpp>
+#include <iostream>
 #include <queue>
 #include <vector>
-#include <glm/glm.hpp>
+#include "singelton.h"
 
-enum MType {
+class btRigidBody;
+
+enum MType
+{
     M_GAME_MODE,
     M_KEY,
     M_MOUSE_CLICK,
@@ -13,10 +17,12 @@ enum MType {
     GUI_FLOAT,
     GUI_VEC3,
     SCENE,
-    RENDERSYSTEM
+    RENDERSYSTEM,
+    PICK_BODY,
 };
 
-enum GuiSettings {
+enum GuiSettings
+{
     BACKGROUND_COLOR1,
     BACKGROUND_COLOR2,
     LIGHT_COLOR,
@@ -33,38 +39,42 @@ enum GuiSettings {
     SAVE
 };
 
-enum class GameMode {
+enum class GameMode
+{
     Menu,
     Gameplay,
-    Editor
+    Editor,
+    Editor2
 };
 
 class Message
 {
-    public:
-        Message() {}
-        virtual ~Message();
+public:
+    Message() {}
+    virtual ~Message();
 
-        MType getType() {
-            return type;
-        }
-    protected:
-        enum MType type;
+    MType getType() { return type; }
+
+protected:
+    enum MType type;
 };
 
-class GameModeMessage: public Message
+class GameModeMessage : public Message
 {
 public:
-    GameModeMessage(GameMode m) : mode(m)
-    {
-        this->type = M_GAME_MODE;
-    }
+    GameModeMessage(GameMode m) : mode(m) { this->type = M_GAME_MODE; }
     const GameMode mode;
 };
 
-class KeyMessage: public Message
+class PickBodyMessage : public Message
 {
+public:
+    PickBodyMessage(btRigidBody* m) : body(m) { this->type = PICK_BODY; }
+    const btRigidBody* body;
+};
 
+class KeyMessage : public Message
+{
 public:
     KeyMessage(int input, int action, float speed)
     {
@@ -74,78 +84,55 @@ public:
         this->speed = speed;
     }
 
-    int getInput()
-    {
-        return input;
-    }
+    int getInput() { return input; }
 
-    int getAction()
-    {
-        return action;
-    }
+    int getAction() { return action; }
 
-    float getSpeed()
-    {
-        return speed;
-    }
+    float getSpeed() { return speed; }
+
 private:
     int input;
     int action;
     float speed;
 };
 
-class MouseClickMessage: public Message
+class MouseClickMessage : public Message
 {
-
 public:
     MouseClickMessage(float x, float y, int input, int action)
-	{
-		this->type = MType::M_MOUSE_CLICK;
-		this->input = input;
-		this->action = action;
-        this->position = { x, y };
-	}
-
-	int getInput()
-	{
-		return input;
-	}
-
-	int getAction()
-	{
-		return action;
-	}
-
-    glm::vec2 getPostion()
     {
-        return position;
+        this->type = MType::M_MOUSE_CLICK;
+        this->input = input;
+        this->action = action;
+        this->position = {x, y};
     }
+
+    int getInput() { return input; }
+
+    int getAction() { return action; }
+
+    glm::vec2 getPostion() { return position; }
+
 private:
     glm::vec2 position;
-	int input;
-	int action;
+    int input;
+    int action;
 };
 
 class MouseMoveMessage : public Message
 {
-
 public:
     MouseMoveMessage(float x, float y, float dX, float dY)
     {
         this->type = MType::M_MOUSE_MOVE;
-        this->position = { x, y };
-        this->deltaPosition = { dX, dY };
+        this->position = {x, y};
+        this->deltaPosition = {dX, dY};
     }
 
-    glm::vec2 getPosition()
-    {
-        return position;
-    }
+    glm::vec2 getPosition() { return position; }
 
-    glm::vec2 getDeltaPosition()
-    {
-        return deltaPosition;
-    }
+    glm::vec2 getDeltaPosition() { return deltaPosition; }
+
 private:
     glm::vec2 position;
     glm::vec2 deltaPosition;
@@ -153,7 +140,6 @@ private:
 
 class GuiFloatMessage : public Message
 {
-
 public:
     GuiFloatMessage(float value, GuiSettings setting)
     {
@@ -162,15 +148,10 @@ public:
         this->value = value;
     }
 
-    float getValue()
-    {
-        return value;
-    }
+    float getValue() { return value; }
 
-    GuiSettings getSetting()
-    {
-        return setting;
-    }
+    GuiSettings getSetting() { return setting; }
+
 private:
     float value;
     GuiSettings setting;
@@ -178,7 +159,6 @@ private:
 
 class GuiVec3Message : public Message
 {
-
 public:
     GuiVec3Message(glm::vec3 value, GuiSettings setting)
     {
@@ -187,156 +167,173 @@ public:
         this->value = value;
     }
 
-    glm::vec3 getValue()
-    {
-        return value;
-    }
+    glm::vec3 getValue() { return value; }
 
-    GuiSettings getSetting()
-    {
-        return setting;
-    }
+    GuiSettings getSetting() { return setting; }
+
 private:
     glm::vec3 value;
     GuiSettings setting;
 };
 
-class MessageBus
+class MessageBus : public Singleton<MessageBus>
 {
-    public:
-        MessageBus();
-        ~MessageBus();
+public:
+    MessageBus();
+    ~MessageBus();
 
-        void addGameModeReceiver(std::function<void(GameModeMessage)> messageReceiver)
+    void addGameModeReceiver(std::function<void(GameModeMessage)> messageReceiver) { this->gameModeReceiver.push_back(messageReceiver); }
+
+    void addKeyReceiver(std::function<void(KeyMessage)> messageReceiver) { this->keyReceiver.push_back(messageReceiver); }
+
+    void addMouseClickReceiver(std::function<void(MouseClickMessage)> messageReceiver) { this->mouseClickReceiver.push_back(messageReceiver); }
+
+    void addMouseMoveReceiver(std::function<void(MouseMoveMessage)> messageReceiver) { this->mouseMoveReceiver.push_back(messageReceiver); }
+
+    void addPickBodyReceiver(std::function<void(PickBodyMessage)> messageReceiver) { this->pickBodyReceiver.push_back(messageReceiver); }
+
+    void addGuiReceiver(std::function<void(Message*)> messageReceiver) { this->guiReceiver.push_back(messageReceiver); }
+
+    void sendMessage(Message* message)
+    {
+        if (message->getType() == MType::M_GAME_MODE)
         {
-            this->gameModeReceiver.push_back(messageReceiver);
+            GameModeMessage* gameModeMessage = dynamic_cast<GameModeMessage*>(message);
+            if (!gameModeMessage)
+                return; // TODO: Error
+            gameModeMessage = new GameModeMessage(*gameModeMessage);
+            this->gameModeMessages.push(gameModeMessage);
+        }
+        if (message->getType() == MType::M_KEY)
+        {
+            KeyMessage* keyMessage = dynamic_cast<KeyMessage*>(message);
+            if (!keyMessage)
+                return; // TODO: Error
+            keyMessage = new KeyMessage(*keyMessage);
+            this->keyMessages.push(keyMessage);
+        }
+        else if (message->getType() == MType::M_MOUSE_CLICK)
+        {
+            MouseClickMessage* mouseMessage = dynamic_cast<MouseClickMessage*>(message);
+            if (!mouseMessage)
+                return; // TODO: Error
+            mouseMessage = new MouseClickMessage(*mouseMessage);
+            this->mouseClickMessages.push(mouseMessage);
+        }
+        else if (message->getType() == MType::M_MOUSE_MOVE)
+        {
+            MouseMoveMessage* mouseMessage = dynamic_cast<MouseMoveMessage*>(message);
+            if (!mouseMessage)
+                return; // TODO: Error
+            mouseMessage = new MouseMoveMessage(*mouseMessage);
+            this->mouseMoveMessages.push(mouseMessage);
+        }
+        else if (message->getType() == MType::GUI_FLOAT)
+        {
+            GuiFloatMessage* m = dynamic_cast<GuiFloatMessage*>(message);
+            if (!m)
+                return; // TODO: Error
+            m = new GuiFloatMessage(*m);
+            this->guiMessages.push(m);
+        }
+        else if (message->getType() == MType::GUI_VEC3)
+        {
+            GuiVec3Message* m = dynamic_cast<GuiVec3Message*>(message);
+            if (!m)
+                return; // TODO: Error
+            m = new GuiVec3Message(*m);
+            this->guiMessages.push(m);
+        }
+        else if (message->getType() == MType::PICK_BODY)
+        {
+            PickBodyMessage* mouseMessage = dynamic_cast<PickBodyMessage*>(message);
+            if (!mouseMessage)
+                return; // TODO: Error
+            mouseMessage = new PickBodyMessage(*mouseMessage);
+            this->pickBodyMessages.push(mouseMessage);
+        }
+    }
+
+    void notify()
+    {
+        while (!gameModeMessages.empty())
+        {
+            for (auto iter = gameModeReceiver.begin(); iter != gameModeReceiver.end(); iter++)
+            {
+                (*iter)(GameModeMessage(*gameModeMessages.front()));
+            }
+            GameModeMessage* m = gameModeMessages.front();
+            gameModeMessages.pop();
+            delete m;
         }
 
-        void addKeyReceiver(std::function<void(KeyMessage)> messageReceiver)
+        while (!keyMessages.empty())
         {
-            this->keyReceiver.push_back(messageReceiver);
+            for (auto iter = keyReceiver.begin(); iter != keyReceiver.end(); iter++)
+            {
+                (*iter)(KeyMessage(*keyMessages.front()));
+            }
+            KeyMessage* m = keyMessages.front();
+            keyMessages.pop();
+            delete m;
         }
 
-		void addMouseClickReceiver(std::function<void(MouseClickMessage)> messageReceiver)
-		{
-			this->mouseClickReceiver.push_back(messageReceiver);
-		}
-
-        void addMouseMoveReceiver(std::function<void(MouseMoveMessage)> messageReceiver)
+        while (!mouseClickMessages.empty())
         {
-            this->mouseMoveReceiver.push_back(messageReceiver);
+            for (auto iter = mouseClickReceiver.begin(); iter != mouseClickReceiver.end(); iter++)
+            {
+                (*iter)(MouseClickMessage(*mouseClickMessages.front()));
+            }
+            MouseClickMessage* m = mouseClickMessages.front();
+            mouseClickMessages.pop();
+            delete m;
         }
 
-        void addGuiReceiver(std::function<void(Message*)> messageReceiver)
+        while (!mouseMoveMessages.empty())
         {
-            this->guiReceiver.push_back(messageReceiver);
+            for (auto iter = mouseMoveReceiver.begin(); iter != mouseMoveReceiver.end(); iter++)
+            {
+                (*iter)(MouseMoveMessage(*mouseMoveMessages.front()));
+            }
+            MouseMoveMessage* m = mouseMoveMessages.front();
+            mouseMoveMessages.pop();
+            delete m;
         }
 
-        void sendMessage(Message* message)
+        while (!pickBodyMessages.empty())
         {
-            if (message->getType() == MType::M_GAME_MODE) {
-                GameModeMessage* gameModeMessage = dynamic_cast<GameModeMessage*>(message);
-                if (!gameModeMessage)
-                    return; //TODO: Error
-                gameModeMessage = new GameModeMessage(*gameModeMessage);
-                this->gameModeMessages.push(gameModeMessage);
+            for (auto iter = pickBodyReceiver.begin(); iter != pickBodyReceiver.end(); iter++)
+            {
+                (*iter)(PickBodyMessage(*pickBodyMessages.front()));
             }
-            if (message->getType() == MType::M_KEY) {
-                KeyMessage* keyMessage = dynamic_cast<KeyMessage*>(message);
-                if (!keyMessage)
-                    return; //TODO: Error
-                keyMessage = new KeyMessage(*keyMessage);
-                this->keyMessages.push(keyMessage);
-            }
-			else if (message->getType() == MType::M_MOUSE_CLICK) {
-                MouseClickMessage* mouseMessage = dynamic_cast<MouseClickMessage*>(message);
-				if (!mouseMessage)
-					return; //TODO: Error
-				mouseMessage = new MouseClickMessage(*mouseMessage);
-				this->mouseClickMessages.push(mouseMessage);
-			}
-            else if (message->getType() == MType::M_MOUSE_MOVE) {
-                MouseMoveMessage* mouseMessage = dynamic_cast<MouseMoveMessage*>(message);
-                if (!mouseMessage)
-                    return; //TODO: Error
-                mouseMessage = new MouseMoveMessage(*mouseMessage);
-                this->mouseMoveMessages.push(mouseMessage);
-            }
-            else if (message->getType() == MType::GUI_FLOAT) {
-                GuiFloatMessage* m = dynamic_cast<GuiFloatMessage*>(message);
-                if (!m)
-                    return; //TODO: Error
-                m = new GuiFloatMessage(*m);
-                this->guiMessages.push(m);
-            }
-            else if (message->getType() == MType::GUI_VEC3) {
-                GuiVec3Message* m = dynamic_cast<GuiVec3Message*>(message);
-                if (!m)
-                    return; //TODO: Error
-                m = new GuiVec3Message(*m);
-                this->guiMessages.push(m);
-            }
+            PickBodyMessage* m = pickBodyMessages.front();
+            mouseMoveMessages.pop();
+            delete m;
         }
 
-        void notify()
+        while (!guiMessages.empty())
         {
-            while (!gameModeMessages.empty()) {
-                for (auto iter = gameModeReceiver.begin(); iter != gameModeReceiver.end(); iter++) {
-                    (*iter)(GameModeMessage(*gameModeMessages.front()));
-                }
-                GameModeMessage* m = gameModeMessages.front();
-                gameModeMessages.pop();
-                delete m;
+            for (auto iter = guiReceiver.begin(); iter != guiReceiver.end(); iter++)
+            {
+                (*iter)(guiMessages.front());
             }
-
-            while (!keyMessages.empty()) {
-                for (auto iter = keyReceiver.begin(); iter != keyReceiver.end(); iter++) {
-                    (*iter)(KeyMessage(*keyMessages.front()));
-                }
-                KeyMessage* m = keyMessages.front();
-                keyMessages.pop();
-                delete m;
-            }
-
-			while (!mouseClickMessages.empty()) {
-				for (auto iter = mouseClickReceiver.begin(); iter != mouseClickReceiver.end(); iter++) {
-					(*iter)(MouseClickMessage(*mouseClickMessages.front()));
-				}
-                MouseClickMessage* m = mouseClickMessages.front();
-                mouseClickMessages.pop();
-				delete m;
-			}
-
-            while (!mouseMoveMessages.empty()) {
-                for (auto iter = mouseMoveReceiver.begin(); iter != mouseMoveReceiver.end(); iter++) {
-                    (*iter)(MouseMoveMessage(*mouseMoveMessages.front()));
-                }
-                MouseMoveMessage* m = mouseMoveMessages.front();
-                mouseMoveMessages.pop();
-                delete m;
-            }
-
-            while (!guiMessages.empty()) {
-                for (auto iter = guiReceiver.begin(); iter != guiReceiver.end(); iter++) {
-                    (*iter)(guiMessages.front());
-                }
-                Message* m = guiMessages.front();
-                guiMessages.pop();
-                delete m;
-            }
+            Message* m = guiMessages.front();
+            guiMessages.pop();
+            delete m;
         }
+    }
 
-        private:
-            std::vector<std::function<void(GameModeMessage)>> gameModeReceiver;
-            std::vector<std::function<void(KeyMessage)>> keyReceiver;
-            std::vector<std::function<void(MouseClickMessage)>> mouseClickReceiver;
-            std::vector<std::function<void(MouseMoveMessage)>> mouseMoveReceiver; 
-            std::vector<std::function<void(Message*)>> guiReceiver;
-            std::queue<GameModeMessage*> gameModeMessages;
-            std::queue<KeyMessage*> keyMessages;
-            std::queue<MouseClickMessage*> mouseClickMessages;
-            std::queue<MouseMoveMessage*> mouseMoveMessages;
-            std::queue<Message*> guiMessages;
-
-};      
-
+private:
+    std::vector<std::function<void(GameModeMessage)>> gameModeReceiver;
+    std::vector<std::function<void(KeyMessage)>> keyReceiver;
+    std::vector<std::function<void(MouseClickMessage)>> mouseClickReceiver;
+    std::vector<std::function<void(MouseMoveMessage)>> mouseMoveReceiver;
+    std::vector<std::function<void(Message*)>> guiReceiver;
+    std::vector<std::function<void(PickBodyMessage)>> pickBodyReceiver;
+    std::queue<GameModeMessage*> gameModeMessages;
+    std::queue<KeyMessage*> keyMessages;
+    std::queue<MouseClickMessage*> mouseClickMessages;
+    std::queue<MouseMoveMessage*> mouseMoveMessages;
+    std::queue<Message*> guiMessages;
+    std::queue<PickBodyMessage*> pickBodyMessages;
+};

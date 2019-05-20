@@ -182,7 +182,7 @@ void Game::update(float elapsedSeconds)
 
     if (deltaTime > 1)
     {
-        std::cout << "Update: " << time << "ms\n";
+        //std::cout << "Update: " << time << "ms\n";
         mLastFrame = glfwGetTime();
     }
 }
@@ -302,7 +302,8 @@ std::function<void(Message*)> Game::getNotifyFuncGui()
 
 void Game::notifyGameModeChange(GameModeMessage message)
 {
-    if (message.mode == GameMode::Menu) {
+    if (message.mode == GameMode::Menu || message.mode == GameMode::Editor2)
+    {
         setCursorMode(glow::glfw::CursorMode::Normal);
     }
     else {
