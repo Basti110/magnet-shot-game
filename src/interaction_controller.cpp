@@ -4,6 +4,7 @@
 #include "bullet_helper.hh"
 #include "magnet.h"
 #include "physics_manager.h"
+#include "coordinate_axes.h"
 
 #include <btBulletDynamicsCommon.h>
 #include <BulletDynamics/Character/btCharacterControllerInterface.h>
@@ -29,10 +30,19 @@ InteractionController::InteractionController(MessageBus* messageBus, SceneManage
             this->notifyMouseMoveInput(message);
     });
 
+    RigidBodyInfo info2;
+    info2.mass = 0.0;
+    info2.friction = 0.5;
+    glm::mat4 trans2 = glm::translate(glm::mat4(1.0), glm::vec3(4.75f, 8.0f, 4.0f));
+    physics->addCone({2.0, 4.0}, trans2, info2);
+
+
+    CoordinateAxes* axes = new CoordinateAxes({4.75, 8, 4.0}, 2, 4, mPhysics->getDynamicsWorld());
+    mScene->appendNode(axes);
+
     RigidBodyInfo info;
     info.mass = 30.0;
     info.friction = 0.5;
-
     //auto controller = new btKinematik
     glm::mat4 trans = glm::translate(glm::mat4(1.0), glm::vec3(4.75f, 2.0f, 4.0f));
 
