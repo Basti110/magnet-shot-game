@@ -22,6 +22,10 @@ public:
 private:
     void createConeBuffer(float length, float radius, int fineness);
     void createLineBuffer(float length);
+    void render(const glow::UsedProgram& shader, glm::mat4& model, glm::vec3 color, glm::mat4& lineTranslate);
+    glm::mat4 getPhysicsArrowModelX();
+    glm::mat4 getPhysicsArrowModelY();
+    glm::mat4 getPhysicsArrowModelZ();
 
     
     unsigned int coneVAO;

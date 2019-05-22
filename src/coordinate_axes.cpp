@@ -2,7 +2,6 @@
 #include <glm/gtc/constants.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/trigonometric.hpp>
-#include <glm/geometric.hpp>
 
 #include <glow/objects/ArrayBuffer.hh>
 #include <glow/objects/ElementArrayBuffer.hh>
@@ -21,26 +20,13 @@ CoordinateAxes::CoordinateAxes(const glm::vec3& position, PhysicsManager* physic
     mColor = glm::vec3({0.5, 0.5, 0.5});
     createConeBuffer(0.2, 0.1, 10);
     createLineBuffer(1);
-    // glm::mat4 mat = mGlobalTransformation;
+
     RigidBodyInfo info;
     info.mass = 0;
 
-    glm::vec3 pos = glm::vec3(mGlobalTransformation[3]) + glm::vec3({0, 0, -mScale});
-    glm::mat4 t = glm::translate(glm::mat4(1.0f), pos);
-    glm::mat4 r = glm::rotate(glm::mat4(1.0f), -0.5f * glm::pi<float>(), glm::vec3({1, 0, 0}));
-    glm::mat4 model = t * r;
-    mArrowX = physics->addCoordinateAxisCone({0.1, 0.2}, model, info);
-
-    pos = glm::vec3(mGlobalTransformation[3]) + glm::vec3({mScale, 0, 0});
-    r = glm::rotate(glm::mat4(1.0f), -0.5f * glm::pi<float>(), glm::vec3({0, 0, 1}));
-    t = glm::translate(glm::mat4(1.0f), pos);
-    model = t * r;
-    mArrowY = physics->addCoordinateAxisCone({0.1, 0.2}, model, info);
-
-    pos = glm::vec3(mGlobalTransformation[3]) + glm::vec3({0, mScale, 0});
-    t = glm::translate(glm::mat4(1.0f), pos);
-    model = t;
-    mArrowZ = physics->addCoordinateAxisCone({0.1, 0.2}, model, info);
+    mArrowX = physics->addCoordinateAxisCone({0.1, 0.2}, getPhysicsArrowModelX(), info);
+    mArrowY = physics->addCoordinateAxisCone({0.1, 0.2}, getPhysicsArrowModelY(), info);
+    mArrowZ = physics->addCoordinateAxisCone({0.1, 0.2}, getPhysicsArrowModelZ(), info);
 
     btCollisionShape* collisionShape = mArrowX->getCollisionShape();
     collisionShape->setLocalScaling({3.0, 3.0, 3.0});
@@ -90,54 +76,36 @@ bool CoordinateAxes::hitArrow(const btRigidBody* body)
 
 void CoordinateAxes::render(const glow::UsedProgram& shader, glm::mat4& projection, glm::mat4& view)
 {
-    glm::mat4 r = glm::rotate(glm::mat4(1.0f), -0.5f * glm::pi<float>(), glm::vec3({1, 0, 0}));
-    glm::vec3 pos = glm::vec3(mGlobalTransformation[3]) + glm::vec3({0, 0, -mScale});
-    glm::mat4 t = glm::translate(glm::mat4(1.0f), pos);
     glm::mat4 s = glm::scale(glm::mat4(1.0f), glm::vec3(mScale, mScale, mScale));
-    glm::mat4 model = t * r * s;
     glLineWidth(10 * mScale);
-    shader.setUniform("model", model);
-    shader.setUniform("colorRatio", 1.0f);
-    shader.setUniform("color", glm::vec3({1, 0, 0}));
-    mVertexArray->bind().draw();
-    t = glm::translate(glm::mat4(1.0f), glm::vec3({0, 0, mScale * .5}));
-    model = t * model;
-    shader.setUniform("model", model);
-    shader.setUniform("colorRatio", 1.0f);
-    shader.setUniform("color", glm::vec3({1, 0, 0}));
-    mLineSVA->bind().draw();
 
-    r = glm::rotate(glm::mat4(1.0f), -0.5f * glm::pi<float>(), glm::vec3({0, 0, 1}));
-    pos = glm::vec3(mGlobalTransformation[3]) + glm::vec3({mScale, 0, 0});
-    t = glm::translate(glm::mat4(1.0f), pos);
-    model = t * r * s;
-    shader.setUniform("model", model);
-    shader.setUniform("colorRatio", 1.0f);
-    shader.setUniform("color", glm::vec3({0, 1, 0}));
-    mVertexArray->bind().draw();
+    glm::mat4 t = glm::translate(glm::mat4(1.0f), glm::vec3({0, 0, mScale * .5}));
+    glm::mat4 model = getPhysicsArrowModelZ() * s;
+    render(shader, model, {1, 0, 0}, t);
+
+    model = getPhysicsArrowModelX() * s;
     t = glm::translate(glm::mat4(1.0f), glm::vec3({-mScale * .5, 0, 0}));
-    model = t * model;
-    shader.setUniform("model", model);
-    shader.setUniform("colorRatio", 1.0f);
-    shader.setUniform("color", glm::vec3({0, 1, 0}));
-    mLineSVA->bind().draw();
+    render(shader, model, {0, 1, 0}, t);
 
-    pos = glm::vec3(mGlobalTransformation[3]) + glm::vec3({0, mScale, 0});
-    t = glm::translate(glm::mat4(1.0f), pos);
-    model = t * s;
-    shader.setUniform("model", model);
-    shader.setUniform("colorRatio", 1.0f);
-    shader.setUniform("color", glm::vec3({0, 0, 1}));
-    mVertexArray->bind().draw();
+    model = getPhysicsArrowModelY() * s;
     t = glm::translate(glm::mat4(1.0f), glm::vec3({0, -mScale * .5, 0}));
-    model = t * model;
-    shader.setUniform("model", model);
-    shader.setUniform("colorRatio", 1.0f);
-    shader.setUniform("color", glm::vec3({0, 0, 1}));
-    mLineSVA->bind().draw();
+    render(shader, model, {0, 0, 1}, t);
 
     glLineWidth(1);
     AbstractNode::render(shader, projection, view);
+}
+
+void CoordinateAxes::render(const glow::UsedProgram& shader, glm::mat4& model, glm::vec3 color, glm::mat4& lineTranslate)
+{
+    shader.setUniform("model", model);
+    shader.setUniform("colorRatio", 1.0f);
+    shader.setUniform("color", color);
+    mVertexArray->bind().draw();
+    model = lineTranslate * model;
+    shader.setUniform("model", model);
+    shader.setUniform("colorRatio", 1.0f);
+    shader.setUniform("color", color);
+    mLineSVA->bind().draw();
 }
 
 void CoordinateAxes::setScale(float scale) 
@@ -145,34 +113,13 @@ void CoordinateAxes::setScale(float scale)
     mScale = scale;
 }
 
-/*void CoordinateAxes::render(const glow::UsedProgram& shader, glm::mat4& projection, glm::mat4& view)
-{
-    //auto shader = shader->use();
-    shader.setUniform("model", mGlobalTransformation);
-    shader.setUniform("projection", projection);
-    shader.setUniform("view", view);
-    glBindVertexArray(coneVAO);
-    glDrawArrays(GL_TRIANGLES, 0, coneTriangles);
-}*/
 void CoordinateAxes::update(float elapsedSeconds)
 {
     AbstractNode::update(elapsedSeconds);
-    glm::vec3 pos = glm::vec3(mGlobalTransformation[3]) + glm::vec3({0, 0, -mScale});
-    glm::mat4 t = glm::translate(glm::mat4(1.0f), pos);
-    glm::mat4 r = glm::rotate(glm::mat4(1.0f), -0.5f * glm::pi<float>(), glm::vec3({1, 0, 0}));
-    glm::mat4 model = t * r;
-    mArrowX->setWorldTransform(to_bullet(model));
 
-    pos = glm::vec3(mGlobalTransformation[3]) + glm::vec3({mScale, 0, 0});
-    r = glm::rotate(glm::mat4(1.0f), -0.5f * glm::pi<float>(), glm::vec3({0, 0, 1}));
-    t = glm::translate(glm::mat4(1.0f), pos);
-    model = t * r;
-    mArrowY->setWorldTransform(to_bullet(model));
-
-    pos = glm::vec3(mGlobalTransformation[3]) + glm::vec3({0, mScale, 0});
-    t = glm::translate(glm::mat4(1.0f), pos);
-    model = t;
-    mArrowZ->setWorldTransform(to_bullet(model));
+    mArrowX->setWorldTransform(to_bullet(getPhysicsArrowModelX()));
+    mArrowY->setWorldTransform(to_bullet(getPhysicsArrowModelY()));
+    mArrowZ->setWorldTransform(to_bullet(getPhysicsArrowModelZ()));
 
     if (mLastScale == mScale)
         return;
@@ -192,22 +139,21 @@ void CoordinateAxes::update(float elapsedSeconds)
 void CoordinateAxes::notifyMouseMoveInput(MouseMoveMessage message) 
 {
     glm::vec2 delta = message.getDeltaPosition();
-    float d = (delta.x - delta.y) / 10; // glm::distance(glm::vec2(0,0), delta) / 10;
+    float d = (delta.x - delta.y) / 30;
     glm::mat4 t;
     if (mHitBody == 1)
     {
-        t = glm::translate(glm::mat4(1.0f), {0, 0, -d});
+        t = glm::translate(glm::mat4(1.0f), {d, 0, 0});
     }
     else if (mHitBody == 2)
     {
-        t = glm::translate(glm::mat4(1.0f), {d, 0, 0});
+        t = glm::translate(glm::mat4(1.0f), {0, d, 0});
     }
     else
     {
-        t = glm::translate(glm::mat4(1.0f), {0, d, 0});
+        t = glm::translate(glm::mat4(1.0f), {0, 0, -d});
     }
     this->setGlobalTransformation(t * this->getGlobalTransformation());
-    //glm::mat4 transformation = this->getGlobalTransformation();
 }
 
 void CoordinateAxes::notifyMouseClickInput(MouseClickMessage message) 
@@ -256,31 +202,6 @@ void CoordinateAxes::createConeBuffer(float length, float radius, int fineness)
         }
     }
 
-    /*coneVertices.push_back(0);
-    coneVertices.push_back(LenHalf);
-    coneVertices.push_back(0);
-
-    coneVertices.push_back(prevCoord.x);
-    coneVertices.push_back(-LenHalf);
-    coneVertices.push_back(prevCoord.y);
-
-    coneVertices.push_back(glm::cos(0) * radius);
-    coneVertices.push_back(LenHalf);
-    coneVertices.push_back(glm::sin(0) * radius);
-
-    glGenVertexArrays(1, &coneVAO);
-    glGenBuffers(1, &coneVBO);
-
-    glBindVertexArray(coneVAO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, coneVBO);
-    glBufferData(GL_ARRAY_BUFFER, coneVertices.size() * sizeof(float), &coneVertices[0], GL_STATIC_DRAW);
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0); */
     auto abPos = glow::ArrayBuffer::create("aPos", aPos);
     auto abNormal = glow::ArrayBuffer::create("aNormal", aNormal);
     auto abTangent = glow::ArrayBuffer::create("aTangent", aTangent);
@@ -314,4 +235,26 @@ void CoordinateAxes::createLineBuffer(float length)
 
     glow::SharedElementArrayBuffer eab;
     mLineSVA = glow::VertexArray::create({abPos, abNormal, abTangent, abTexCoord}, eab, GL_LINES);
+}
+
+glm::mat4 CoordinateAxes::getPhysicsArrowModelX()
+{
+    glm::vec3 pos = glm::vec3(mGlobalTransformation[3]) + glm::vec3({mScale, 0, 0});
+    glm::mat4 r = glm::rotate(glm::mat4(1.0f), -0.5f * glm::pi<float>(), glm::vec3({0, 0, 1}));
+    glm::mat4 t = glm::translate(glm::mat4(1.0f), pos);
+    return t * r;
+}
+
+glm::mat4 CoordinateAxes::getPhysicsArrowModelY()
+{
+    glm::vec3 pos = glm::vec3(mGlobalTransformation[3]) + glm::vec3({0, mScale, 0});
+    return glm::translate(glm::mat4(1.0f), pos);
+}
+
+glm::mat4 CoordinateAxes::getPhysicsArrowModelZ()
+{
+    glm::vec3 pos = glm::vec3(mGlobalTransformation[3]) + glm::vec3({0, 0, -mScale});
+    glm::mat4 t = glm::translate(glm::mat4(1.0f), pos);
+    glm::mat4 r = glm::rotate(glm::mat4(1.0f), -0.5f * glm::pi<float>(), glm::vec3({1, 0, 0}));
+    return t * r;
 }
