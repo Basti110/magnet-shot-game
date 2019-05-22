@@ -1,8 +1,8 @@
 #pragma once
-#include "abstract_node.h"
+#include "physics_node.h"
 #include "physics_manager.h"
 
-class Cube : public AbstractNode
+class Cube : public PhysicsNode
 {
 public:
 public:
@@ -18,7 +18,6 @@ public:
     void setScale(glm::vec3 scale);
     bool setTexture(std::string path);
     void addPhysics(glm::vec3 scale, const RigidBodyInfo& info);
-    int getPhysicsID();
     glm::vec3 getScale();
     glm::vec3 getColor();
     const RigidBodyInfo& getRigidBodyInfo();
@@ -31,13 +30,10 @@ private:
     static unsigned int VAO;
 
     bool mIsPhysicsOn = false;
-    int mPhysicsID = -1;
     unsigned int mTexture;
     std::vector<float> mVertices;
     bool mIsVisible;
     float mColorRatio;
-    glm::vec3 mColor;
     glm::vec3 mScale;
-    PhysicsManager* mPhysics;
     RigidBodyInfo mRigidBodyinfo;
 };

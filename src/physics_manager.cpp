@@ -84,7 +84,7 @@ int PhysicsManager::addPlane(glm::vec3 normal, float planeConstant)
     return addRigidBody(rigidBody, GROUP_STATIC_OBJECTS, GROUP_DYNAMIC_OBJECTS);
 }
 
-int PhysicsManager::addCube(const glm::vec3& shape, const glm::mat4& transform, const RigidBodyInfo& info)
+btRigidBody* PhysicsManager::addCube(const glm::vec3& shape, const glm::mat4& transform, const RigidBodyInfo& info)
 {
     // TODO: More Cube info
     btDefaultMotionState* motionState = new btDefaultMotionState(to_bullet(transform));
@@ -99,7 +99,8 @@ int PhysicsManager::addCube(const glm::vec3& shape, const glm::mat4& transform, 
     btInfo.m_angularDamping = info.angularDamping;
     btRigidBody* rigidBody = new btRigidBody(btInfo);
 
-    return addRigidBody(rigidBody, GROUP_DYNAMIC_OBJECTS, GROUP_STATIC_OBJECTS | GROUP_DYNAMIC_OBJECTS);
+    addRigidBody(rigidBody, GROUP_DYNAMIC_OBJECTS, GROUP_STATIC_OBJECTS | GROUP_DYNAMIC_OBJECTS);
+    return rigidBody;
 }
 
 int PhysicsManager::addCapsule(const glm::vec2& shape, const glm::mat4& transform, const RigidBodyInfo& info)

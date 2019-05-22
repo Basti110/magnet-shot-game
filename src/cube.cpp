@@ -1,6 +1,8 @@
 #include "cube.h"
 #include <glm/gtc/matrix_access.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include "bullet_helper.hh"
+#include "coordinate_axes.h"
 #include <iostream>
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -10,7 +12,7 @@ bool Cube::isInit = false;
 unsigned int Cube::VBO = 0;
 unsigned int Cube::VAO = 0;
 
-Cube::Cube(glm::mat4& transformation, Color color, PhysicsManager* physics) : mPhysics(physics)
+Cube::Cube(glm::mat4& transformation, Color color, PhysicsManager* physics) : PhysicsNode(physics)
 {
     mLocalTransformation = transformation;
     mGlobalTransformation = transformation;
@@ -38,19 +40,17 @@ void Cube::createBuffer()
 
     glBufferData(GL_ARRAY_BUFFER, mVertices.size() * sizeof(float), &mVertices[0], GL_STATIC_DRAW);
 
-    // position attribute
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
-    // Normals
+
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(2);
-    // Tangents
+
     glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(6 * sizeof(float)));
     glEnableVertexAttribArray(2);
-    // texture coord attribute
+
     glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 11 * sizeof(float), (void*)(9 * sizeof(float)));
     glEnableVertexAttribArray(1);
-
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
@@ -66,28 +66,34 @@ void Cube::render(const glow::UsedProgram& shader, glm::mat4& projection, glm::m
 {
     if (!mIsVisible) return;
 
-    AbstractNode::render(shader, projection, view);
+    
     if (this->isInit)
     {
         shader.setUniform("model", mGlobalTransformation);
         shader.setUniform("colorRatio", mColorRatio);
         shader.setUniform("color", mColor);
-        //glBindTexture(GL_TEXTURE_2D, this->mTexture);
         glBindVertexArray(this->VAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
     }
+
+    if (mCoordinateAxes && mIsPicked)
+    {
+        mCoordinateAxes->render(shader, projection, view);
+    }
+    AbstractNode::render(shader, projection, view);
 }
 
 void Cube::update(float elapsedSeconds) 
 {
-    if (mIsPhysicsOn)
+    /*if (mIsPhysicsOn)
     {
         glm::mat4 transform;
-        if (mPhysics->getTransformation(mPhysicsID, transform))
-            setGlobalTransformation(transform* glm::scale(glm::mat4(1), mScale));
-    }
-        
-    AbstractNode::update(elapsedSeconds);
+        btTransform t;
+        mRigidBody->getMotionState()->getWorldTransform(t);
+        transform = to_glm(t);
+        setGlobalTransformation(transform* glm::scale(glm::mat4(1), mScale));
+    }*/
+    PhysicsNode::update(elapsedSeconds);
 }
 
 void Cube::setVisible(bool value)
@@ -146,13 +152,8 @@ void Cube::addPhysics(glm::vec3 scale, const RigidBodyInfo& info)
 {
     mScale = scale;
     mRigidBodyinfo = RigidBodyInfo(info);
-    mPhysicsID = mPhysics->addCube({scale.x / 2, scale.y / 2, scale.z / 2}, mGlobalTransformation, info);
+    mRigidBody = mPhysics->addCube({scale.x / 2, scale.y / 2, scale.z / 2}, mGlobalTransformation, info);
     mIsPhysicsOn = true;
-}
-
-int Cube::getPhysicsID()
-{
-    return mPhysicsID;
 }
 
 glm::vec3 Cube::getScale()

@@ -52,7 +52,7 @@ public:
     bool bodyWithinReach(const glm::vec3& pos, const glm::vec3& rayToWorld, float distance, btRigidBody* excludeObject);
 
     int addPlane(glm::vec3 normal, float planeConstant);
-    int addCube(const glm::vec3& shape, const glm::mat4& transform, const RigidBodyInfo& info);
+    btRigidBody* addCube(const glm::vec3& shape, const glm::mat4& transform, const RigidBodyInfo& info);
     int addCapsule(const glm::vec2& shape, const glm::mat4& transform, const RigidBodyInfo& info);
     btRigidBody* addCoordinateAxisCone(const glm::vec2& shape, const glm::mat4& transform, const RigidBodyInfo& info);
     int addRigidBody(btRigidBody* body, short group = GROUP_NONE, short mask = GROUP_NONE);

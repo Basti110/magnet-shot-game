@@ -86,7 +86,7 @@ Editor::Editor(MessageBus* mB, SceneManager* scene, PhysicsManager* physics) :
     info.mass = 1.0;
     info.friction = 0.5;
     newCube->addPhysics({4.0, 1.0, 6.0}, info);
-    btRigidBody* body = mPhysics->getRigidBody(newCube->getPhysicsID());
+    btRigidBody* body = newCube->getRigidBody();
     body->setActivationState(DISABLE_DEACTIVATION);
     const btVector3 btPivotA(0.0, -0.5f, -3.0f); // right next to the door slightly outside
     btVector3 btAxisA(1.0f, 0.0f, 0.0f);       // pointing upwards, aka Y-axis
