@@ -54,7 +54,7 @@ public:
     int addPlane(glm::vec3 normal, float planeConstant);
     int addCube(const glm::vec3& shape, const glm::mat4& transform, const RigidBodyInfo& info);
     int addCapsule(const glm::vec2& shape, const glm::mat4& transform, const RigidBodyInfo& info);
-    btRigidBody* addCone(const glm::vec2& shape, const glm::mat4& transform, const RigidBodyInfo& info);
+    btRigidBody* addCoordinateAxisCone(const glm::vec2& shape, const glm::mat4& transform, const RigidBodyInfo& info);
     int addRigidBody(btRigidBody* body, short group = GROUP_NONE, short mask = GROUP_NONE);
     bool getTransformation(int idx, glm::mat4& transform);
     btRigidBody* getRigidBody(int id);
@@ -65,6 +65,7 @@ private:
     btCollisionDispatcher* mBulletCollisionDispatcher = nullptr;
     btSequentialImpulseConstraintSolver* mBulletSolver = nullptr;
     btDiscreteDynamicsWorld* mBulletWorld = nullptr;
+    btDiscreteDynamicsWorld* mBulletCoordinateAxes = nullptr;
     DebugDrawer* mDebugDrawer = nullptr;
 
     std::vector<btRigidBody*> mRigidBodies;

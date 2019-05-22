@@ -107,14 +107,14 @@ void Game::init()
 
         // add level
         MeshNode* level = new MeshNode(
-            glm::mat4(1), "../../data/meshes/FirstRoom.obj", dynamicsWorld,
+            glm::mat4(1), "../../data/meshes/FirstRoom.obj", mPhysics,
             GROUP_STATIC_OBJECTS, GROUP_DYNAMIC_OBJECTS, 0.0f
         );
         root->addChild(level);
 
         // add dynamic objects
         MeshNode* obstacle = new MeshNode(
-            glm::mat4(1), "../../data/meshes/Obstacle.obj", dynamicsWorld,
+            glm::mat4(1), "../../data/meshes/Obstacle.obj", mPhysics,
             GROUP_DYNAMIC_OBJECTS, GROUP_STATIC_OBJECTS | GROUP_DYNAMIC_OBJECTS, 1.0f
         );
         obstacle->setColor(glm::vec3(234/255.0f, 22/255.0f, 22/255.0f));
@@ -133,13 +133,13 @@ void Game::init()
             glm::mat4 transform = glm::translate(glm::mat4(1), param.first);
             transform = glm::rotate(transform, glm::radians(param.second), glm::vec3(0,1,0));
             MeshNode* base = new MeshNode(
-                transform, "../../data/meshes/TreeBase.obj", dynamicsWorld,
+                transform, "../../data/meshes/TreeBase.obj", mPhysics,
                 GROUP_STATIC_OBJECTS, GROUP_DYNAMIC_OBJECTS, 0.0f
             );
             base->setColor(glm::vec3(151/255.0f, 103/255.0f, 48/255.0f));
             root->addChild(base);
             MeshNode* top = new MeshNode(
-                transform, "../../data/meshes/TreeTop.obj", dynamicsWorld,
+                transform, "../../data/meshes/TreeTop.obj", mPhysics,
                 GROUP_STATIC_OBJECTS, GROUP_DYNAMIC_OBJECTS, 0.0f
             );
             top->setColor(glm::vec3(99/255.0f, 194/255.0f, 47/255.0f));
@@ -147,7 +147,7 @@ void Game::init()
         }
 
         // add dispenser
-        root->addChild(new Dispenser(glm::vec3(2.5f, 0.0f, -14.0f), dynamicsWorld));
+        root->addChild(new Dispenser(glm::vec3(2.5f, 0.0f, -14.0f), mPhysics));
 
         root->createBuffer();
         mScene->setSceneRoot(root);

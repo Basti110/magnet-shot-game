@@ -10,8 +10,8 @@
 #include <glow/objects/VertexArray.hh>
 
 
-MeshNode::MeshNode(const glm::mat4& transform, const std::string& filename, btDynamicsWorld* world, short collisionGroup, short collisionMask, float mass) :
-    PhysicsNode(world)
+MeshNode::MeshNode(const glm::mat4& transform, const std::string& filename, PhysicsManager* physics, short collisionGroup, short collisionMask, float mass) :
+    PhysicsNode(physics)
 {
     mLocalTransformation = transform;
     mGlobalTransformation = transform;

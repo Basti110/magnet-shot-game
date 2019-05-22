@@ -27,6 +27,7 @@ private:
     glm::vec3 mCubeScale;
     RigidBodyInfo mCubeInfo;
     float mCubeDistance;
+    float mCoordinateAxesScale = 1;
     bool mIsActive;
     GameMode mGameMode = GameMode::Gameplay;
     std::vector<Cube*> mCubes;

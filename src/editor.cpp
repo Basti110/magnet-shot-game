@@ -7,6 +7,7 @@
 #include <btBulletDynamicsCommon.h>
 #include <json/json.hpp>
 #include "light.h"
+#include "coordinate_axes.h"
 #include <iostream>
 #include <fstream>
 
@@ -70,6 +71,11 @@ Editor::Editor(MessageBus* mB, SceneManager* scene, PhysicsManager* physics) :
     mCube->createBuffer();
     mScene->appendNode(mCube);
 
+    // Test Axes
+
+    CoordinateAxes* axes = new CoordinateAxes({4.75, 8, 4.0}, mPhysics);
+
+     mScene->appendNode(axes);
     // ADD BRIDGE ------------------------------------------------
     trans = glm::mat4(1.0f);
     trans = glm::translate(trans, glm::vec3(-3.25f, -0.5f, -27.75f));
@@ -141,38 +147,58 @@ void Editor::notifyMouseClickInput(MouseClickMessage message)
 {
     if (message.getInput() == GLFW_MOUSE_BUTTON_LEFT && mGameMode == GameMode::Editor)
     {
-        Cube* newCube = new Cube(*mCube);
-        auto trans = mCube->getLocalTransformation();
-        trans -= glm::scale(glm::mat4(1.0), mCubeScale);
-        trans += glm::mat4(1.0);
-        newCube->setLocalTransformation(trans);
-        mScene->appendNode(newCube);
-        newCube->addPhysics(mCubeScale, mCubeInfo);
-        mCubes.push_back(newCube);
-
+        if (message.getAction() == GLFW_PRESS)
+        {
+            Cube* newCube = new Cube(*mCube);
+            auto trans = mCube->getLocalTransformation();
+            trans -= glm::scale(glm::mat4(1.0), mCubeScale);
+            trans += glm::mat4(1.0);
+            newCube->setLocalTransformation(trans);
+            mScene->appendNode(newCube);
+            newCube->addPhysics(mCubeScale, mCubeInfo);
+            mCubes.push_back(newCube);
+        }
     }
-    if (message.getInput() == GLFW_MOUSE_BUTTON_MIDDLE && message.getAction() == 1000 && mGameMode == GameMode::Editor)
+    if (message.getInput() == GLFW_MOUSE_BUTTON_MIDDLE && message.getAction() == 1000)
     {
-        mCubeDistance += message.getPostion().y;
-        if (mCubeDistance > 10)
-            mCubeDistance = 10;
-        if (mCubeDistance < 1)
-            mCubeDistance = 1;
-        refreshCube();
+        if (mGameMode == GameMode::Editor)
+        {
+            mCubeDistance += message.getPostion().y;
+            if (mCubeDistance > 10)
+                mCubeDistance = 10;
+            if (mCubeDistance < 1)
+                mCubeDistance = 1;
+            refreshCube();
+        }
+        if (mGameMode == GameMode::Editor2)
+        {
+            mCoordinateAxesScale += message.getPostion().y;
+            if (mCoordinateAxesScale > 10)
+                mCoordinateAxesScale = 10;
+            if (mCoordinateAxesScale < 1)
+                mCoordinateAxesScale = 1;
+            CoordinateAxes::setScale(mCoordinateAxesScale);
+        }
     }
     if (mGameMode == GameMode::Editor2 && message.getInput() == GLFW_MOUSE_BUTTON_LEFT)
     {
-        glm::vec3 direction = getRayTo(message.getPostion().x, message.getPostion().y);
-        direction = glm::normalize(direction);
-        std::cout << direction.x << ", " << direction.y << ", " << direction.z << "\n";
+        if (message.getAction() == GLFW_PRESS)
+        {
+            glm::vec3 direction = getRayTo(message.getPostion().x, message.getPostion().y);
+            direction = glm::normalize(direction);
+            std::cout << direction.x << ", " << direction.y << ", " << direction.z << "\n";
         
-        Camera* cam = mScene->getCamera();
-        glm::vec3 pos = cam->getCameraPosition();
-        std::cout << pos.x << ", " << pos.y << ", " << pos.z << "\n";
-        pos = pos + 2.f * glm::normalize(direction);
-        btRigidBody* test = mPhysics->pickBody(pos, direction * 200.f);
-        if (test != nullptr)
-            std::cout << "Hit Object!: " << test->getUserIndex() << "\n";
+            Camera* cam = mScene->getCamera();
+            glm::vec3 pos = cam->getCameraPosition();
+            std::cout << pos.x << ", " << pos.y << ", " << pos.z << "\n";
+            pos = pos + 2.f * glm::normalize(direction);
+            btRigidBody* test = mPhysics->pickBody(pos, direction * 200.f);
+            //test->
+            /*if (test != nullptr)
+                std::cout << "Hit Object!: " << test->getUserIndex() << "\n";*/
+            PickBodyMessage* m = new PickBodyMessage(test);
+            MessageBus::getInstance()->sendMessage(m);
+        }
     }
     std::cout << "click\n";
 }

@@ -5,7 +5,7 @@
 class SphereNode : public PhysicsNode
 {
 public:
-    SphereNode(const glm::vec3& position, float radius, btDynamicsWorld* world, short collisionGroup, short collisionMask, float mass);
+    SphereNode(const glm::vec3& position, float radius, PhysicsManager* physics, short collisionGroup, short collisionMask, float mass);
     void update(float elapsedSeconds) override;
 
 private:

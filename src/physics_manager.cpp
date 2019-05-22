@@ -20,6 +20,7 @@ PhysicsManager::PhysicsManager()
     mBulletCollisionDispatcher = new btCollisionDispatcher(mBulletCollisionConfig);
     mBulletSolver = new btSequentialImpulseConstraintSolver;
     mBulletWorld = new btDiscreteDynamicsWorld(mBulletCollisionDispatcher, mBulletBroadphase, mBulletSolver, mBulletCollisionConfig);
+    mBulletCoordinateAxes = new btDiscreteDynamicsWorld(mBulletCollisionDispatcher, mBulletBroadphase, mBulletSolver, mBulletCollisionConfig);
     mBulletWorld->setGravity(btVector3(0, -10, 0)); // set initial gravity
     mDebugDrawer = new DebugDrawer();
     mBulletWorld->setDebugDrawer(mDebugDrawer);
@@ -118,7 +119,7 @@ int PhysicsManager::addCapsule(const glm::vec2& shape, const glm::mat4& transfor
     return addRigidBody(rigidBody, GROUP_DYNAMIC_OBJECTS, GROUP_STATIC_OBJECTS | GROUP_DYNAMIC_OBJECTS);
 }
 
-btRigidBody* PhysicsManager::addCone(const glm::vec2& shape, const glm::mat4& transform, const RigidBodyInfo& info)
+btRigidBody* PhysicsManager::addCoordinateAxisCone(const glm::vec2& shape, const glm::mat4& transform, const RigidBodyInfo& info)
 {
     btDefaultMotionState* motionState = new btDefaultMotionState(to_bullet(transform));
     btCollisionShape* collisionShape = new btConeShape(shape.x, shape.y); // new btCapsuleShape(shape.x, shape.y);
@@ -131,6 +132,8 @@ btRigidBody* PhysicsManager::addCone(const glm::vec2& shape, const glm::mat4& tr
     btInfo.m_linearDamping = info.linearDamping;
     btInfo.m_angularDamping = info.angularDamping;
     btRigidBody* rigidBody = new btRigidBody(btInfo);
+
+    //mBulletCoordinateAxes->addRigidBody(rigidBody, GROUP_DYNAMIC_OBJECTS, GROUP_STATIC_OBJECTS | GROUP_DYNAMIC_OBJECTS);
 
     addRigidBody(rigidBody, GROUP_DYNAMIC_OBJECTS, GROUP_STATIC_OBJECTS | GROUP_DYNAMIC_OBJECTS);
     return rigidBody;

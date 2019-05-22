@@ -210,8 +210,11 @@ void IOManager::processInput()
     const int leftButtonState = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT);
     const int rightButtonState = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT);
     const int middleButtonState = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE);
-    if (leftButtonState == GLFW_RELEASE && mPrevLeftButtonState == GLFW_PRESS) {
+    if (mPrevLeftButtonState == GLFW_RELEASE && leftButtonState == GLFW_PRESS){
         sendMessageMouseClick(GLFW_MOUSE_BUTTON_LEFT, GLFW_PRESS);
+    }
+    if (mPrevLeftButtonState == GLFW_PRESS && leftButtonState == GLFW_RELEASE){
+        sendMessageMouseClick(GLFW_MOUSE_BUTTON_LEFT, GLFW_RELEASE);
     }
     if (rightButtonState == GLFW_RELEASE && mPrevRightButtonState == GLFW_PRESS) {
         sendMessageMouseClick(GLFW_MOUSE_BUTTON_RIGHT, GLFW_PRESS);

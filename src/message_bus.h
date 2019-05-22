@@ -307,7 +307,7 @@ public:
                 (*iter)(PickBodyMessage(*pickBodyMessages.front()));
             }
             PickBodyMessage* m = pickBodyMessages.front();
-            mouseMoveMessages.pop();
+            pickBodyMessages.pop();
             delete m;
         }
 

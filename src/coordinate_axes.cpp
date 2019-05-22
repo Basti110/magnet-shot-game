@@ -2,15 +2,19 @@
 #include <glm/gtc/constants.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/trigonometric.hpp>
+#include <glm/geometric.hpp>
 
 #include <glow/objects/ArrayBuffer.hh>
 #include <glow/objects/ElementArrayBuffer.hh>
 #include <glow/objects/VertexArray.hh>
 
+#include "bullet_helper.hh"
+#include "physics_manager.h"
+
 
 //#include <glm/gtc/matrix_inverse.hpp>
-
-CoordinateAxes::CoordinateAxes(const glm::vec3& position, float radius, float lenght, btDynamicsWorld* world) : PhysicsNode(world)
+float CoordinateAxes::mScale = 1.0f;
+CoordinateAxes::CoordinateAxes(const glm::vec3& position, PhysicsManager* physics)
 {
     glm::mat4 translation = glm::translate(glm::mat4(1), position);
     this->setGlobalTransformation(translation);
@@ -18,6 +22,38 @@ CoordinateAxes::CoordinateAxes(const glm::vec3& position, float radius, float le
     createConeBuffer(0.2, 0.1, 10);
     createLineBuffer(1);
     // glm::mat4 mat = mGlobalTransformation;
+    RigidBodyInfo info;
+    info.mass = 0;
+
+    glm::vec3 pos = glm::vec3(mGlobalTransformation[3]) + glm::vec3({0, 0, -mScale});
+    glm::mat4 t = glm::translate(glm::mat4(1.0f), pos);
+    glm::mat4 r = glm::rotate(glm::mat4(1.0f), -0.5f * glm::pi<float>(), glm::vec3({1, 0, 0}));
+    glm::mat4 model = t * r;
+    mArrowX = physics->addCoordinateAxisCone({0.1, 0.2}, model, info);
+
+    pos = glm::vec3(mGlobalTransformation[3]) + glm::vec3({mScale, 0, 0});
+    r = glm::rotate(glm::mat4(1.0f), -0.5f * glm::pi<float>(), glm::vec3({0, 0, 1}));
+    t = glm::translate(glm::mat4(1.0f), pos);
+    model = t * r;
+    mArrowY = physics->addCoordinateAxisCone({0.1, 0.2}, model, info);
+
+    pos = glm::vec3(mGlobalTransformation[3]) + glm::vec3({0, mScale, 0});
+    t = glm::translate(glm::mat4(1.0f), pos);
+    model = t;
+    mArrowZ = physics->addCoordinateAxisCone({0.1, 0.2}, model, info);
+
+    btCollisionShape* collisionShape = mArrowX->getCollisionShape();
+    collisionShape->setLocalScaling({3.0, 3.0, 3.0});
+
+    MessageBus::getInstance()->addMouseMoveReceiver([=](MouseMoveMessage message) {
+        if (mHit)
+            this->notifyMouseMoveInput(message);
+    });
+
+    MessageBus::getInstance()->addMouseClickReceiver([=](MouseClickMessage message) {
+        if (mHit)
+            this->notifyMouseClickInput(message);
+    });
 }
 
 CoordinateAxes::~CoordinateAxes()
@@ -29,18 +65,42 @@ CoordinateAxes::~CoordinateAxes()
     glDeleteBuffers(1, &coneVBO);
 }
 
+bool CoordinateAxes::hitArrow(const btRigidBody* body)
+{
+    if (body == mArrowX)
+    {
+        mHitBody = 1;
+        mHit = true;
+        return true;
+    }
+    else if (body == mArrowY)
+    {
+        mHitBody = 2;
+        mHit = true;
+        return true;
+    }
+    else if (body == mArrowZ)
+    {
+        mHitBody = 3;
+        mHit = true;
+        return true;
+    }
+    return false;
+}
+
 void CoordinateAxes::render(const glow::UsedProgram& shader, glm::mat4& projection, glm::mat4& view)
 {
     glm::mat4 r = glm::rotate(glm::mat4(1.0f), -0.5f * glm::pi<float>(), glm::vec3({1, 0, 0}));
-    glm::vec3 pos = glm::vec3(mGlobalTransformation[3]) + glm::vec3({0, 0, -1});
+    glm::vec3 pos = glm::vec3(mGlobalTransformation[3]) + glm::vec3({0, 0, -mScale});
     glm::mat4 t = glm::translate(glm::mat4(1.0f), pos);
-    glm::mat4 model = t * r;
-    glLineWidth(10);
+    glm::mat4 s = glm::scale(glm::mat4(1.0f), glm::vec3(mScale, mScale, mScale));
+    glm::mat4 model = t * r * s;
+    glLineWidth(10 * mScale);
     shader.setUniform("model", model);
     shader.setUniform("colorRatio", 1.0f);
     shader.setUniform("color", glm::vec3({1, 0, 0}));
     mVertexArray->bind().draw();
-    t = glm::translate(glm::mat4(1.0f), glm::vec3({0, 0, 0.5}));
+    t = glm::translate(glm::mat4(1.0f), glm::vec3({0, 0, mScale * .5}));
     model = t * model;
     shader.setUniform("model", model);
     shader.setUniform("colorRatio", 1.0f);
@@ -48,28 +108,28 @@ void CoordinateAxes::render(const glow::UsedProgram& shader, glm::mat4& projecti
     mLineSVA->bind().draw();
 
     r = glm::rotate(glm::mat4(1.0f), -0.5f * glm::pi<float>(), glm::vec3({0, 0, 1}));
-    pos = glm::vec3(mGlobalTransformation[3]) + glm::vec3({1, 0, 0});
+    pos = glm::vec3(mGlobalTransformation[3]) + glm::vec3({mScale, 0, 0});
     t = glm::translate(glm::mat4(1.0f), pos);
-    model = t * r;
+    model = t * r * s;
     shader.setUniform("model", model);
     shader.setUniform("colorRatio", 1.0f);
     shader.setUniform("color", glm::vec3({0, 1, 0}));
     mVertexArray->bind().draw();
-    t = glm::translate(glm::mat4(1.0f), glm::vec3({-0.5, 0, 0}));
+    t = glm::translate(glm::mat4(1.0f), glm::vec3({-mScale * .5, 0, 0}));
     model = t * model;
     shader.setUniform("model", model);
     shader.setUniform("colorRatio", 1.0f);
     shader.setUniform("color", glm::vec3({0, 1, 0}));
     mLineSVA->bind().draw();
 
-    pos = glm::vec3(mGlobalTransformation[3]) + glm::vec3({0, 1, 0});
+    pos = glm::vec3(mGlobalTransformation[3]) + glm::vec3({0, mScale, 0});
     t = glm::translate(glm::mat4(1.0f), pos);
-    model = t;
+    model = t * s;
     shader.setUniform("model", model);
     shader.setUniform("colorRatio", 1.0f);
     shader.setUniform("color", glm::vec3({0, 0, 1}));
     mVertexArray->bind().draw();
-    t = glm::translate(glm::mat4(1.0f), glm::vec3({0, -0.5, 0}));
+    t = glm::translate(glm::mat4(1.0f), glm::vec3({0, -mScale * .5, 0}));
     model = t * model;
     shader.setUniform("model", model);
     shader.setUniform("colorRatio", 1.0f);
@@ -78,6 +138,11 @@ void CoordinateAxes::render(const glow::UsedProgram& shader, glm::mat4& projecti
 
     glLineWidth(1);
     AbstractNode::render(shader, projection, view);
+}
+
+void CoordinateAxes::setScale(float scale) 
+{
+    mScale = scale;
 }
 
 /*void CoordinateAxes::render(const glow::UsedProgram& shader, glm::mat4& projection, glm::mat4& view)
@@ -89,6 +154,72 @@ void CoordinateAxes::render(const glow::UsedProgram& shader, glm::mat4& projecti
     glBindVertexArray(coneVAO);
     glDrawArrays(GL_TRIANGLES, 0, coneTriangles);
 }*/
+void CoordinateAxes::update(float elapsedSeconds)
+{
+    AbstractNode::update(elapsedSeconds);
+    glm::vec3 pos = glm::vec3(mGlobalTransformation[3]) + glm::vec3({0, 0, -mScale});
+    glm::mat4 t = glm::translate(glm::mat4(1.0f), pos);
+    glm::mat4 r = glm::rotate(glm::mat4(1.0f), -0.5f * glm::pi<float>(), glm::vec3({1, 0, 0}));
+    glm::mat4 model = t * r;
+    mArrowX->setWorldTransform(to_bullet(model));
+
+    pos = glm::vec3(mGlobalTransformation[3]) + glm::vec3({mScale, 0, 0});
+    r = glm::rotate(glm::mat4(1.0f), -0.5f * glm::pi<float>(), glm::vec3({0, 0, 1}));
+    t = glm::translate(glm::mat4(1.0f), pos);
+    model = t * r;
+    mArrowY->setWorldTransform(to_bullet(model));
+
+    pos = glm::vec3(mGlobalTransformation[3]) + glm::vec3({0, mScale, 0});
+    t = glm::translate(glm::mat4(1.0f), pos);
+    model = t;
+    mArrowZ->setWorldTransform(to_bullet(model));
+
+    if (mLastScale == mScale)
+        return;
+
+    btCollisionShape* collisionShape = mArrowX->getCollisionShape();
+    collisionShape->setLocalScaling({mScale, mScale, mScale});
+
+    collisionShape = mArrowY->getCollisionShape();
+    collisionShape->setLocalScaling({mScale, mScale, mScale});
+
+    collisionShape = mArrowZ->getCollisionShape();
+    collisionShape->setLocalScaling({mScale, mScale, mScale});
+
+    mLastScale = mScale;
+}
+
+void CoordinateAxes::notifyMouseMoveInput(MouseMoveMessage message) 
+{
+    glm::vec2 delta = message.getDeltaPosition();
+    float d = (delta.x - delta.y) / 10; // glm::distance(glm::vec2(0,0), delta) / 10;
+    glm::mat4 t;
+    if (mHitBody == 1)
+    {
+        t = glm::translate(glm::mat4(1.0f), {0, 0, -d});
+    }
+    else if (mHitBody == 2)
+    {
+        t = glm::translate(glm::mat4(1.0f), {d, 0, 0});
+    }
+    else
+    {
+        t = glm::translate(glm::mat4(1.0f), {0, d, 0});
+    }
+    this->setGlobalTransformation(t * this->getGlobalTransformation());
+    //glm::mat4 transformation = this->getGlobalTransformation();
+}
+
+void CoordinateAxes::notifyMouseClickInput(MouseClickMessage message) 
+{
+    if (message.getInput() == 0)
+    {
+        if (message.getAction() == 0)
+        {
+            mHit = false;
+        }
+    }
+}
 
 void CoordinateAxes::createConeBuffer(float length, float radius, int fineness)
 {

@@ -7,13 +7,13 @@
 class Dispenser : public AbstractNode
 {
 public:
-    Dispenser(const glm::vec3& position, btDynamicsWorld* world) {
+    Dispenser(const glm::vec3& position, PhysicsManager* physics) {
         glm::mat4 transform = glm::translate(glm::mat4(1), position);
 
         MeshNode* top = new MeshNode(
             transform,
             "../../data/meshes/DispenserTop.obj",
-            world,
+            physics,
             GROUP_DYNAMIC_OBJECTS,
             GROUP_DYNAMIC_OBJECTS,
             10.0f
@@ -27,7 +27,7 @@ public:
         MeshNode* base = new MeshNode(
             transform,
             "../../data/meshes/DispenserBase.obj",
-            world,
+            physics,
             GROUP_STATIC_OBJECTS,
             GROUP_DYNAMIC_OBJECTS,
             0.0f
@@ -36,7 +36,7 @@ public:
         SphereNode* sphere = new SphereNode(
             position + glm::vec3(1.1f, 1.65f,-1.45f),
             0.25f,
-            world,
+            physics,
             GROUP_DYNAMIC_OBJECTS,
             GROUP_STATIC_OBJECTS | GROUP_DYNAMIC_OBJECTS,
             1.0f
