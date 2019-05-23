@@ -73,9 +73,9 @@ Editor::Editor(MessageBus* mB, SceneManager* scene, PhysicsManager* physics) :
 
     // Test Axes
 
-    CoordinateAxes* axes = new CoordinateAxes({4.75, 8, 4.0}, mPhysics);
+    //CoordinateAxes* axes = new CoordinateAxes({4.75, 8, 4.0}, mPhysics);
 
-     mScene->appendNode(axes);
+    //mScene->appendNode(axes);
     // ADD BRIDGE ------------------------------------------------
     trans = glm::mat4(1.0f);
     trans = glm::translate(trans, glm::vec3(-3.25f, -0.5f, -27.75f));
@@ -373,16 +373,9 @@ void Editor::load() {
     }
 }
 
+//TODO: Do not use hard coded camera Settings 
 glm::vec3 Editor::getRayTo(int x, int y)
 {
-    //CommonRenderInterface* renderer = m_guiHelper->getRenderInterface();
-
-    /*if (!renderer)
-    {
-        btAssert(0);
-        return btVector3(0, 0, 0);
-    }*/
-
     float top = 1.f;
     float bottom = -1.f;
     float nearPlane = 0.1f;
@@ -392,8 +385,6 @@ glm::vec3 Editor::getRayTo(int x, int y)
     glm::vec3 camPos, camTarget;
 
     camPos = mScene->getCamera()->getCameraPosition();
-    //renderer->getActiveCamera()->getCameraPosition(camPos);
-    //renderer->getActiveCamera()->getCameraTargetPosition(camTarget);
 
     glm::vec3 rayFrom = camPos;
     glm::vec3 rayForward = glm::normalize(mScene->getCamera()->getCameraFront());
@@ -402,15 +393,10 @@ glm::vec3 Editor::getRayTo(int x, int y)
 
     btVector3 rightOffset;
     glm::vec3 vertical = mScene->getCamera()->getCameraUp();
-    //cameraUp[m_guiHelper->getAppInterface()->getUpAxis()] = 1;
 
-    //btVector3 vertical = cameraUp;
 
     glm::vec3 hor;
     hor = -glm::normalize(glm::cross(vertical, rayForward));
-    //hor.safeNormalize();
-    //vertical = hor.cross(rayForward);
-    //vertical.safeNormalize();
 
     float tanfov = tanf(0.5f * glm::radians(75.0f));
 
