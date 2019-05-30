@@ -26,8 +26,8 @@ void GameplayController::notifyGameModeChange(GameModeMessage message)
 
 void GameplayController::notifyMouseClickInput(MouseClickMessage message)
 {
-    if (message.getInput() == GLFW_MOUSE_BUTTON_LEFT ||
-        message.getInput() == GLFW_MOUSE_BUTTON_RIGHT)
+    if ((message.getAction() == GLFW_PRESS && message.getInput() == GLFW_MOUSE_BUTTON_LEFT) ||
+        (message.getAction() == GLFW_PRESS && message.getInput() == GLFW_MOUSE_BUTTON_RIGHT))
     {
         Camera* cam = mScene->getCamera();
         glm::vec3 pos = cam->getCameraPosition();

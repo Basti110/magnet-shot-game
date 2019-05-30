@@ -182,10 +182,11 @@ void Game::update(float elapsedSeconds)
 
     float time = glfwGetTime();
     mStartManager->getPhysicsManager()->update(elapsedSeconds);
-    mScene->update(elapsedSeconds);
     mStartManager->getGuiManager()->update();
     mStartManager->getIOManager()->processInput();
     mStartManager->getMessageBus()->notify();
+    updateCamera(elapsedSeconds);
+    mScene->update(elapsedSeconds);
     time = glfwGetTime() - time;
 
     if (deltaTime > 1)
@@ -214,11 +215,6 @@ void Game::render(float elapsedSeconds)
         shader.setUniform("view", shadowView);
         mScene->render(shader, shadowProj, shadowView);
     }
-
-    // render game variable timestep
-
-    // camera update here because it should be coupled tightly to rendering!
-    updateCamera(elapsedSeconds);
 
     // TODO: Add window size to parameter
     int SCR_WIDTH = 1080;
