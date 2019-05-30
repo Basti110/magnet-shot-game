@@ -8,7 +8,8 @@ PhysicsNode::PhysicsNode(PhysicsManager* physics) :
     mPhysics(physics),
     mWorld(physics->getDynamicsWorld()), 
     mRigidBody(nullptr), 
-    mColor(glm::vec3(1))
+    mColor(glm::vec3(1)),
+    mIsVisible(true)
 {
     mMessageBus = MessageBus::getInstance();
     mMessageBus->addPickBodyReceiver([=](PickBodyMessage message) { this->notifyPickBody(message); });
@@ -56,6 +57,8 @@ void PhysicsNode::update(float elapsedSeconds)
 
 void PhysicsNode::render(const glow::UsedProgram& shader, glm::mat4& projection, glm::mat4& view)
 {
+    if (!mIsVisible) return;
+
     glm::vec3 color = mIsPicked ? glm::vec3(1, 0, 0) : mColor;
     shader.setUniform("model", mGlobalTransformation);
     shader.setUniform("colorRatio", 1.0f);

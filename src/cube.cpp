@@ -96,11 +96,6 @@ void Cube::update(float elapsedSeconds)
     PhysicsNode::update(elapsedSeconds);
 }
 
-void Cube::setVisible(bool value)
-{
-    mIsVisible = value;
-}
-
 void Cube::setColorRatio(float ratio)
 {
     mColorRatio = ratio;

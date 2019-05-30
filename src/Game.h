@@ -15,6 +15,7 @@ class btDefaultCollisionConfiguration;
 class btCollisionDispatcher;
 class btDiscreteDynamicsWorld;
 class btSequentialImpulseConstraintSolver;
+class MagnetGun;
 
 class Game : public glow::glfw::GlfwApp
 {
@@ -29,6 +30,7 @@ private:
     Starter* mStartManager;
     SceneManager* mScene;
     PhysicsManager* mPhysics;
+    MagnetGun* mMagnetGun;
 
     // gfx objects
 private:

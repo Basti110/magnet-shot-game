@@ -41,7 +41,6 @@ void Game::init()
     mStartManager = new Starter(window());
     mScene = mStartManager->getScene();
     mPhysics = mStartManager->getPhysicsManager();
-    auto dynamicsWorld = mPhysics->getDynamicsWorld();
 
     mStartManager->getMessageBus()->addGameModeReceiver([=](GameModeMessage message) {
         this->notifyGameModeChange(message);
@@ -114,11 +113,11 @@ void Game::init()
         root->addChild(level);
 
         // add gun
-        MagnetGun* gun = new MagnetGun(
+        mMagnetGun = new MagnetGun(
             glm::vec3(2.5, 1.5, 1.5), "../../data/meshes/MagnetGun.obj", mPhysics,
-            mScene->getCamera()
+            mStartManager->getMessageBus(), mScene->getCamera()
         );
-        root->addChild(gun);
+        root->addChild(mMagnetGun);
 
         // add dynamic objects
         MeshNode* obstacle = new MeshNode(
@@ -199,6 +198,8 @@ void Game::update(float elapsedSeconds)
 void Game::render(float elapsedSeconds)
 {
     // shadow pass
+    const bool gunIsVisible = mMagnetGun->getVisible();
+    mMagnetGun->setVisible(false);
     glm::vec3 camPos = mStartManager->getScene()->getCamera()->getPos();
     glm::vec3 lightPos = camPos + glm::vec3(10);
     glm::mat4 shadowView = glm::lookAt(lightPos, camPos, glm::vec3(0, 1, 0));
@@ -215,6 +216,7 @@ void Game::render(float elapsedSeconds)
         shader.setUniform("view", shadowView);
         mScene->render(shader, shadowProj, shadowView);
     }
+    mMagnetGun->setVisible(gunIsVisible);
 
     // TODO: Add window size to parameter
     int SCR_WIDTH = 1080;

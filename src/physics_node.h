@@ -17,6 +17,8 @@ public:
 
     btRigidBody* getRigidBody() { return mRigidBody; }
     void setColor(const glm::vec3& color) { mColor = color; }
+    void setVisible(bool value) { mIsVisible = value; }
+    bool getVisible() { return mIsVisible; }
     void notifyPickBody(PickBodyMessage message);
 
 protected:
@@ -25,9 +27,11 @@ protected:
     btRigidBody* mRigidBody;
     std::vector<btTypedConstraint*> mConstraints;
 
+    glm::vec3 mColor;
+    bool mIsVisible;
+
     CoordinateAxes* mCoordinateAxes = nullptr;
     glow::SharedVertexArray mVertexArray;
-    glm::vec3 mColor;
     bool mIsPicked = false;
     MessageBus* mMessageBus;
 };
