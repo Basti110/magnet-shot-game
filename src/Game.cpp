@@ -10,6 +10,7 @@
 #include "node.h"
 #include "light.h"
 #include "mesh_node.h"
+#include "magnet_gun.h"
 #include "dispenser.h"
 #include "cube.h"
 
@@ -111,6 +112,13 @@ void Game::init()
             GROUP_STATIC_OBJECTS, GROUP_DYNAMIC_OBJECTS, 0.0f
         );
         root->addChild(level);
+
+        // add gun
+        MagnetGun* gun = new MagnetGun(
+            glm::vec3(2.5, 1.5, 1.5), "../../data/meshes/MagnetGun.obj", mPhysics,
+            mScene->getCamera()
+        );
+        root->addChild(gun);
 
         // add dynamic objects
         MeshNode* obstacle = new MeshNode(
