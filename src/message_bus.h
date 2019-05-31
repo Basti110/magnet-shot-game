@@ -14,6 +14,7 @@ enum MType
     M_KEY,
     M_MOUSE_CLICK,
     M_MOUSE_MOVE,
+    M_LOCATION_EVENT,
     GUI_FLOAT,
     GUI_VEC3,
     SCENE,
@@ -45,6 +46,18 @@ enum class GameMode
     Gameplay,
     Editor,
     Editor2
+};
+
+enum class LocationEventId
+{
+    GameOver,
+    MagnetGunPickUp
+};
+
+enum class LocationEventType
+{
+    Enter,
+    Exit
 };
 
 class Message
@@ -176,6 +189,19 @@ private:
     GuiSettings setting;
 };
 
+class LocationEventMessage : public Message
+{
+public:
+    LocationEventMessage(LocationEventId eventId, LocationEventType eventType) :
+        eventId(eventId),
+        eventType(eventType)
+    {
+        this->type = M_LOCATION_EVENT;
+    }
+    const LocationEventId eventId;
+    const LocationEventType eventType;
+};
+
 class MessageBus : public Singleton<MessageBus>
 {
 public:
@@ -194,6 +220,8 @@ public:
 
     void addGuiReceiver(std::function<void(Message*)> messageReceiver) { this->guiReceiver.push_back(messageReceiver); }
 
+    void addLocationEventReceiver(std::function<void(LocationEventMessage)> messageReceiver) { this->locationEventReceiver.push_back(messageReceiver); }
+
     void sendMessage(Message* message)
     {
         if (message->getType() == MType::M_GAME_MODE)
@@ -204,7 +232,7 @@ public:
             gameModeMessage = new GameModeMessage(*gameModeMessage);
             this->gameModeMessages.push(gameModeMessage);
         }
-        if (message->getType() == MType::M_KEY)
+        else if (message->getType() == MType::M_KEY)
         {
             KeyMessage* keyMessage = dynamic_cast<KeyMessage*>(message);
             if (!keyMessage)
@@ -251,6 +279,14 @@ public:
                 return; // TODO: Error
             mouseMessage = new PickBodyMessage(*mouseMessage);
             this->pickBodyMessages.push(mouseMessage);
+        }
+        else if (message->getType() == MType::M_LOCATION_EVENT)
+        {
+            LocationEventMessage* locationEventMessage = dynamic_cast<LocationEventMessage*>(message);
+            if (!locationEventMessage)
+                return; // TODO: Error
+            locationEventMessage = new LocationEventMessage(*locationEventMessage);
+            this->locationEventMessages.push(locationEventMessage);
         }
     }
 
@@ -321,6 +357,17 @@ public:
             guiMessages.pop();
             delete m;
         }
+
+        while (!locationEventMessages.empty())
+        {
+            for (auto iter = locationEventReceiver.begin(); iter != locationEventReceiver.end(); iter++)
+            {
+                (*iter)(LocationEventMessage(*locationEventMessages.front()));
+            }
+            LocationEventMessage* m = locationEventMessages.front();
+            locationEventMessages.pop();
+            delete m;
+        }
     }
 
 private:
@@ -330,10 +377,12 @@ private:
     std::vector<std::function<void(MouseMoveMessage)>> mouseMoveReceiver;
     std::vector<std::function<void(Message*)>> guiReceiver;
     std::vector<std::function<void(PickBodyMessage)>> pickBodyReceiver;
+    std::vector<std::function<void(LocationEventMessage)>> locationEventReceiver;
     std::queue<GameModeMessage*> gameModeMessages;
     std::queue<KeyMessage*> keyMessages;
     std::queue<MouseClickMessage*> mouseClickMessages;
     std::queue<MouseMoveMessage*> mouseMoveMessages;
     std::queue<Message*> guiMessages;
     std::queue<PickBodyMessage*> pickBodyMessages;
+    std::queue<LocationEventMessage*> locationEventMessages;
 };

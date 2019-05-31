@@ -5,6 +5,7 @@ class GuiManager;
 // class RenderSystem;
 class IOManager;
 class SceneManager;
+class LocationEventManager;
 class MessageBus;
 class Editor;
 class PhysicsManager;
@@ -15,15 +16,14 @@ class Starter
 public:
     Starter(GLFWwindow* window);
     ~Starter();
-    // RenderSystem* getRenderSystem();
     IOManager* getIOManager();
     MessageBus* getMessageBus();
     GuiManager* getGuiManager();
     SceneManager* getScene();
     PhysicsManager* getPhysicsManager();
+    LocationEventManager* getLocationEventManager();
 
 private:
-    // RenderSystem* mRenderSystem;
     InteractionController* mInteractionController;
     GameplayController* mGameplayController;
     GuiManager* mGuiManager;
@@ -32,4 +32,5 @@ private:
     MessageBus* mBusManager;
     Editor* mEditor;
     PhysicsManager* mPhysics;
+    LocationEventManager* mLocationEventManager;
 };

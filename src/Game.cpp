@@ -4,6 +4,7 @@
 
 #include "gui_manager.h"
 #include "io_manager.h"
+#include "location_event_manager.h"
 #include "scnene_manager.h"
 #include "physics_manager.h"
 
@@ -170,6 +171,10 @@ void Game::init()
             newCube->createBuffer();
             newCube->addPhysics(glm::vec3(1.0f), info);
         }
+
+        // register location events
+        auto locationEventManager = mStartManager->getLocationEventManager();
+        locationEventManager->registerEvent(glm::vec3(2,0,1), glm::vec3(3,5,2), LocationEventId::MagnetGunPickUp);
     }
 }
 
@@ -183,6 +188,7 @@ void Game::update(float elapsedSeconds)
     mStartManager->getPhysicsManager()->update(elapsedSeconds);
     mStartManager->getGuiManager()->update();
     mStartManager->getIOManager()->processInput();
+    mStartManager->getLocationEventManager()->update();
     mStartManager->getMessageBus()->notify();
     updateCamera(elapsedSeconds);
     mScene->update(elapsedSeconds);

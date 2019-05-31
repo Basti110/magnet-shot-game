@@ -6,6 +6,7 @@
 #include "gameplay_controller.h"
 #include "message_bus.h"
 #include "scnene_manager.h"
+#include "location_event_manager.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -21,6 +22,7 @@ Starter::Starter(GLFWwindow* window)
     mEditor = new Editor(mBusManager, mScene, mPhysics);
     mIoManager = new IOManager(window, mBusManager);
     mGuiManager = new GuiManager(mBusManager, window, mScene);
+    mLocationEventManager = new LocationEventManager(mBusManager, mScene->getCamera());
     std::cout << "Startup finished\n";
 }
 
@@ -49,4 +51,9 @@ SceneManager* Starter::getScene()
 PhysicsManager* Starter::getPhysicsManager()
 {
     return mPhysics;
+}
+
+LocationEventManager* Starter::getLocationEventManager()
+{
+    return mLocationEventManager;
 }

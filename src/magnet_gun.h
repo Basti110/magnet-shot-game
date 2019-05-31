@@ -24,6 +24,9 @@ public:
         messageBus->addGameModeReceiver([=](GameModeMessage message) {
             if (mAttatchToCamera) this->notifyGameModeChange(message);
         });
+        messageBus->addLocationEventReceiver([=](LocationEventMessage message) {
+            if (!mAttatchToCamera) this->notifyLocationEvent(message);
+        });
     }
 
     void update(float elapsedSeconds) override
@@ -69,6 +72,15 @@ public:
     void notifyGameModeChange(GameModeMessage message)
     {
         setVisible(message.mode == GameMode::Gameplay);
+    }
+
+    void notifyLocationEvent(LocationEventMessage message)
+    {
+        if (message.eventId == LocationEventId::MagnetGunPickUp &&
+            message.eventType == LocationEventType::Enter)
+        {
+            mAttatchToCamera = true;
+        }
     }
 
 private:
