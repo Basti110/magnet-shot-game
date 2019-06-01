@@ -7,9 +7,7 @@
 class Dispenser : public AbstractNode
 {
 public:
-    Dispenser(const glm::vec3& position, PhysicsManager* physics) {
-        glm::mat4 transform = glm::translate(glm::mat4(1), position);
-
+    Dispenser(const glm::mat4& transform, PhysicsManager* physics) {
         MeshNode* top = new MeshNode(
             transform,
             "../../data/meshes/DispenserTop.obj",
@@ -34,7 +32,7 @@ public:
         );
 
         SphereNode* sphere = new SphereNode(
-            position + glm::vec3(1.1f, 1.65f,-1.45f),
+            glm::vec3(transform * glm::vec4(1.1f, 1.65f,-1.45f, 1.0f)),
             0.25f,
             physics,
             GROUP_DYNAMIC_OBJECTS,
