@@ -127,7 +127,7 @@ void Game::init()
         auto treeParams = {
             std::make_pair(glm::vec3(-4.35f, 0.27f, -6.2f), -45.0f),
             std::make_pair(glm::vec3(-4.35f, 0.27f, -9.5f), -45.0f),
-            std::make_pair(glm::vec3(11.25f, 0.27f, -12.18f), 0.0f)
+            std::make_pair(glm::vec3(11.0f, 0.27f, -12.18f), 0.0f)
         };
         for (const auto& param : treeParams) {
             glm::mat4 transform = glm::translate(glm::mat4(1), param.first);
@@ -147,7 +147,10 @@ void Game::init()
         }
 
         // add dispenser
-        root->addChild(new Dispenser(glm::vec3(2.5f, 0.0f, -14.0f), mPhysics));
+        glm::mat4 dispenserTransform = glm::mat4(1);
+        dispenserTransform = glm::translate(dispenserTransform, glm::vec3(12,0,5));
+        dispenserTransform = glm::rotate(dispenserTransform, glm::pi<float>(), glm::vec3(0,1,0));
+        root->addChild(new Dispenser(dispenserTransform, mPhysics));
 
         root->createBuffer();
         mScene->setSceneRoot(root);

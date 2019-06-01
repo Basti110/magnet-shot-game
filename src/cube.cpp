@@ -85,15 +85,8 @@ void Cube::render(const glow::UsedProgram& shader, glm::mat4& projection, glm::m
 
 void Cube::update(float elapsedSeconds) 
 {
-    /*if (mIsPhysicsOn)
-    {
-        glm::mat4 transform;
-        btTransform t;
-        mRigidBody->getMotionState()->getWorldTransform(t);
-        transform = to_glm(t);
-        setGlobalTransformation(transform* glm::scale(glm::mat4(1), mScale));
-    }*/
     PhysicsNode::update(elapsedSeconds);
+    mGlobalTransformation = glm::scale(mGlobalTransformation, mScale);
 }
 
 void Cube::setVisible(bool value)
