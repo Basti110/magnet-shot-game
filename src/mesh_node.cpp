@@ -18,7 +18,9 @@ MeshNode::MeshNode(const glm::mat4& transform, const std::string& filename, Phys
     mGlobalTransformation = transform;
 
     const size_t idx = filename.find_last_of(".");
-    const std::string collisionFilename = filename.substr(0, idx) + "Collision.obj";
+    const std::string basename = filename.substr(0, idx);
+    const std::string extension = filename.substr(idx, std::string::npos);
+    const std::string collisionFilename = basename + "Collision.obj";
     std::ifstream collisionFile(collisionFilename);
 
     // collision mesh
@@ -60,5 +62,11 @@ MeshNode::MeshNode(const glm::mat4& transform, const std::string& filename, Phys
     }
 
     // visual mesh
-    mVertexArray = load_mesh_from_obj(filename, false);
+    if (extension == ".obj") {
+        mVertexArray = load_mesh_from_obj(filename, false);
+    }
+    else if (extension == ".ply") {
+        mVertexArray = load_mesh_from_ply(filename);
+        setUseVertexColors(true);
+    }
 }

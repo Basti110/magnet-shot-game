@@ -9,6 +9,7 @@ PhysicsNode::PhysicsNode(PhysicsManager* physics) :
     mWorld(physics->getDynamicsWorld()), 
     mRigidBody(nullptr), 
     mColor(glm::vec3(1)),
+    mUseVertexColors(false),
     mIsVisible(true)
 {
     mMessageBus = MessageBus::getInstance();
@@ -63,6 +64,7 @@ void PhysicsNode::render(const glow::UsedProgram& shader, glm::mat4& projection,
     shader.setUniform("model", mGlobalTransformation);
     shader.setUniform("colorRatio", 1.0f);
     shader.setUniform("color", color);
+    shader.setUniform("uUseVertexColors", mUseVertexColors);
     mVertexArray->bind().draw();
     AbstractNode::render(shader, projection, view);
     if (mCoordinateAxes && mIsPicked)

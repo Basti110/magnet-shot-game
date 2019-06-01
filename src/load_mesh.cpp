@@ -180,3 +180,168 @@ glow::SharedVertexArray load_mesh_from_obj(const std::string& filename, bool int
 
     return glow::VertexArray::create({abPos, abNormal, abTangent, abTexCoord}, eab, GL_TRIANGLES);
 }
+
+glow::SharedVertexArray load_mesh_from_ply(const std::string& filename)
+{
+    std::ifstream file(filename);
+    std::string line;
+
+    std::getline(file, line);
+    if (line.compare("ply")) {
+        return nullptr;
+    }
+
+    std::getline(file, line);
+    if (line.compare("format ascii 1.0")) {
+        return nullptr;
+    }
+
+    std::getline(file, line);
+    if (line.compare(0, 7, "comment")) {
+        return nullptr;
+    }
+
+    std::getline(file, line);
+    if (line.compare(0, 14, "element vertex")) {
+        return nullptr;
+    }
+    line = line.substr(15, std::string::npos);
+    int numVertices = atoi(line.c_str());
+
+    bool positions = false;
+    bool normals   = false;
+    bool coords    = false;
+    bool colors    = false;
+
+    while (std::getline(file, line).good() && line.compare(0, 8, "property") == 0) {
+        if (line.compare("property float x") == 0) {
+            std::getline(file, line);
+            if (line.compare("property float y")) {
+                return nullptr;
+            }
+            std::getline(file, line);
+            if (line.compare("property float z")) {
+                return nullptr;
+            }
+            positions = true;
+        }
+
+        if (line.compare("property float nx") == 0) {
+            std::getline(file, line);
+            if (line.compare("property float ny")) {
+                return nullptr;
+            }
+            std::getline(file, line);
+            if (line.compare("property float nz")) {
+                return nullptr;
+            }
+            normals = true;
+        }
+
+        if (line.compare("property float s") == 0) {
+            std::getline(file, line);
+            if (line.compare("property float t")) {
+                return nullptr;
+            }
+            coords = true;
+        }
+
+        if (line.compare("property uchar red") == 0) {
+            std::getline(file, line);
+            if (line.compare("property uchar green")) {
+                return nullptr;
+            }
+            std::getline(file, line);
+            if (line.compare("property uchar blue")) {
+                return nullptr;
+            }
+            colors = true;
+        }
+    }
+
+    int numFaces = 0;
+
+    if (line.compare(0, 12, "element face") == 0) {
+        line = line.substr(13, std::string::npos);
+        numFaces = atoi(line.c_str());
+
+        std::getline(file, line);
+        if (line.compare("property list uchar uint vertex_indices")) {
+            return nullptr;
+        }
+    }
+
+    if (line.compare(0, 12, "element edge") == 0) {
+        std::getline(file, line);
+        if (line.compare("property uint v1")) {
+            return nullptr;
+        }
+        std::getline(file, line);
+        if (line.compare("property uint v2")) {
+            return nullptr;
+        }
+    }
+
+    std::getline(file, line);
+    if (line.compare("end_header")) {
+        return nullptr;
+    }
+
+    std::vector<glm::vec3> aPos(numVertices);
+    std::vector<glm::vec3> aNormal(numVertices);
+    std::vector<glm::vec3> aColor(numVertices);
+    std::vector<glm::vec2> aTexCoord(numVertices);
+
+    std::stringstream sstream;
+
+    for (int i = 0; i < numVertices; i++) {
+        std::getline(file, line);
+        sstream.clear();
+        sstream.str(line);
+
+        if (positions) {
+            float x, y, z;
+            sstream >> x >> y >> z;
+            aPos[i] = glm::vec3(x, y, z);
+        }
+
+        if (normals) {
+            float x, y, z;
+            sstream >> x >> y >> z;
+            aNormal[i] = glm::vec3(x, y, z);
+        }
+
+        if (coords) {
+            float u, v;
+            sstream >> u >> v;
+            aTexCoord[i] = glm::vec2(u, v);
+        }
+
+        if (colors) {
+            float r, g, b;
+            sstream >> r >> g >> b;
+            aColor[i] = glm::vec3(r/255, g/255, b/255);
+        }
+    }
+
+    std::vector<int> indices(numFaces * 3);
+
+    for (int i = 0; i < numFaces; i++) {
+        std::getline(file, line);
+        sstream.clear();
+        sstream.str(line);
+        int v0, v1, v2;
+        sstream >> v0 >> v0 >> v1 >> v2;
+        indices[i * 3 + 0] = v0;
+        indices[i * 3 + 1] = v1;
+        indices[i * 3 + 2] = v2;
+    }
+
+    auto abPos = glow::ArrayBuffer::create("aPos", aPos);
+    auto abNormal = glow::ArrayBuffer::create("aNormal", aNormal);
+    auto abColor = glow::ArrayBuffer::create("aColor", aColor);
+    auto abTexCoord = glow::ArrayBuffer::create("aTexCoord", aTexCoord);
+    auto eab = glow::ElementArrayBuffer::create(indices);
+
+    return glow::VertexArray::create({abPos, abNormal, abColor, abTexCoord}, eab, GL_TRIANGLES);
+}

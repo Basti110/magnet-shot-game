@@ -17,6 +17,8 @@ public:
 
     btRigidBody* getRigidBody() { return mRigidBody; }
     void setColor(const glm::vec3& color) { mColor = color; }
+    void setUseVertexColors(bool value) { mUseVertexColors = value; }
+    bool getUseVertexColors() { return mUseVertexColors; }
     void setVisible(bool value) { mIsVisible = value; }
     bool getVisible() { return mIsVisible; }
     void notifyPickBody(PickBodyMessage message);
@@ -28,6 +30,7 @@ protected:
     std::vector<btTypedConstraint*> mConstraints;
 
     glm::vec3 mColor;
+    bool mUseVertexColors;
     bool mIsVisible;
 
     CoordinateAxes* mCoordinateAxes = nullptr;
