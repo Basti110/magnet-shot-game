@@ -9,8 +9,8 @@
 class MagnetGun : public MeshNode
 {
 public:
-    MagnetGun(const glm::vec3& position, const std::string& filename, PhysicsManager* physics, MessageBus* messageBus, Camera* camera) :
-        MeshNode(glm::translate(glm::mat4(1), position), filename, physics, GROUP_NONE, GROUP_NONE, 0.0f),
+    MagnetGun(const glm::vec3& position, PhysicsManager* physics, MessageBus* messageBus, Camera* camera) :
+        MeshNode(glm::translate(glm::mat4(1), position), "../../data/meshes/MagnetGun.ply", physics, GROUP_NONE, GROUP_NONE, 0.0f),
         mCamera(camera),
         mAttatchToCamera(false),
         mInitialPosition(position),
@@ -35,10 +35,11 @@ public:
             const glm::vec3 front = mCamera->getCameraFront();
             const glm::vec3 right = mCamera->getCameraRight();
             const glm::vec3 up = mCamera->getCameraUp();
-            const glm::vec3 position = mCamera->getPos() + 0.15 * right - 0.25 * up;
+            const glm::vec3 position = mCamera->getPos() - 0.05 * front + 0.2 * right - 0.26 * up;
             mGlobalTransformation = glm::translate(glm::mat4(1), position);
             mGlobalTransformation = mGlobalTransformation * glm::mat4(glm::mat3(right, up, -front));
             mGlobalTransformation = glm::rotate(mGlobalTransformation, 0.0125f, glm::vec3(0,1,0));
+            mGlobalTransformation = glm::rotate(mGlobalTransformation, 0.01f, glm::vec3(1,0,0));
 
             // recoil animation
             if (mRecoilParam > 0) {

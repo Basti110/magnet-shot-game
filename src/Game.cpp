@@ -115,7 +115,7 @@ void Game::init()
 
         // add gun
         mMagnetGun = new MagnetGun(
-            glm::vec3(2.5, 1.5, 1.5), "../../data/meshes/MagnetGun.obj", mPhysics,
+            glm::vec3(2.5, 1.5, 1.5), mPhysics,
             mStartManager->getMessageBus(), mScene->getCamera()
         );
         root->addChild(mMagnetGun);
