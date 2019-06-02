@@ -13,6 +13,7 @@
 #include "mesh_node.h"
 #include "magnet_gun.h"
 #include "dispenser.h"
+#include "wind_turbine.h"
 #include "cube.h"
 
 // glow OpenGL wrapper
@@ -133,6 +134,7 @@ void Game::init()
 
         // add trees
         auto treeParams = {
+            // position, rotation z
             std::make_pair(glm::vec3(-4.35f, 0.27f, -6.2f), -45.0f),
             std::make_pair(glm::vec3(-4.35f, 0.27f, -9.5f), -45.0f),
             std::make_pair(glm::vec3(11.0f, 0.27f, -12.18f), 0.0f)
@@ -152,6 +154,18 @@ void Game::init()
             );
             top->setColor(glm::vec3(99/255.0f, 194/255.0f, 47/255.0f));
             root->addChild(top);
+        }
+
+        // add wind turbines
+        auto turbineParams = {
+            // position, rotation z, initial blade angle
+            std::make_tuple(glm::vec3(-36.5f, 0.0f, 3.5f), 30.0f, 0.0f),
+            std::make_tuple(glm::vec3(-44.0f, 0.0f, -4.0f), 30.0f, 22.5f)
+        };
+        for (const auto& param : turbineParams) {
+            glm::mat4 transform = glm::translate(glm::mat4(1), std::get<0>(param));
+            transform = glm::rotate(transform, glm::radians(std::get<1>(param)), glm::vec3(0,1,0));
+            root->addChild(new WindTurbine(transform, glm::radians(std::get<2>(param)), mPhysics));
         }
 
         // add dispenser
