@@ -6,7 +6,7 @@ class Cube : public PhysicsNode
 {
 public:
 public:
-    Cube(glm::mat4& transformation, Color color, PhysicsManager* physik);
+    Cube(const glm::mat4& transformation, Color color, PhysicsManager* physics);
     ~Cube();
     virtual void createBuffer() override;
     virtual void deleteBuffer() override;
