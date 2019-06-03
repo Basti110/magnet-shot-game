@@ -1,5 +1,4 @@
 #pragma once
-//#include <utility>
 #include "cube.h"
 #include "message_bus.h"
 #include "scnene_manager.h"

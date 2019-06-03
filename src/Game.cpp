@@ -2,6 +2,7 @@
 
 #include <glm/ext.hpp>
 
+#include "common.h"
 #include "gui_manager.h"
 #include "io_manager.h"
 #include "location_event_manager.h"
@@ -10,12 +11,13 @@
 
 #include "node.h"
 #include "light.h"
+#include "cube.h"
 #include "mesh_node.h"
 #include "magnet_gun.h"
 #include "dispenser.h"
 #include "solar_panel.h"
 #include "wind_turbine.h"
-#include "cube.h"
+#include "floating_bridge.h"
 
 // glow OpenGL wrapper
 #include <glow/common/log.hh>
@@ -114,6 +116,18 @@ void Game::init()
             GROUP_STATIC_OBJECTS, GROUP_DYNAMIC_OBJECTS, 0.0f
         );
         root->addChild(level);
+
+        // add left bridge
+        glm::mat4 bridgeTransform = glm::translate(glm::mat4(1), glm::vec3(-26.0f, -0.75f, -16.0f));
+        FloatingBridge* bridge = new FloatingBridge(bridgeTransform, mPhysics);
+        bridge->setColor(red);
+        root->addChild(bridge);
+
+        // add right bridge
+        bridgeTransform = glm::translate(glm::mat4(1), glm::vec3(29.0f, -0.75f, -17.6296f));
+        bridge = new FloatingBridge(bridgeTransform, mPhysics);
+        bridge->setColor(red);
+        root->addChild(bridge);
 
         // add gun
         mMagnetGun = new MagnetGun(

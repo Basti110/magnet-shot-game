@@ -1,15 +1,22 @@
 #include "editor.h"
+#include "common.h"
+#include "light.h"
+#include "coordinate_axes.h"
+
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
+
 #include <glm/gtc/matrix_access.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+
 #include <btBulletDynamicsCommon.h>
+
 #include <json/json.hpp>
-#include "light.h"
-#include "coordinate_axes.h"
+
 #include <iostream>
 #include <fstream>
+
 
 namespace
 {
@@ -78,8 +85,8 @@ Editor::Editor(MessageBus* mB, SceneManager* scene, PhysicsManager* physics) :
     //mScene->appendNode(axes);
     // ADD BRIDGE ------------------------------------------------
     trans = glm::mat4(1.0f);
-    trans = glm::translate(trans, glm::vec3(-3.25f, -0.5f, -27.75f));
-    Cube* newCube = new Cube(trans, Color{1.0f, 1.0f, 1.0f}, mPhysics);
+    trans = glm::translate(trans, glm::vec3(-3.45f, -0.5f, -27.75f));
+    Cube* newCube = new Cube(trans, {red.r, red.g, red.b}, mPhysics);
     mScene->appendNode(newCube);
 
     RigidBodyInfo info;

@@ -1,4 +1,5 @@
 #pragma once
+#include "common.h"
 #include "mesh_node.h"
 #include "sphere_node.h"
 #include "physics_manager.h"
@@ -54,7 +55,7 @@ public:
             GROUP_DYNAMIC_OBJECTS,
             10.0f
         );
-        top->setColor(glm::vec3(234/255.0f, 22/255.0f, 22/255.0f));
+        top->setColor(red);
 
         // restrict movement to rotation around the y-axis
         top->getRigidBody()->setLinearFactor(btVector3(0,0,0));
