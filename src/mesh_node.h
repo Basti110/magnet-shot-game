@@ -6,5 +6,6 @@ class MeshNode : public PhysicsNode
 {
 public:
     MeshNode(const glm::mat4& transform, const std::string& filename, PhysicsManager* physics, short collisionGroup, short collisionMask, float mass);
+    MeshNode(const glm::mat4& transform, const std::string& filename, PhysicsManager* physics, btCollisionShape* collisionShape, short collisionGroup, short collisionMask, float mass);
 
 };

@@ -4,6 +4,7 @@
 
 #include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
+#include <glm/gtc/quaternion.hpp>
 
 #include <LinearMath/btVector3.h>
 #include <LinearMath/btTransform.h>
@@ -30,4 +31,14 @@ inline btTransform to_bullet(glm::mat4 const& m)
     btTransform t;
     t.setFromOpenGLMatrix(&m[0][0]);
     return t;
+}
+
+inline glm::quat to_glm(btQuaternion const& v)
+{
+    return {v.x(), v.y(), v.z(), v.w()};
+}
+
+inline btQuaternion to_bullet(glm::quat const& v)
+{
+    return {v.x, v.y, v.z, v.w};
 }

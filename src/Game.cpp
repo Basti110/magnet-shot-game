@@ -13,6 +13,7 @@
 #include "mesh_node.h"
 #include "magnet_gun.h"
 #include "dispenser.h"
+#include "solar_panel.h"
 #include "wind_turbine.h"
 #include "cube.h"
 
@@ -155,6 +156,11 @@ void Game::init()
             top->setColor(glm::vec3(99/255.0f, 194/255.0f, 47/255.0f));
             root->addChild(top);
         }
+
+        // add solar panel
+        glm::mat4 panelTransform = glm::translate(glm::mat4(1), glm::vec3(1.75, 4, -40.25));
+        panelTransform = glm::rotate(panelTransform, glm::radians(45.0f), glm::vec3(0,1,0));
+        root->addChild(new SolarPanel(panelTransform, glm::pi<float>(), mPhysics));
 
         // add wind turbines
         auto turbineParams = {

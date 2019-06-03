@@ -70,3 +70,30 @@ MeshNode::MeshNode(const glm::mat4& transform, const std::string& filename, Phys
         setUseVertexColors(true);
     }
 }
+
+MeshNode::MeshNode(const glm::mat4& transform, const std::string& filename, PhysicsManager* physics, btCollisionShape* collisionShape, short collisionGroup, short collisionMask, float mass) :
+    PhysicsNode(physics)
+{
+    mLocalTransformation = transform;
+    mGlobalTransformation = transform;
+
+    const size_t idx = filename.find_last_of(".");
+    const std::string extension = filename.substr(idx, std::string::npos);
+
+    // rigid body
+    btDefaultMotionState* motionState = new btDefaultMotionState(to_bullet(transform));
+    btVector3 inertia;
+    collisionShape->calculateLocalInertia(mass, inertia);
+    auto btInfo = btRigidBody::btRigidBodyConstructionInfo(mass, motionState, collisionShape, inertia);
+    mRigidBody = new btRigidBody(btInfo);
+    mWorld->addRigidBody(mRigidBody, collisionGroup, collisionMask);
+
+    // visual mesh
+    if (extension == ".obj") {
+        mVertexArray = load_mesh_from_obj(filename, false);
+    }
+    else if (extension == ".ply") {
+        mVertexArray = load_mesh_from_ply(filename);
+        setUseVertexColors(true);
+    }
+}
