@@ -4,16 +4,19 @@
 
 #include <btBulletDynamicsCommon.h>
 #include <glow/objects/VertexArray.hh>
+
 class CoordinateAxes;
 class PhysicsManager;
+
 
 class PhysicsNode : public AbstractNode
 {
 public:
     PhysicsNode(PhysicsManager* physics);
     ~PhysicsNode() override;
+
     void update(float elapsedSeconds) override;
-    void render(const glow::UsedProgram& shader, glm::mat4& projection, glm::mat4& view) override;
+    void render(const glow::UsedProgram& shader, glm::mat4& projection, glm::mat4& view, bool shadowPass) override;
 
     btRigidBody* getRigidBody() { return mRigidBody; }
     void setColor(const glm::vec3& color) { mColor = color; }
@@ -21,6 +24,9 @@ public:
     bool getUseVertexColors() { return mUseVertexColors; }
     void setVisible(bool value) { mIsVisible = value; }
     bool getVisible() { return mIsVisible; }
+    void setDisableShadows(bool value) { mDisableShadows = value; }
+    bool getDisableShadows() { return mDisableShadows; }
+    void setAlpha(float value) { mAlpha = value; }
     void notifyPickBody(PickBodyMessage message);
 
 protected:
@@ -32,6 +38,8 @@ protected:
     glm::vec3 mColor;
     bool mUseVertexColors;
     bool mIsVisible;
+    bool mDisableShadows;
+    float mAlpha;
 
     CoordinateAxes* mCoordinateAxes = nullptr;
     glow::SharedVertexArray mVertexArray;

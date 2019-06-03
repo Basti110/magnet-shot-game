@@ -75,7 +75,7 @@ void SceneManager::update(float elapsedSeconds)
     mRoot->update(elapsedSeconds);
 }
 
-void SceneManager::render(const glow::UsedProgram& shader, glm::mat4& projection, glm::mat4& view)
+void SceneManager::render(const glow::UsedProgram& shader, glm::mat4& projection, glm::mat4& view, bool shadowPass)
 {
     glm::vec3 camPos = this->getCamera()->getPos();
     glm::vec3 lightPos;
@@ -92,9 +92,9 @@ void SceneManager::render(const glow::UsedProgram& shader, glm::mat4& projection
     
     for (int i = 0; i < mDynamicObjects.size(); ++i)
     {
-        mDynamicObjects[i]->render(shader, projection, view);
+        mDynamicObjects[i]->render(shader, projection, view, shadowPass);
 	}
-    mRoot->render(shader, projection, view);
+    mRoot->render(shader, projection, view, shadowPass);
 }
 
 void SceneManager::setCamera(Camera * camera)

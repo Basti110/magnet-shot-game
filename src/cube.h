@@ -10,7 +10,7 @@ public:
     ~Cube();
     virtual void createBuffer() override;
     virtual void deleteBuffer() override;
-    virtual void render(const glow::UsedProgram& shader, glm::mat4& model, glm::mat4& view) override;
+    virtual void render(const glow::UsedProgram& shader, glm::mat4& model, glm::mat4& view, bool shadowPass) override;
     virtual void update(float elapsedSeconds) override;
     void setColorRatio(float ratio);
     void setColor(glm::vec3 color);

@@ -82,11 +82,11 @@ const glm::mat4& AbstractNode::getGlobalTransformation()
     return mGlobalTransformation;
 }
 
-void AbstractNode::render(const glow::UsedProgram& shader, glm::mat4& projection, glm::mat4& view)
+void AbstractNode::render(const glow::UsedProgram& shader, glm::mat4& projection, glm::mat4& view, bool shadowPass)
 {
     for (std::vector<AbstractNode*>::iterator it = mChilds.begin(); it != mChilds.end(); ++it)
     {
-        (*it)->render(shader, projection, view);
+        (*it)->render(shader, projection, view, shadowPass);
     }
 }
 

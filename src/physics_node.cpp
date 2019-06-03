@@ -10,7 +10,9 @@ PhysicsNode::PhysicsNode(PhysicsManager* physics) :
     mRigidBody(nullptr), 
     mColor(glm::vec3(1)),
     mUseVertexColors(false),
-    mIsVisible(true)
+    mIsVisible(true),
+    mDisableShadows(false),
+    mAlpha(1.0f)
 {
     mMessageBus = MessageBus::getInstance();
     mMessageBus->addPickBodyReceiver([=](PickBodyMessage message) { this->notifyPickBody(message); });
@@ -56,20 +58,22 @@ void PhysicsNode::update(float elapsedSeconds)
     AbstractNode::update(elapsedSeconds);
 }
 
-void PhysicsNode::render(const glow::UsedProgram& shader, glm::mat4& projection, glm::mat4& view)
+void PhysicsNode::render(const glow::UsedProgram& shader, glm::mat4& projection, glm::mat4& view, bool shadowPass)
 {
     if (!mIsVisible) return;
+    if (shadowPass && mDisableShadows) return;
 
     glm::vec3 color = mIsPicked ? glm::vec3(1, 0, 0) : mColor;
     shader.setUniform("model", mGlobalTransformation);
     shader.setUniform("colorRatio", 1.0f);
     shader.setUniform("color", color);
+    shader.setUniform("uAlpha", mAlpha);
     shader.setUniform("uUseVertexColors", mUseVertexColors);
     mVertexArray->bind().draw();
-    AbstractNode::render(shader, projection, view);
+    AbstractNode::render(shader, projection, view, shadowPass);
     if (mCoordinateAxes && mIsPicked)
     {
-        mCoordinateAxes->render(shader, projection, view);
+        mCoordinateAxes->render(shader, projection, view, shadowPass);
     }
 }
 

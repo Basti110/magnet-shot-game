@@ -30,7 +30,7 @@ public:
     virtual void createBuffer();
     virtual void setLocalTransformation(glm::mat4 matrix);
     virtual void deleteBuffer();
-    virtual void render(const glow::UsedProgram& shader, glm::mat4& projection, glm::mat4& view);
+    virtual void render(const glow::UsedProgram& shader, glm::mat4& projection, glm::mat4& view, bool shadowPass);
     virtual void update(float elapsedSeconds);
 
 protected:

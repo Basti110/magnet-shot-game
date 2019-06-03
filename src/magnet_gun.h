@@ -81,6 +81,7 @@ public:
             message.eventType == LocationEventType::Enter)
         {
             mAttatchToCamera = true;
+            setDisableShadows(true);
         }
     }
 

@@ -12,6 +12,7 @@ uniform vec3 lightPos;
 uniform vec3 viewPos; 
 uniform vec3 lightColor;
 uniform bool uUseVertexColors;
+uniform float uAlpha;
 
 uniform sampler2D shadowMap;
 uniform mat4 shadowTransform;
@@ -75,5 +76,5 @@ void main()
     }
 
     vec3 result = (ambient + (0.5+0.5*shadowFactor) * diffuse + specular) * objectColor;
-    FragColor = vec4(result, 1.0);
+    FragColor = vec4(result, uAlpha);
 }

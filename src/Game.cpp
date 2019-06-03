@@ -221,8 +221,6 @@ void Game::update(float elapsedSeconds)
 void Game::render(float elapsedSeconds)
 {
     // shadow pass
-    const bool gunIsVisible = mMagnetGun->getVisible();
-    mMagnetGun->setVisible(false);
     glm::vec3 camPos = mStartManager->getScene()->getCamera()->getPos();
     glm::vec3 lightPos = camPos + glm::vec3(10);
     glm::mat4 shadowView = glm::lookAt(lightPos, camPos, glm::vec3(0, 1, 0));
@@ -237,9 +235,8 @@ void Game::render(float elapsedSeconds)
         auto shader = mShaderShadow->use();
         shader.setUniform("projection", shadowProj);
         shader.setUniform("view", shadowView);
-        mScene->render(shader, shadowProj, shadowView);
+        mScene->render(shader, shadowProj, shadowView, true);
     }
-    mMagnetGun->setVisible(gunIsVisible);
 
     // TODO: Add window size to parameter
     int SCR_WIDTH = 1080;
@@ -249,10 +246,12 @@ void Game::render(float elapsedSeconds)
         auto fb = mFramebuffer->bind();
 
         GLOW_SCOPED(enable, GL_DEPTH_TEST);
-        //GLOW_SCOPED(enable, GL_CULL_FACE);
 
-        //GLOW_SCOPED(polygonMode, GL_FILL);
+        GLOW_SCOPED(enable, GL_BLEND);
+        GLOW_SCOPED(blendFunc, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+        GLOW_SCOPED(enable, GL_CULL_FACE);
+        GLOW_SCOPED(cullFace, GL_BACK);
 
         GLOW_SCOPED(clearColor, mBackgroundColor1);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -266,7 +265,7 @@ void Game::render(float elapsedSeconds)
             shader.setUniform("view", view);
             shader.setUniform("shadowTransform", shadowTransform);
             shader.setTexture("shadowMap", mShadowMap);
-            mScene->render(shader, projection, view);
+            mScene->render(shader, projection, view, false);
         }
         else
         {

@@ -9,7 +9,7 @@ public:
     CoordinateAxes(const glm::vec3& position, PhysicsManager* physics);
     ~CoordinateAxes();
 
-    void render(const glow::UsedProgram& shader, glm::mat4& projection, glm::mat4& view) override;
+    void render(const glow::UsedProgram& shader, glm::mat4& projection, glm::mat4& view, bool shadowPass) override;
     void update(float elapsedSeconds) override;
 
     bool hitArrow(const btRigidBody* body);

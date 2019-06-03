@@ -62,7 +62,7 @@ void Cube::deleteBuffer()
     // TODO: Delete Buffer
 }
 
-void Cube::render(const glow::UsedProgram& shader, glm::mat4& projection, glm::mat4& view)
+void Cube::render(const glow::UsedProgram& shader, glm::mat4& projection, glm::mat4& view, bool shadowPass)
 {
     if (!mIsVisible) return;
 
@@ -72,15 +72,17 @@ void Cube::render(const glow::UsedProgram& shader, glm::mat4& projection, glm::m
         shader.setUniform("model", mGlobalTransformation);
         shader.setUniform("colorRatio", mColorRatio);
         shader.setUniform("color", mColor);
+        shader.setUniform("uAlpha", 1.0f);
+        shader.setUniform("uUseVertexColors", false);
         glBindVertexArray(this->VAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
     }
 
     if (mCoordinateAxes && mIsPicked)
     {
-        mCoordinateAxes->render(shader, projection, view);
+        mCoordinateAxes->render(shader, projection, view, shadowPass);
     }
-    AbstractNode::render(shader, projection, view);
+    AbstractNode::render(shader, projection, view, shadowPass);
 }
 
 void Cube::update(float elapsedSeconds) 
