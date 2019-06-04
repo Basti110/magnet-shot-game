@@ -46,18 +46,19 @@ void Game::init()
     mStartManager = new Starter(window());
     mScene = mStartManager->getScene();
     mPhysics = mStartManager->getPhysicsManager();
+    auto messageBus = mStartManager->getMessageBus();
 
-    mStartManager->getMessageBus()->addGameModeReceiver([=](GameModeMessage message) {
+    messageBus->addGameModeReceiver([=](GameModeMessage message) {
         this->notifyGameModeChange(message);
     });
-    mStartManager->getMessageBus()->addKeyReceiver([=](KeyMessage message) { 
+    messageBus->addKeyReceiver([=](KeyMessage message) {
         this->notifyKeyInput(message); 
     });
 
-    mStartManager->getMessageBus()->addGuiReceiver(getNotifyFuncGui());
+    messageBus->addGuiReceiver(getNotifyFuncGui());
 
     GameModeMessage m(GameMode::Gameplay);
-    mStartManager->getMessageBus()->sendMessage(&m);
+    messageBus->sendMessage(&m);
     setCursorMode(glow::glfw::CursorMode::Disabled);
 
     {
@@ -117,6 +118,32 @@ void Game::init()
         );
         root->addChild(level);
 
+        // add screens & cables
+        for (int i = 0; i < 3; i++) {
+            const glm::vec3 position(1.34631f + i * 1.525f, 0.0f, -18.5735f);
+            const glm::mat4 transform = glm::translate(glm::mat4(1), position);
+            MeshNode* screen = new MeshNode(
+                transform, "../../data/meshes/ScreenBase.obj", mPhysics,
+                GROUP_STATIC_OBJECTS, GROUP_DYNAMIC_OBJECTS, 0.0f
+            );
+            root->addChild(screen);
+
+            screen = new MeshNode(
+                transform, "../../data/meshes/ScreenTop.obj", mPhysics,
+                GROUP_NONE, GROUP_NONE, 0.0f
+            );
+            screen->setColor(glm::vec3(0.5));
+            root->addChild(screen);
+
+            const std::string idx = std::to_string(i + 1);
+            MeshNode* cable = new MeshNode(
+                glm::mat4(1), "../../data/meshes/Cable" + idx + ".obj", mPhysics,
+                GROUP_NONE, GROUP_NONE, 0.0f
+            );
+            root->addChild(cable);
+        }
+
+
         // add left bridge
         glm::mat4 bridgeTransform = glm::translate(glm::mat4(1), glm::vec3(-26.0f, -0.75f, -16.0f));
         FloatingBridge* bridge = new FloatingBridge(bridgeTransform, mPhysics);
@@ -132,16 +159,18 @@ void Game::init()
         // add gun
         mMagnetGun = new MagnetGun(
             glm::vec3(2.5, 1.5, 1.5), mPhysics,
-            mStartManager->getMessageBus(), mScene->getCamera()
+            messageBus, mScene->getCamera()
         );
         root->addChild(mMagnetGun);
 
-        // add dynamic objects
-        MeshNode* obstacle = new MeshNode(
-            glm::mat4(1), "../../data/meshes/Obstacle.obj", mPhysics,
+        // add obstacle
+        glm::mat4 obstacleTransform = glm::translate(glm::mat4(1), glm::vec3(-1.5f, 1.5f, -40.0f));
+        glm::vec3 obstacleScale(8.5f, 1.5f, 1.0f);
+        BoxNode* obstacle = new BoxNode(
+            obstacleTransform, obstacleScale, mPhysics,
             GROUP_DYNAMIC_OBJECTS, GROUP_STATIC_OBJECTS | GROUP_DYNAMIC_OBJECTS, 1.0f
         );
-        obstacle->setColor(glm::vec3(234/255.0f, 22/255.0f, 22/255.0f));
+        obstacle->setColor(red);
         obstacle->getRigidBody()->setLinearFactor(btVector3(1,0,0));
         obstacle->getRigidBody()->setAngularFactor(btVector3(0,0,0));
         obstacle->getRigidBody()->setFriction(0.5f);
