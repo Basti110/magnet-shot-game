@@ -74,7 +74,7 @@ bool CoordinateAxes::hitArrow(const btRigidBody* body)
     return false;
 }
 
-void CoordinateAxes::render(const glow::UsedProgram& shader, glm::mat4& projection, glm::mat4& view, bool shadowPass)
+void CoordinateAxes::render(glow::UsedProgram& shader, glm::mat4& projection, glm::mat4& view, bool shadowPass)
 {
     glm::mat4 s = glm::scale(glm::mat4(1.0f), glm::vec3(mScale, mScale, mScale));
     glLineWidth(10 * mScale);
@@ -95,7 +95,7 @@ void CoordinateAxes::render(const glow::UsedProgram& shader, glm::mat4& projecti
     AbstractNode::render(shader, projection, view, shadowPass);
 }
 
-void CoordinateAxes::render(const glow::UsedProgram& shader, glm::mat4& model, glm::vec3 color, glm::mat4& lineTranslate)
+void CoordinateAxes::render(glow::UsedProgram& shader, glm::mat4& model, glm::vec3 color, glm::mat4& lineTranslate)
 {
     shader.setUniform("model", model);
     shader.setUniform("colorRatio", 1.0f);

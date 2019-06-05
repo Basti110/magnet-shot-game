@@ -10,6 +10,7 @@ PhysicsNode::PhysicsNode(PhysicsManager* physics) :
     mRigidBody(nullptr), 
     mColor(glm::vec3(1)),
     mUseVertexColors(false),
+    mUseTexture(false),
     mIsVisible(true),
     mDisableShadows(false),
     mAlpha(1.0f)
@@ -58,7 +59,7 @@ void PhysicsNode::update(float elapsedSeconds)
     AbstractNode::update(elapsedSeconds);
 }
 
-void PhysicsNode::render(const glow::UsedProgram& shader, glm::mat4& projection, glm::mat4& view, bool shadowPass)
+void PhysicsNode::render(glow::UsedProgram& shader, glm::mat4& projection, glm::mat4& view, bool shadowPass)
 {
     if (!mIsVisible) return;
     if (shadowPass && mDisableShadows) return;
@@ -69,6 +70,7 @@ void PhysicsNode::render(const glow::UsedProgram& shader, glm::mat4& projection,
     shader.setUniform("color", color);
     shader.setUniform("uAlpha", mAlpha);
     shader.setUniform("uUseVertexColors", mUseVertexColors);
+    shader.setUniform("uUseTexture", mUseTexture);
     mVertexArray->bind().draw();
     AbstractNode::render(shader, projection, view, shadowPass);
     if (mCoordinateAxes && mIsPicked)

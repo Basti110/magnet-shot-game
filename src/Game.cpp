@@ -14,6 +14,8 @@
 #include "cube.h"
 #include "mesh_node.h"
 #include "magnet_gun.h"
+#include "screen.h"
+#include "cable.h"
 #include "dispenser.h"
 #include "solar_panel.h"
 #include "wind_turbine.h"
@@ -122,25 +124,8 @@ void Game::init()
         for (int i = 0; i < 3; i++) {
             const glm::vec3 position(1.34631f + i * 1.525f, 0.0f, -18.5735f);
             const glm::mat4 transform = glm::translate(glm::mat4(1), position);
-            MeshNode* screen = new MeshNode(
-                transform, "../../data/meshes/ScreenBase.obj", mPhysics,
-                GROUP_STATIC_OBJECTS, GROUP_DYNAMIC_OBJECTS, 0.0f
-            );
-            root->addChild(screen);
-
-            screen = new MeshNode(
-                transform, "../../data/meshes/ScreenTop.obj", mPhysics,
-                GROUP_NONE, GROUP_NONE, 0.0f
-            );
-            screen->setColor(glm::vec3(0.5));
-            root->addChild(screen);
-
-            const std::string idx = std::to_string(i + 1);
-            MeshNode* cable = new MeshNode(
-                glm::mat4(1), "../../data/meshes/Cable" + idx + ".obj", mPhysics,
-                GROUP_NONE, GROUP_NONE, 0.0f
-            );
-            root->addChild(cable);
+            root->addChild(new Screen(i, transform, mPhysics, messageBus));
+            root->addChild(new Cable(i, mPhysics, messageBus));
         }
 
 
@@ -190,20 +175,20 @@ void Game::init()
                 transform, "../../data/meshes/TreeBase.obj", mPhysics,
                 GROUP_STATIC_OBJECTS, GROUP_DYNAMIC_OBJECTS, 0.0f
             );
-            base->setColor(glm::vec3(151/255.0f, 103/255.0f, 48/255.0f));
+            base->setColor(brown);
             root->addChild(base);
             MeshNode* top = new MeshNode(
                 transform, "../../data/meshes/TreeTop.obj", mPhysics,
                 GROUP_STATIC_OBJECTS, GROUP_DYNAMIC_OBJECTS, 0.0f
             );
-            top->setColor(glm::vec3(99/255.0f, 194/255.0f, 47/255.0f));
+            top->setColor(green);
             root->addChild(top);
         }
 
         // add solar panel
         glm::mat4 panelTransform = glm::translate(glm::mat4(1), glm::vec3(1.75, 4, -40.25));
         panelTransform = glm::rotate(panelTransform, glm::radians(45.0f), glm::vec3(0,1,0));
-        root->addChild(new SolarPanel(panelTransform, glm::pi<float>(), mPhysics));
+        root->addChild(new SolarPanel(panelTransform, glm::pi<float>(), mPhysics, messageBus));
 
         // add wind turbines
         auto turbineParams = {

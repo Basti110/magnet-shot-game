@@ -15,6 +15,7 @@ enum MType
     M_MOUSE_CLICK,
     M_MOUSE_MOVE,
     M_LOCATION_EVENT,
+    M_ACTIVATE_SCREEN,
     GUI_FLOAT,
     GUI_VEC3,
     SCENE,
@@ -202,6 +203,17 @@ public:
     const LocationEventType eventType;
 };
 
+class ActivateScreenMessage : public Message
+{
+public:
+    ActivateScreenMessage(int screenId) :
+        screenId(screenId)
+    {
+        this->type = M_ACTIVATE_SCREEN;
+    }
+    const int screenId;
+};
+
 class MessageBus : public Singleton<MessageBus>
 {
 public:
@@ -221,6 +233,8 @@ public:
     void addGuiReceiver(std::function<void(Message*)> messageReceiver) { this->guiReceiver.push_back(messageReceiver); }
 
     void addLocationEventReceiver(std::function<void(LocationEventMessage)> messageReceiver) { this->locationEventReceiver.push_back(messageReceiver); }
+
+    void addActivateScreenReceiver(std::function<void(ActivateScreenMessage)> messageReceiver) { this->activateScreenReceiver.push_back(messageReceiver); }
 
     void sendMessage(Message* message)
     {
@@ -287,6 +301,14 @@ public:
                 return; // TODO: Error
             locationEventMessage = new LocationEventMessage(*locationEventMessage);
             this->locationEventMessages.push(locationEventMessage);
+        }
+        else if (message->getType() == MType::M_ACTIVATE_SCREEN)
+        {
+            ActivateScreenMessage* activateScreenMessage = dynamic_cast<ActivateScreenMessage*>(message);
+            if (!activateScreenMessage)
+                return; // TODO: Error
+            activateScreenMessage = new ActivateScreenMessage(*activateScreenMessage);
+            this->activateScreenMessages.push(activateScreenMessage);
         }
     }
 
@@ -368,6 +390,17 @@ public:
             locationEventMessages.pop();
             delete m;
         }
+
+        while (!activateScreenMessages.empty())
+        {
+            for (auto iter = activateScreenReceiver.begin(); iter != activateScreenReceiver.end(); iter++)
+            {
+                (*iter)(ActivateScreenMessage(*activateScreenMessages.front()));
+            }
+            ActivateScreenMessage* m = activateScreenMessages.front();
+            activateScreenMessages.pop();
+            delete m;
+        }
     }
 
 private:
@@ -378,6 +411,7 @@ private:
     std::vector<std::function<void(Message*)>> guiReceiver;
     std::vector<std::function<void(PickBodyMessage)>> pickBodyReceiver;
     std::vector<std::function<void(LocationEventMessage)>> locationEventReceiver;
+    std::vector<std::function<void(ActivateScreenMessage)>> activateScreenReceiver;
     std::queue<GameModeMessage*> gameModeMessages;
     std::queue<KeyMessage*> keyMessages;
     std::queue<MouseClickMessage*> mouseClickMessages;
@@ -385,4 +419,5 @@ private:
     std::queue<Message*> guiMessages;
     std::queue<PickBodyMessage*> pickBodyMessages;
     std::queue<LocationEventMessage*> locationEventMessages;
+    std::queue<ActivateScreenMessage*> activateScreenMessages;
 };

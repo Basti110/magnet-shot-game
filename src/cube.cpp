@@ -63,7 +63,7 @@ void Cube::deleteBuffer()
     // TODO: Delete Buffer
 }
 
-void Cube::render(const glow::UsedProgram& shader, glm::mat4& projection, glm::mat4& view, bool shadowPass)
+void Cube::render(glow::UsedProgram& shader, glm::mat4& projection, glm::mat4& view, bool shadowPass)
 {
     if (!mIsVisible) return;
 
@@ -75,6 +75,7 @@ void Cube::render(const glow::UsedProgram& shader, glm::mat4& projection, glm::m
         shader.setUniform("color", mColor);
         shader.setUniform("uAlpha", 1.0f);
         shader.setUniform("uUseVertexColors", false);
+        shader.setUniform("uUseTexture", false);
         glBindVertexArray(this->VAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
     }

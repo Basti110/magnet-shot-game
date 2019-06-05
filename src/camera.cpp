@@ -145,7 +145,7 @@ void Camera::setLocalTransformation(glm::mat4 transformation)
     buildTransform();
 }
 
-void Camera::render(const glow::UsedProgram& shader, glm::mat4& projection, glm::mat4& view, bool shadowPass)
+void Camera::render(glow::UsedProgram &shader, glm::mat4& projection, glm::mat4& view, bool shadowPass)
 {
     AbstractNode::render(shader, projection, view, shadowPass);
 }

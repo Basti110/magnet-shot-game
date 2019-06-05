@@ -91,7 +91,7 @@ void Light::createBuffer()
 
 void Light::deleteBuffer() {}
 
-void Light::render(const glow::UsedProgram& shader, glm::mat4& projection, glm::mat4& view, bool shadowPass)
+void Light::render(glow::UsedProgram& shader, glm::mat4& projection, glm::mat4& view, bool shadowPass)
 {
     if (this->mIsInit)
     {

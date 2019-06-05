@@ -6,12 +6,13 @@ in vec3 FragPos;
 in vec3 vColor;
 
 uniform float colorRatio;
-uniform sampler2D ourTexture;
+uniform sampler2D uTexture;
 uniform vec3 color;
 uniform vec3 lightPos; 
 uniform vec3 viewPos; 
 uniform vec3 lightColor;
 uniform bool uUseVertexColors;
+uniform bool uUseTexture;
 uniform float uAlpha;
 
 uniform sampler2D shadowMap;
@@ -22,7 +23,14 @@ uniform float shadowSmoothness;
 
 void main()
 {
-    vec3 objectColor = uUseVertexColors ? vColor : color;
+    vec3 objectColor = color;
+
+    if (uUseTexture) {
+        objectColor = texture(uTexture, TexCoord).rgb;
+    }
+    else if (uUseVertexColors) {
+        objectColor = vColor;
+    }
 
     // ambient
     float ambientStrength = 0.2;

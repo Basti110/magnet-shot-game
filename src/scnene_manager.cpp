@@ -75,7 +75,7 @@ void SceneManager::update(float elapsedSeconds)
     mRoot->update(elapsedSeconds);
 }
 
-void SceneManager::render(const glow::UsedProgram& shader, glm::mat4& projection, glm::mat4& view, bool shadowPass)
+void SceneManager::render(glow::UsedProgram& shader, glm::mat4& projection, glm::mat4& view, bool shadowPass)
 {
     glm::vec3 camPos = this->getCamera()->getPos();
     glm::vec3 lightPos;

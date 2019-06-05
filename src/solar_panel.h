@@ -10,7 +10,9 @@
 class SolarPanel : public AbstractNode
 {
 public:
-    SolarPanel(const glm::mat4& transform, float panelAngle, PhysicsManager* physics)
+    SolarPanel(const glm::mat4& transform, float panelAngle, PhysicsManager* physics, MessageBus* messageBus) :
+        mMessageBus(messageBus),
+        mMessageSent(false)
     {
         mBase = new MeshNode(
             transform,
@@ -25,9 +27,11 @@ public:
         btCylinderShape* pylon = new btCylinderShape(btVector3(0.101403f, 1.59142f, 0.101403f));
         btBoxShape* panel = new btBoxShape(btVector3(1.8f, 0.04f, 1.125f));
 
+        const glm::vec3 pylonPosition(0.0f, 1.71907, 0.0f);
+
         btTransform t;
         t.setIdentity();
-        t.setOrigin(btVector3(0.0f, 1.71907, 0.0f));
+        t.setOrigin(to_bullet(pylonPosition));
         compoundShape->addChildShape(t, pylon);
 
         t.setIdentity();
@@ -53,6 +57,7 @@ public:
         addChild(mTop);
 
         mOrientation = to_bullet(glm::quat_cast(transform));
+        mLockedInHeight = mTop->getRigidBody()->getCenterOfMassPosition().y() - 0.12f;
     }
 
     void update(float elapsedSeconds)
@@ -65,10 +70,18 @@ public:
             mTop->getRigidBody()->setAngularFactor(btVector3(0,0,0));
             mTop->getRigidBody()->setAngularVelocity(btVector3(0,0,0));
         }
+
+        if (!mMessageSent && mTop->getRigidBody()->getCenterOfMassPosition().y() < mLockedInHeight) {
+            mMessageBus->sendMessage(new ActivateScreenMessage(1));
+            mMessageSent = true;
+        }
     }
 
 private:
+    MessageBus* mMessageBus;
     MeshNode* mBase;
     MeshNode* mTop;
     btQuaternion mOrientation;
+    float mLockedInHeight;
+    bool mMessageSent;
 };

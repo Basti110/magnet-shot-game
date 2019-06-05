@@ -16,12 +16,14 @@ public:
     ~PhysicsNode() override;
 
     void update(float elapsedSeconds) override;
-    void render(const glow::UsedProgram& shader, glm::mat4& projection, glm::mat4& view, bool shadowPass) override;
+    void render(glow::UsedProgram& shader, glm::mat4& projection, glm::mat4& view, bool shadowPass) override;
 
     btRigidBody* getRigidBody() { return mRigidBody; }
     void setColor(const glm::vec3& color) { mColor = color; }
     void setUseVertexColors(bool value) { mUseVertexColors = value; }
     bool getUseVertexColors() { return mUseVertexColors; }
+    void setUseTexture(bool value) { mUseTexture = value; }
+    bool getUseTexture() { return mUseTexture; }
     void setVisible(bool value) { mIsVisible = value; }
     bool getVisible() { return mIsVisible; }
     void setDisableShadows(bool value) { mDisableShadows = value; }
@@ -37,6 +39,7 @@ protected:
 
     glm::vec3 mColor;
     bool mUseVertexColors;
+    bool mUseTexture;
     bool mIsVisible;
     bool mDisableShadows;
     float mAlpha;
