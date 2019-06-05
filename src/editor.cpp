@@ -148,6 +148,13 @@ void Editor::notifyGameModeChange(GameModeMessage message)
     mIsActive = message.mode == GameMode::Editor || message.mode == GameMode::Editor2;
     mCube->setVisible(message.mode == GameMode::Editor);
     mGameMode = message.mode;
+
+	if (mGameMode != GameMode::Editor2)
+    {
+            PickBodyMessage* m = new PickBodyMessage(nullptr);
+            MessageBus::getInstance()->sendMessage(m);
+    }
+
 }
 
 void Editor::notifyMouseClickInput(MouseClickMessage message)

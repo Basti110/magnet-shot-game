@@ -43,7 +43,7 @@ void PhysicsNode::update(float elapsedSeconds)
         mGlobalTransformation = to_glm(transform);
     }
 
-    if (mIsPicked && mCoordinateAxes)
+    if (mIsPicked && mCoordinateAxes && mRigidBody)
     {
         mCoordinateAxes->update(elapsedSeconds);
         glm::vec3 pos = glm::vec3(mCoordinateAxes->getGlobalTransformation()[3]);
@@ -81,6 +81,12 @@ void PhysicsNode::render(glow::UsedProgram& shader, glm::mat4& projection, glm::
 
 void PhysicsNode::notifyPickBody(PickBodyMessage message)
 {
+    if (message.body == nullptr)
+    {
+        mIsPicked = false;
+        return;
+    }
+
     if (mIsPicked && mCoordinateAxes != nullptr)
     {
         //bool hit = mCoordinateAxes->hitArrow(message.body);
