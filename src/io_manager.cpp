@@ -78,6 +78,21 @@ void IOManager::processInput()
         mPressD = true;
         sendMessageKey(GLFW_KEY_D, GLFW_PRESS, cameraSpeed);
     }
+
+    if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
+    {
+        mPress1 = true;
+    }
+
+    if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
+    {
+        mPress2 = true;
+    }
+
+    if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
+    {
+        mPress3 = true;
+    }
        
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_RELEASE && mPressW)
     {
@@ -102,7 +117,24 @@ void IOManager::processInput()
         sendMessageKey(GLFW_KEY_D, GLFW_RELEASE, cameraSpeed);
         mPressD = false;
     }
-        
+
+    if (glfwGetKey(window, GLFW_KEY_1) == GLFW_RELEASE && mPress1)
+    {
+        messageBus->sendMessage(new ActivateScreenMessage(0));
+        mPress1 = false;
+    }
+
+    if (glfwGetKey(window, GLFW_KEY_2) == GLFW_RELEASE && mPress2)
+    {
+        messageBus->sendMessage(new ActivateScreenMessage(1));
+        mPress2 = false;
+    }
+
+    if (glfwGetKey(window, GLFW_KEY_3) == GLFW_RELEASE && mPress3)
+    {
+        messageBus->sendMessage(new ActivateScreenMessage(2));
+        mPress3 = false;
+    }
 
     if (mCurrGameMode == GameMode::Editor || mCurrGameMode == GameMode::Editor2)
     {

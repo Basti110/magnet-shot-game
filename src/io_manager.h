@@ -41,5 +41,8 @@ private:
     bool mPressS = false;
     bool mPressA = false;
     bool mPressD = false;
+    bool mPress1 = false;
+    bool mPress2 = false;
+    bool mPress3 = false;
 };
 
