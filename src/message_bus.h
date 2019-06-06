@@ -52,7 +52,9 @@ enum class GameMode
 enum class LocationEventId
 {
     GameOver,
-    MagnetGunPickUp
+    MagnetGunPickUp,
+    ActivateStairs,
+    DeactivateStairs
 };
 
 enum class LocationEventType

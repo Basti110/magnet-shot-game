@@ -20,6 +20,7 @@
 #include "solar_panel.h"
 #include "wind_turbine.h"
 #include "floating_bridge.h"
+#include "stairs.h"
 
 // glow OpenGL wrapper
 #include <glow/common/log.hh>
@@ -128,7 +129,6 @@ void Game::init()
             root->addChild(new Cable(i, mPhysics, messageBus));
         }
 
-
         // add left bridge
         glm::mat4 bridgeTransform = glm::translate(glm::mat4(1), glm::vec3(-26.0f, -0.75f, -16.0f));
         FloatingBridge* bridge = new FloatingBridge(bridgeTransform, mPhysics);
@@ -223,9 +223,16 @@ void Game::init()
             newCube->addPhysics(glm::vec3(1.0f), info);
         }
 
+        // add stairs
+        glm::mat4 stairsTransform = glm::translate(glm::mat4(1), glm::vec3(-3.45f, 2.866667f, -34.6f));
+        Stairs* stairs = new Stairs(stairsTransform, mPhysics, messageBus);
+        root->addChild(stairs);
+
         // register location events
         auto locationEventManager = mStartManager->getLocationEventManager();
         locationEventManager->registerEvent(glm::vec3(2,0,1), glm::vec3(3,5,2), LocationEventId::MagnetGunPickUp);
+        locationEventManager->registerEvent(glm::vec3(-6,4,-39), glm::vec3(-1,7,-35), LocationEventId::ActivateStairs);
+        locationEventManager->registerEvent(glm::vec3(-6,0,-38), glm::vec3(-1,7,-23), LocationEventId::DeactivateStairs);
     }
 }
 
