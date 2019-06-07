@@ -183,8 +183,6 @@ void CoordinateAxes::createConeBuffer(float length, float radius, int fineness)
 
     for (int i = 1; i <= fineness; ++i)
     {
-        aPos.push_back({0, LenHalf, 0});
-        aNormal.push_back({0, 1, 0});
         aPos.push_back({prevCoord.x, -LenHalf, prevCoord.y});
         aNormal.push_back(glm::normalize(glm::vec3({prevCoord.x, 0, prevCoord.y})));
 
@@ -194,6 +192,9 @@ void CoordinateAxes::createConeBuffer(float length, float radius, int fineness)
 
         aPos.push_back({prevCoord.x, -LenHalf, prevCoord.y});
         aNormal.push_back(glm::normalize(glm::vec3({prevCoord.x, 0, prevCoord.y})));
+
+		aPos.push_back({0, LenHalf, 0});
+        aNormal.push_back({0, 1, 0});
 
         for (int i = 0; i < 3; ++i)
         {

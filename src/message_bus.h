@@ -18,6 +18,8 @@ enum MType
     M_ACTIVATE_SCREEN,
     GUI_FLOAT,
     GUI_VEC3,
+    BODY_PROPERTIES_OUT,
+	BODY_PROPERTIES_IN,
     SCENE,
     RENDERSYSTEM,
     PICK_BODY,
@@ -61,6 +63,14 @@ enum class LocationEventType
 {
     Enter,
     Exit
+};
+
+struct BodyProperties
+{
+    glm::vec3 ambient;
+    glm::vec3 diffuse;
+    glm::vec3 specular;
+    float shininess;
 };
 
 class Message
@@ -195,9 +205,7 @@ private:
 class LocationEventMessage : public Message
 {
 public:
-    LocationEventMessage(LocationEventId eventId, LocationEventType eventType) :
-        eventId(eventId),
-        eventType(eventType)
+    LocationEventMessage(LocationEventId eventId, LocationEventType eventType) : eventId(eventId), eventType(eventType)
     {
         this->type = M_LOCATION_EVENT;
     }
@@ -208,12 +216,15 @@ public:
 class ActivateScreenMessage : public Message
 {
 public:
-    ActivateScreenMessage(int screenId) :
-        screenId(screenId)
-    {
-        this->type = M_ACTIVATE_SCREEN;
-    }
+    ActivateScreenMessage(int screenId) : screenId(screenId) { this->type = M_ACTIVATE_SCREEN; }
     const int screenId;
+};
+
+class GuiPropertyMessage : public Message
+{
+public:
+    GuiPropertyMessage(bool out) { this->type = out ? BODY_PROPERTIES_OUT : BODY_PROPERTIES_IN; }
+    const BodyProperties mProperty;
 };
 
 class MessageBus : public Singleton<MessageBus>
@@ -234,9 +245,17 @@ public:
 
     void addGuiReceiver(std::function<void(Message*)> messageReceiver) { this->guiReceiver.push_back(messageReceiver); }
 
-    void addLocationEventReceiver(std::function<void(LocationEventMessage)> messageReceiver) { this->locationEventReceiver.push_back(messageReceiver); }
+	void addGuiReceiverOut(std::function<void(Message*)> messageReceiver) { this->guiOutReceiver.push_back(messageReceiver); }
 
-    void addActivateScreenReceiver(std::function<void(ActivateScreenMessage)> messageReceiver) { this->activateScreenReceiver.push_back(messageReceiver); }
+    void addLocationEventReceiver(std::function<void(LocationEventMessage)> messageReceiver)
+    {
+        this->locationEventReceiver.push_back(messageReceiver);
+    }
+
+    void addActivateScreenReceiver(std::function<void(ActivateScreenMessage)> messageReceiver)
+    {
+        this->activateScreenReceiver.push_back(messageReceiver);
+    }
 
     void sendMessage(Message* message)
     {
@@ -287,6 +306,14 @@ public:
                 return; // TODO: Error
             m = new GuiVec3Message(*m);
             this->guiMessages.push(m);
+        }
+        else if (message->getType() == MType::BODY_PROPERTIES_OUT)
+        {
+            GuiVec3Message* m = dynamic_cast<GuiVec3Message*>(message);
+            if (!m)
+                return; // TODO: Error
+            m = new GuiVec3Message(*m);
+            this->guiOutMessages.push(m);
         }
         else if (message->getType() == MType::PICK_BODY)
         {
@@ -382,6 +409,17 @@ public:
             delete m;
         }
 
+		while (!guiOutMessages.empty())
+        {
+            for (auto iter = guiOutReceiver.begin(); iter != guiOutReceiver.end(); iter++)
+            {
+                (*iter)(guiMessages.front());
+            }
+            Message* m = guiOutMessages.front();
+            guiOutMessages.pop();
+            delete m;
+        }
+
         while (!locationEventMessages.empty())
         {
             for (auto iter = locationEventReceiver.begin(); iter != locationEventReceiver.end(); iter++)
@@ -411,6 +449,7 @@ private:
     std::vector<std::function<void(MouseClickMessage)>> mouseClickReceiver;
     std::vector<std::function<void(MouseMoveMessage)>> mouseMoveReceiver;
     std::vector<std::function<void(Message*)>> guiReceiver;
+    std::vector<std::function<void(Message*)>> guiOutReceiver;
     std::vector<std::function<void(PickBodyMessage)>> pickBodyReceiver;
     std::vector<std::function<void(LocationEventMessage)>> locationEventReceiver;
     std::vector<std::function<void(ActivateScreenMessage)>> activateScreenReceiver;
@@ -419,6 +458,7 @@ private:
     std::queue<MouseClickMessage*> mouseClickMessages;
     std::queue<MouseMoveMessage*> mouseMoveMessages;
     std::queue<Message*> guiMessages;
+    std::queue<Message*> guiOutMessages;
     std::queue<PickBodyMessage*> pickBodyMessages;
     std::queue<LocationEventMessage*> locationEventMessages;
     std::queue<ActivateScreenMessage*> activateScreenMessages;

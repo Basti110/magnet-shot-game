@@ -67,12 +67,12 @@ void Cube::render(glow::UsedProgram& shader, glm::mat4& projection, glm::mat4& v
 {
     if (!mIsVisible) return;
 
-    
+    glm::vec3 color = mIsPicked ? glm::vec3(1, 0, 0) : mColor;
     if (this->isInit)
     {
         shader.setUniform("model", mGlobalTransformation);
         shader.setUniform("colorRatio", mColorRatio);
-        shader.setUniform("color", mColor);
+        shader.setUniform("color", color);
         shader.setUniform("uAlpha", 1.0f);
         shader.setUniform("uUseVertexColors", false);
         shader.setUniform("uUseTexture", false);
