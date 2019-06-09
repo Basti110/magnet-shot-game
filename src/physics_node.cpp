@@ -20,9 +20,10 @@ PhysicsNode::PhysicsNode(PhysicsManager* physics) :
     mMessageBus->addGuiReceiver([=](Message* message) { this->notifyGuiInput(message); });
 
 	mProperty.nodeID = this->getNodeId();
-    mProperty.ambient = mColor;
+    mProperty.ambient = 0.2f * mColor;
     mProperty.diffuse = mColor;
     mProperty.specular = mColor;
+    mProperty.shininess = 32;
 }
 
 PhysicsNode::~PhysicsNode()
@@ -71,6 +72,10 @@ void PhysicsNode::render(glow::UsedProgram& shader, glm::mat4& projection, glm::
     if (shadowPass && mDisableShadows) return;
 
     glm::vec3 color = mIsPicked ? glm::vec3(1, 0, 0) : mColor;
+    shader.setUniform("material.ambient", mProperty.ambient);
+    shader.setUniform("material.diffuse", mProperty.diffuse);
+    shader.setUniform("material.specular", mProperty.specular); // specular lighting doesn't have full effect on this object's material
+    shader.setUniform("material.shininess", mProperty.shininess);
     shader.setUniform("model", mGlobalTransformation);
     shader.setUniform("colorRatio", 1.0f);
     shader.setUniform("color", color);
@@ -83,6 +88,15 @@ void PhysicsNode::render(glow::UsedProgram& shader, glm::mat4& projection, glm::
     {
         mCoordinateAxes->render(shader, projection, view, shadowPass);
     }
+}
+
+void PhysicsNode::setColor(const glm::vec3& color) 
+{
+    mColor = color;
+    mProperty.nodeID = this->getNodeId();
+    mProperty.ambient = 0.2f * mColor;
+    mProperty.diffuse = mColor;
+    mProperty.specular = mColor;
 }
 
 void PhysicsNode::notifyPickBody(PickBodyMessage message)

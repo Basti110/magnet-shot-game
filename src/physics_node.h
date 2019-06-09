@@ -19,14 +19,7 @@ public:
     void render(glow::UsedProgram& shader, glm::mat4& projection, glm::mat4& view, bool shadowPass) override;
 
     btRigidBody* getRigidBody() { return mRigidBody; }
-    void setColor(const glm::vec3& color)
-    {
-        mColor = color;
-        mProperty.nodeID = this->getNodeId();
-        mProperty.ambient = mColor;
-        mProperty.diffuse = mColor;
-        mProperty.specular = mColor;
-    }
+    void setColor(const glm::vec3& color);
     void setUseVertexColors(bool value) { mUseVertexColors = value; }
     bool getUseVertexColors() { return mUseVertexColors; }
     void setUseTexture(bool value) { mUseTexture = value; }

@@ -70,6 +70,10 @@ void Cube::render(glow::UsedProgram& shader, glm::mat4& projection, glm::mat4& v
     glm::vec3 color = mIsPicked ? glm::vec3(1, 0, 0) : mColor;
     if (this->isInit)
     {
+        shader.setUniform("material.ambient", mProperty.ambient);
+        shader.setUniform("material.diffuse", mProperty.diffuse);
+        shader.setUniform("material.specular", mProperty.specular); // specular lighting doesn't have full effect on this object's material
+        shader.setUniform("material.shininess", mProperty.shininess);
         shader.setUniform("model", mGlobalTransformation);
         shader.setUniform("colorRatio", mColorRatio);
         shader.setUniform("color", color);

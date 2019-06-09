@@ -76,7 +76,7 @@ public:
 
 	bool compare(const BodyProperties& v) 
 	{
-        return (ambient == v.ambient) && diffuse == v.diffuse && specular == v.specular && shininess == shininess && nodeID == v.nodeID;
+        return (ambient == v.ambient) && diffuse == v.diffuse && specular == v.specular && shininess == v.shininess && nodeID == v.nodeID;
 	}
 };
 
