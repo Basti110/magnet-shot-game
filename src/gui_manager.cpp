@@ -4,6 +4,7 @@
 #include "imgui/imgui_impl_opengl3.h"
 #include "scnene_manager.h"
 
+//TODO: Templates for sending;
 GuiManager::GuiManager(MessageBus* messageBus, GLFWwindow* window, SceneManager* scene) : 
     mMessageBus(messageBus),
     mWindow(window), 
@@ -12,6 +13,10 @@ GuiManager::GuiManager(MessageBus* messageBus, GLFWwindow* window, SceneManager*
     messageBus->addGameModeReceiver([=](GameModeMessage message) {
         this->notifyGameModeChange(message);
     });
+
+	messageBus->addGuiOutReceiver([=](Message* message) { 
+		this->notifyGuiOut(message); 
+	});
 
 
     //Common Settings
@@ -82,10 +87,19 @@ void GuiManager::render()
         bool show_demo_window = true;
         //ImGui::ShowDemoWindow(&show_demo_window);
     }
+
+	renderPropertyView();
 }
 
 void GuiManager::update()
 {
+    if (!mBodyProperty.first.compare(mBodyProperty.second))
+    {
+        GuiPropertyMessage m(false, mBodyProperty.first);
+        mMessageBus->sendMessage(&m);
+        mBodyProperty.second = mBodyProperty.second;
+    }
+
     if (mGameMode != GameMode::Menu)
         return;
 
@@ -141,6 +155,20 @@ void GuiManager::update()
 void GuiManager::notifyGameModeChange(GameModeMessage message)
 {
     mGameMode = message.mode;
+}
+
+void GuiManager::notifyGuiOut(Message* message) 
+{
+    if (message->getType() == MType::BODY_PROPERTIES_OUT)
+    {
+        GuiPropertyMessage* m = dynamic_cast<GuiPropertyMessage*>(message);
+        if (m == nullptr)
+            return;
+
+		mBodyProperty.first = m->mProperty;	
+		mBodyProperty.second = m->mProperty;
+		mPropertyViewIsActive = true;
+	}
 }
 
 void GuiManager::sendVec3Message(std::pair<glm::vec3, glm::vec3>& v, GuiSettings s) {
@@ -281,6 +309,25 @@ void GuiManager::renderEditorSettings()
         }
         ImGui::EndChild();
         ImGui::EndGroup();
+    }
+    ImGui::End();
+}
+
+void GuiManager::renderPropertyView() 
+{
+    if (!mPropertyViewIsActive)
+        return;
+
+    if (ImGui::Begin("Object Property"))
+    {
+        ImGui::Text("Object:");
+        {
+            ImGui::SliderInt("ID", &mBodyProperty.first.nodeID, 0, 10);
+            ImGui::SliderFloat("shininess", &mBodyProperty.first.shininess, 0.0f, 10.0f);
+            ImGui::ColorEdit3("ambient", &mBodyProperty.first.ambient.r);
+            ImGui::ColorEdit3("diffiuse", &mBodyProperty.first.diffuse.r);
+            ImGui::ColorEdit3("specular", &mBodyProperty.first.specular.r);
+        }
     }
     ImGui::End();
 }

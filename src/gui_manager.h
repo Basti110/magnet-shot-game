@@ -17,6 +17,7 @@ public:
     void update();
 
     void notifyGameModeChange(GameModeMessage message);
+    void notifyGuiOut(Message* message);
 
 private:
     void sendVec3Message(std::pair<glm::vec3, glm::vec3>& v, GuiSettings s);
@@ -24,6 +25,7 @@ private:
     void renderOverlay();
     void renderWorldSettings();
     void renderEditorSettings();
+    void renderPropertyView();
 
     GLFWwindow* mWindow;
     MessageBus* mMessageBus;
@@ -58,5 +60,9 @@ private:
     std::pair<float, float> mCubeAngularDamping;
 
     bool mSave = false;
+
+	//Property Output
+    bool mPropertyViewIsActive = false;
+    std::pair<BodyProperties, BodyProperties> mBodyProperty;
 };
 

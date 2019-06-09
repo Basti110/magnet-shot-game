@@ -19,7 +19,14 @@ public:
     void render(glow::UsedProgram& shader, glm::mat4& projection, glm::mat4& view, bool shadowPass) override;
 
     btRigidBody* getRigidBody() { return mRigidBody; }
-    void setColor(const glm::vec3& color) { mColor = color; }
+    void setColor(const glm::vec3& color)
+    {
+        mColor = color;
+        mProperty.nodeID = this->getNodeId();
+        mProperty.ambient = mColor;
+        mProperty.diffuse = mColor;
+        mProperty.specular = mColor;
+    }
     void setUseVertexColors(bool value) { mUseVertexColors = value; }
     bool getUseVertexColors() { return mUseVertexColors; }
     void setUseTexture(bool value) { mUseTexture = value; }
@@ -30,8 +37,10 @@ public:
     bool getDisableShadows() { return mDisableShadows; }
     void setAlpha(float value) { mAlpha = value; }
     void notifyPickBody(PickBodyMessage message);
+    void notifyGuiInput(Message* message);
 
 protected:
+    BodyProperties mProperty;
     PhysicsManager* mPhysics;
     btDynamicsWorld* mWorld;
     btRigidBody* mRigidBody;

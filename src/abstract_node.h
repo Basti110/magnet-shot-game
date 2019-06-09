@@ -21,6 +21,7 @@ public:
     void isAddedTo(AbstractNode* parent);
     void isRemoved();
     void updateGlobalTransformation();
+    int getNodeId();
     AbstractNode* getChild(unsigned int index);
     glm::vec3 getPos();
 
@@ -39,4 +40,8 @@ protected:
     AbstractNode* mParent;
     glm::mat4 mGlobalTransformation;
     glm::mat4 mLocalTransformation;
+
+private:
+    int mNodeId;
+    static int mNodeNumber;
 };

@@ -8,10 +8,15 @@ AbstractNode::AbstractNode() : mParent(nullptr)
     glm::mat4 trans = glm::mat4(1.0f);
     mLocalTransformation = glm::translate(trans, glm::vec3(0.0f, 0.0f, 0.0f));
     mGlobalTransformation = glm::translate(trans, glm::vec3(0.0f, 0.0f, 0.0f));
+
+	mNodeId = mNodeNumber;
+    mNodeNumber++;
 }
 
 
 AbstractNode::~AbstractNode() {}
+
+int AbstractNode::mNodeNumber = 0;
 
 void AbstractNode::addChild(AbstractNode* child)
 {
@@ -70,6 +75,11 @@ void AbstractNode::updateGlobalTransformation()
     {
         (*it)->updateGlobalTransformation();
     }
+}
+
+int AbstractNode::getNodeId()
+{
+    return mNodeId;
 }
 
 const glm::mat4& AbstractNode::getLocalTransformation()

@@ -65,12 +65,19 @@ enum class LocationEventType
     Exit
 };
 
-struct BodyProperties
+class BodyProperties
 {
+public:
+    int nodeID;
     glm::vec3 ambient;
     glm::vec3 diffuse;
     glm::vec3 specular;
     float shininess;
+
+	bool compare(const BodyProperties& v) 
+	{
+        return (ambient == v.ambient) && diffuse == v.diffuse && specular == v.specular && shininess == shininess && nodeID == v.nodeID;
+	}
 };
 
 class Message
@@ -223,7 +230,7 @@ public:
 class GuiPropertyMessage : public Message
 {
 public:
-    GuiPropertyMessage(bool out) { this->type = out ? BODY_PROPERTIES_OUT : BODY_PROPERTIES_IN; }
+    GuiPropertyMessage(bool out, BodyProperties& p) : mProperty(p) { this->type = out ? BODY_PROPERTIES_OUT : BODY_PROPERTIES_IN; }
     const BodyProperties mProperty;
 };
 
@@ -245,7 +252,7 @@ public:
 
     void addGuiReceiver(std::function<void(Message*)> messageReceiver) { this->guiReceiver.push_back(messageReceiver); }
 
-	void addGuiReceiverOut(std::function<void(Message*)> messageReceiver) { this->guiOutReceiver.push_back(messageReceiver); }
+	void addGuiOutReceiver(std::function<void(Message*)> messageReceiver) { this->guiOutReceiver.push_back(messageReceiver); }
 
     void addLocationEventReceiver(std::function<void(LocationEventMessage)> messageReceiver)
     {
@@ -309,11 +316,19 @@ public:
         }
         else if (message->getType() == MType::BODY_PROPERTIES_OUT)
         {
-            GuiVec3Message* m = dynamic_cast<GuiVec3Message*>(message);
+            GuiPropertyMessage* m = dynamic_cast<GuiPropertyMessage*>(message);
             if (!m)
                 return; // TODO: Error
-            m = new GuiVec3Message(*m);
+            m = new GuiPropertyMessage(*m);
             this->guiOutMessages.push(m);
+        }
+        else if (message->getType() == MType::BODY_PROPERTIES_IN)
+        {
+            GuiPropertyMessage* m = dynamic_cast<GuiPropertyMessage*>(message);
+            if (!m)
+                return; // TODO: Error
+            m = new GuiPropertyMessage(*m);
+            this->guiMessages.push(m);
         }
         else if (message->getType() == MType::PICK_BODY)
         {
@@ -413,7 +428,7 @@ public:
         {
             for (auto iter = guiOutReceiver.begin(); iter != guiOutReceiver.end(); iter++)
             {
-                (*iter)(guiMessages.front());
+                (*iter)(guiOutMessages.front());
             }
             Message* m = guiOutMessages.front();
             guiOutMessages.pop();

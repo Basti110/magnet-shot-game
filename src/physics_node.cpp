@@ -17,6 +17,12 @@ PhysicsNode::PhysicsNode(PhysicsManager* physics) :
 {
     mMessageBus = MessageBus::getInstance();
     mMessageBus->addPickBodyReceiver([=](PickBodyMessage message) { this->notifyPickBody(message); });
+    mMessageBus->addGuiReceiver([=](Message* message) { this->notifyGuiInput(message); });
+
+	mProperty.nodeID = this->getNodeId();
+    mProperty.ambient = mColor;
+    mProperty.diffuse = mColor;
+    mProperty.specular = mColor;
 }
 
 PhysicsNode::~PhysicsNode()
@@ -87,6 +93,8 @@ void PhysicsNode::notifyPickBody(PickBodyMessage message)
         return;
     }
 
+
+
     if (mIsPicked && mCoordinateAxes != nullptr)
     {
         //bool hit = mCoordinateAxes->hitArrow(message.body);
@@ -96,7 +104,25 @@ void PhysicsNode::notifyPickBody(PickBodyMessage message)
     mIsPicked = message.body == mRigidBody ? true : false;
     if (mIsPicked)
     {
+
+        GuiPropertyMessage m(true, mProperty);
+        mMessageBus->sendMessage(&m);
         if (mCoordinateAxes == nullptr)
             mCoordinateAxes = new CoordinateAxes(glm::vec3(mGlobalTransformation[3]), mPhysics);
+    }
+}
+
+void PhysicsNode::notifyGuiInput(Message* message) 
+{
+    if (message->getType() == MType::BODY_PROPERTIES_IN)
+    {
+        GuiPropertyMessage* m = dynamic_cast<GuiPropertyMessage*>(message);
+        if (m == nullptr)
+            return;
+
+		if (m->mProperty.nodeID == getNodeId())
+		{
+            mProperty = m->mProperty;
+		}
     }
 }
