@@ -84,11 +84,13 @@ void SceneManager::render(glow::UsedProgram& shader, glm::mat4& projection, glm:
     if (mLight)
     {
         lightPos = mLight->getPos();
-        lightColor = mLight->getColor();
+        shader.setUniform("light.position", lightPos);
+        shader.setUniform("light.ambient", mLight->getAmbient());
+        shader.setUniform("light.diffuse", mLight->getDiffuse());
+        shader.setUniform("light.specular", mLight->getSpecular());
     }
-    shader.setUniform("lightPos", lightPos);
-    shader.setUniform("viewPos", camPos);
-    shader.setUniform("lightColor", lightColor);
+
+	shader.setUniform("viewPos", camPos);
     
     for (int i = 0; i < mDynamicObjects.size(); ++i)
     {

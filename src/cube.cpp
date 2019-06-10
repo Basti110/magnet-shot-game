@@ -67,7 +67,7 @@ void Cube::render(glow::UsedProgram& shader, glm::mat4& projection, glm::mat4& v
 {
     if (!mIsVisible) return;
 
-    glm::vec3 color = mIsPicked ? glm::vec3(1, 0, 0) : mColor;
+    glm::vec3 color = false ? glm::vec3(1, 0, 0) : mColor;
     if (this->isInit)
     {
         shader.setUniform("material.ambient", mProperty.ambient);

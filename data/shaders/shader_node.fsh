@@ -12,6 +12,13 @@ struct Material {
     float shininess;
 }; 
 
+struct Light {
+    vec3 position;
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+};
+
 uniform float colorRatio;
 uniform sampler2D uTexture;
 uniform vec3 color;
@@ -22,6 +29,7 @@ uniform bool uUseVertexColors;
 uniform bool uUseTexture;
 uniform float uAlpha;
 
+uniform Light light;
 uniform Material material;
 uniform sampler2D shadowMap;
 uniform mat4 shadowTransform;
@@ -41,21 +49,19 @@ void main()
     }
 
     // ambient
-    //float ambientStrength = 0.2;
-    vec3 ambient = material.ambient * lightColor;
-
+    vec3 ambient = light.ambient * material.ambient;
+  	
     // diffuse 
     vec3 norm = normalize(Normal);
-    vec3 lightDir = normalize(lightPos - FragPos);
+    vec3 lightDir = normalize(light.position - FragPos);
     float diff = max(dot(norm, lightDir), 0.0);
-    vec3 diffuse = (diff * material.diffuse) * lightColor;
-
+    vec3 diffuse = light.diffuse * (diff * material.diffuse);
+    
     // specular
-    float specularStrength = 0.2;
     vec3 viewDir = normalize(viewPos - FragPos);
     vec3 reflectDir = reflect(-lightDir, norm);  
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
-    vec3 specular = (spec * material.specular) * lightColor; 
+    vec3 specular = light.specular * (spec * material.specular);  
 
     // shadows
     vec4 shadowPos = shadowTransform * vec4(FragPos, 1.0);

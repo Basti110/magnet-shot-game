@@ -36,7 +36,9 @@ private:
     std::pair<glm::vec3, glm::vec3> mCubeColor;
     std::pair<glm::vec3, glm::vec3> mBackgroundColor1;
     std::pair<glm::vec3, glm::vec3> mBackgroundColor2;
-    std::pair<glm::vec3, glm::vec3> mLightColor;
+    std::pair<glm::vec3, glm::vec3> mLightAmbient;
+    std::pair<glm::vec3, glm::vec3> mLightDiffuse;
+    std::pair<glm::vec3, glm::vec3> mLightSpecular;
     std::pair<float, float> mShadowOffset;
     std::pair<float, float> mShadowSmoothness;
 

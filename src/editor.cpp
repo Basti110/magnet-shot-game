@@ -268,11 +268,25 @@ void Editor::notifyGuiInput(Message* message)
             mCube->setColor(m->getValue());
         }
 
-        if (m->getSetting() == GuiSettings::LIGHT_COLOR)
+        if (m->getSetting() == GuiSettings::LIGHT_AMBIENT)
         {
             Light* light = mScene->getLight();
             if (light)
-                light->setColor(m->getValue());
+                light->setAmbient(m->getValue());
+        }
+
+		if (m->getSetting() == GuiSettings::LIGHT_DIFFUSE)
+        {
+            Light* light = mScene->getLight();
+            if (light)
+                light->setDiffuse(m->getValue());
+        }
+
+		if (m->getSetting() == GuiSettings::LIGHT_SPECULAR)
+        {
+            Light* light = mScene->getLight();
+            if (light)
+                light->setSpecular(m->getValue());
         }
 
         if (m->getSetting() == GuiSettings::CUBE_SHAPE)

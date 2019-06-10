@@ -9,7 +9,9 @@ glow::SharedProgram Light::mShader = glow::SharedProgram(); // glow::Program::cr
 Light::Light(glm::mat4& transformation, Color color)
 {
     mShader = glow::Program::createFromFile("../../data/shaders/shader_light");
-    mColor = {color.red, color.green, color.blue};
+    mAmbient = {color.red, color.green, color.blue};
+    mDiffuse = {color.red, color.green, color.blue};
+    mSpecular = {color.red, color.green, color.blue};
 
     mLocalTransformation = transformation;
     mGlobalTransformation = transformation;
@@ -99,18 +101,38 @@ void Light::render(glow::UsedProgram& shader, glm::mat4& projection, glm::mat4& 
         shader.setUniform("model", mGlobalTransformation);
         shader.setUniform("projection", projection);
         shader.setUniform("view", view);
-        shader.setUniform("color", mColor);
+        shader.setUniform("color", mDiffuse);
         glBindVertexArray(this->VAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
     }
 }
 
-void Light::setColor(glm::vec3 color)
+void Light::setAmbient(const glm::vec3& color) 
 {
-    mColor = color;
+    mAmbient = color;
 }
 
-glm::vec3 Light::getColor()
+void Light::setDiffuse(const glm::vec3& color) 
 {
-    return mColor;
+    mDiffuse = color;
+}
+
+void Light::setSpecular(const glm::vec3& color) 
+{
+    mSpecular = color;
+}
+
+glm::vec3 Light::getAmbient()
+{
+    return mAmbient;
+}
+
+glm::vec3 Light::getDiffuse()
+{
+    return mDiffuse;
+}
+
+glm::vec3 Light::getSpecular()
+{
+    return mSpecular;
 }

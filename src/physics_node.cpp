@@ -71,7 +71,7 @@ void PhysicsNode::render(glow::UsedProgram& shader, glm::mat4& projection, glm::
     if (!mIsVisible) return;
     if (shadowPass && mDisableShadows) return;
 
-    glm::vec3 color = mIsPicked ? glm::vec3(1, 0, 0) : mColor;
+    glm::vec3 color = false ? glm::vec3(1, 0, 0) : mColor;
     shader.setUniform("material.ambient", mProperty.ambient);
     shader.setUniform("material.diffuse", mProperty.diffuse);
     shader.setUniform("material.specular", mProperty.specular); // specular lighting doesn't have full effect on this object's material

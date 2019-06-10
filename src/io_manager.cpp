@@ -2,7 +2,9 @@
 #include "message_bus.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_glfw.h"
+#include "imgui/imgui_impl_opengl3.h"
 namespace {
     MessageBus* bus;
     void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
@@ -239,6 +241,9 @@ void IOManager::processInput()
     sendMessageMouseMove();
 
     // Mouse buttons
+    if (ImGui::GetIO().WantCaptureMouse)
+        return;
+
     const int leftButtonState = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT);
     const int rightButtonState = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT);
     const int middleButtonState = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_MIDDLE);
