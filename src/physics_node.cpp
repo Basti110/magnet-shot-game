@@ -7,8 +7,7 @@
 PhysicsNode::PhysicsNode(PhysicsManager* physics) : 
     mPhysics(physics),
     mWorld(physics->getDynamicsWorld()), 
-    mRigidBody(nullptr), 
-    mColor(glm::vec3(1)),
+    mRigidBody(nullptr),
     mUseVertexColors(false),
     mUseTexture(false),
     mIsVisible(true),
@@ -20,9 +19,9 @@ PhysicsNode::PhysicsNode(PhysicsManager* physics) :
     mMessageBus->addGuiReceiver([=](Message* message) { this->notifyGuiInput(message); });
 
 	mProperty.nodeID = this->getNodeId();
-    mProperty.ambient = 0.2f * mColor;
-    mProperty.diffuse = mColor;
-    mProperty.specular = mColor;
+    mProperty.ambient = 0.2f * glm::vec3(1);
+    mProperty.diffuse = glm::vec3(1);
+    mProperty.specular = glm::vec3(1);
     mProperty.shininess = 32;
 }
 
@@ -71,14 +70,14 @@ void PhysicsNode::render(glow::UsedProgram& shader, glm::mat4& projection, glm::
     if (!mIsVisible) return;
     if (shadowPass && mDisableShadows) return;
 
-    glm::vec3 color = false ? glm::vec3(1, 0, 0) : mColor;
+    //glm::vec3 color = false ? glm::vec3(1, 0, 0) : mColor;
     shader.setUniform("material.ambient", mProperty.ambient);
     shader.setUniform("material.diffuse", mProperty.diffuse);
     shader.setUniform("material.specular", mProperty.specular); // specular lighting doesn't have full effect on this object's material
     shader.setUniform("material.shininess", mProperty.shininess);
     shader.setUniform("model", mGlobalTransformation);
     shader.setUniform("colorRatio", 1.0f);
-    shader.setUniform("color", color);
+    //shader.setUniform("color", color);
     shader.setUniform("uAlpha", mAlpha);
     shader.setUniform("uUseVertexColors", mUseVertexColors);
     shader.setUniform("uUseTexture", mUseTexture);
@@ -92,11 +91,10 @@ void PhysicsNode::render(glow::UsedProgram& shader, glm::mat4& projection, glm::
 
 void PhysicsNode::setColor(const glm::vec3& color) 
 {
-    mColor = color;
     mProperty.nodeID = this->getNodeId();
-    mProperty.ambient = 0.2f * mColor;
-    mProperty.diffuse = mColor;
-    mProperty.specular = mColor;
+    mProperty.ambient = 0.2f * color;
+    mProperty.diffuse = color;
+    mProperty.specular = color;
 }
 
 void PhysicsNode::notifyPickBody(PickBodyMessage message)
@@ -139,4 +137,9 @@ void PhysicsNode::notifyGuiInput(Message* message)
             mProperty = m->mProperty;
 		}
     }
+}
+
+void PhysicsNode::setShininess(float shininess)
+{
+    mProperty.shininess = shininess;
 }

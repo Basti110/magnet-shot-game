@@ -10,7 +10,7 @@ public:
         SphereNode(position, radius, physics, GROUP_NONE, GROUP_NONE, parent->isStaticObject() ? 0.0f : 0.1f),
         mParent(parent)
     {
-        mColor = red ? glm::vec3(1,0,0) : glm::vec3(0,0,1);
+        //mColor = red ? glm::vec3(1,0,0) : glm::vec3(0,0,1);
         physics->addMagnet(mRigidBody, red);
         if (!parent->isStaticObject()) {
             auto magnetCenter = mRigidBody->getCenterOfMassPosition();

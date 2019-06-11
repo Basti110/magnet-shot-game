@@ -20,7 +20,7 @@ Cube::Cube(const glm::mat4& transformation, Color color, PhysicsManager* physics
 
     mIsVisible = true;
     mColorRatio = 1;
-    mColor = {color.red, color.green, color.blue};
+    setColor({color.red, color.green, color.blue});
     std::vector<float> colorVec = {color.red, color.green, color.blue};
     setVertices();
 }
@@ -67,7 +67,6 @@ void Cube::render(glow::UsedProgram& shader, glm::mat4& projection, glm::mat4& v
 {
     if (!mIsVisible) return;
 
-    glm::vec3 color = false ? glm::vec3(1, 0, 0) : mColor;
     if (this->isInit)
     {
         shader.setUniform("material.ambient", mProperty.ambient);
@@ -76,7 +75,6 @@ void Cube::render(glow::UsedProgram& shader, glm::mat4& projection, glm::mat4& v
         shader.setUniform("material.shininess", mProperty.shininess);
         shader.setUniform("model", mGlobalTransformation);
         shader.setUniform("colorRatio", mColorRatio);
-        shader.setUniform("color", color);
         shader.setUniform("uAlpha", 1.0f);
         shader.setUniform("uUseVertexColors", false);
         shader.setUniform("uUseTexture", false);
@@ -104,7 +102,10 @@ void Cube::setColorRatio(float ratio)
 
 void Cube::setColor(glm::vec3 color)
 {
-    mColor = color;
+    mProperty.nodeID = this->getNodeId();
+    mProperty.ambient = 0.2f * color;
+    mProperty.diffuse = color;
+    mProperty.specular = color;
 }
 
 void Cube::setScale(glm::vec3 scale)
@@ -159,7 +160,7 @@ glm::vec3 Cube::getScale()
 
 glm::vec3 Cube::getColor()
 {
-    return mColor;
+    return glm::vec3(0);
 }
 
 const RigidBodyInfo& Cube::getRigidBodyInfo()

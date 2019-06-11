@@ -31,6 +31,7 @@ public:
     void setAlpha(float value) { mAlpha = value; }
     void notifyPickBody(PickBodyMessage message);
     void notifyGuiInput(Message* message);
+    void setShininess(float shininess);
 
 protected:
     BodyProperties mProperty;
@@ -39,7 +40,6 @@ protected:
     btRigidBody* mRigidBody;
     std::vector<btTypedConstraint*> mConstraints;
 
-    glm::vec3 mColor;
     bool mUseVertexColors;
     bool mUseTexture;
     bool mIsVisible;

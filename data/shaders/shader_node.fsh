@@ -39,7 +39,7 @@ uniform float shadowSmoothness;
 
 void main()
 {
-    vec3 objectColor = color;
+    vec3 objectColor = vec3(1);
 
     if (uUseTexture) {
         objectColor = texture(uTexture, TexCoord).rgb;
@@ -49,13 +49,13 @@ void main()
     }
 
     // ambient
-    vec3 ambient = light.ambient * material.ambient;
+    vec3 ambient = light.ambient * material.ambient * objectColor;
   	
     // diffuse 
     vec3 norm = normalize(Normal);
     vec3 lightDir = normalize(light.position - FragPos);
     float diff = max(dot(norm, lightDir), 0.0);
-    vec3 diffuse = light.diffuse * (diff * material.diffuse);
+    vec3 diffuse = light.diffuse * (diff * material.diffuse) * objectColor;
     
     // specular
     vec3 viewDir = normalize(viewPos - FragPos);
@@ -97,6 +97,6 @@ void main()
         }
     }
 
-    vec3 result = (ambient + (0.5+0.5*shadowFactor) * diffuse + specular) * objectColor;
+    vec3 result = (ambient + (0.5+0.5*shadowFactor) * diffuse + specular);
     FragColor = vec4(result, uAlpha);
 }

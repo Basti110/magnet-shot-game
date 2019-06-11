@@ -31,6 +31,7 @@ public:
             0.0f
         );
         mTop->setUseTexture(true);
+        mTop->setShininess(200);
 
         addChild(mBase);
         addChild(mTop);
@@ -55,6 +56,7 @@ public:
     void update(float elapsedSeconds) override
     {
         mAnimationTimer += elapsedSeconds;
+        AbstractNode::update(elapsedSeconds);
     }
 
     void render(glow::UsedProgram& shader, glm::mat4& projection, glm::mat4& view, bool shadowPass) override
