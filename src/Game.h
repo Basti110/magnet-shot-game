@@ -56,6 +56,7 @@ private:
 	
 	//SSAO
     glow::SharedFramebuffer mGBuffer;
+    glow::SharedTexture2D mGDepth;
     glow::SharedTexture2D mGPosition;
     glow::SharedTexture2D mGNormal;
     glow::SharedTexture2D mGAmbient;

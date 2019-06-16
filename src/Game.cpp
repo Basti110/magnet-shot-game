@@ -99,7 +99,7 @@ void Game::init()
         mCrosshair = glow::VertexArray::create(crosshairBuffer, GL_LINES);
 
         // SSAO
-
+        mGDepth = glow::Texture2D::create(SCR_WIDTH, SCR_HEIGHT, GL_DEPTH_COMPONENT32);
         mGPosition = glow::Texture2D::create(SCR_WIDTH, SCR_HEIGHT, GL_RGB16F);
         mGPosition->bind().setWrap(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
         mGPosition->bind().setFilter(GL_LINEAR, GL_NEAREST);
@@ -116,7 +116,7 @@ void Game::init()
         mGSpecular = glow::Texture2D::create(SCR_WIDTH, SCR_HEIGHT, GL_RGBA);
         mGSpecular->bind().setFilter(GL_LINEAR, GL_NEAREST);
 
-        mGBuffer = glow::Framebuffer::create();
+        mGBuffer = glow::Framebuffer::createDepthOnly(mGDepth);
         mGBuffer->bind().attachColor("gPosition", mGPosition);
         mGBuffer->bind().attachColor("gNormal", mGNormal);
         mGBuffer->bind().attachColor("gAmbient", mGAmbient);
@@ -299,14 +299,13 @@ void Game::render(float elapsedSeconds)
         glm::mat4 projection = mScene->getCamera()->getProjectionMatrix();
         if (!mShowPhysicsDebug)
         {
+            GLOW_SCOPED(clearColor, mBackgroundColor1);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			//Render Geometry in G-Buffer
             {
                 auto gBuffer = mGBuffer->bind();
 
 				GLOW_SCOPED(enable, GL_DEPTH_TEST);
-
-                GLOW_SCOPED(enable, GL_BLEND);
-                GLOW_SCOPED(blendFunc, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
                 GLOW_SCOPED(enable, GL_CULL_FACE);
                 GLOW_SCOPED(cullFace, GL_BACK);
@@ -320,6 +319,11 @@ void Game::render(float elapsedSeconds)
                 mScene->render(shader, projection, view, false);
             }
 
+            GLOW_SCOPED(disable, GL_DEPTH_TEST);
+
+			GLOW_SCOPED(enable, GL_BLEND);
+            GLOW_SCOPED(blendFunc, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			
 			{
                 auto shader = mShaderLighting->use();
 				shader.setUniform("shadowTransform", shadowTransform);
@@ -339,7 +343,6 @@ void Game::render(float elapsedSeconds)
             mPhysics->renderDebug(projection, view, updateRate);
         }
 
-
         // draw skybox
         /*view = glm::mat4(glm::mat3(view));
         GLOW_SCOPED(depthFunc, GL_LEQUAL);
@@ -349,9 +352,17 @@ void Game::render(float elapsedSeconds)
         shaderSkybox.setUniform("uColor2", mBackgroundColor2);
         mSkybox->bind().draw();*/
     }
+    /*GLOW_SCOPED(enable, GL_BLEND);
+    GLOW_SCOPED(blendFunc, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    GLOW_SCOPED(disable, GL_DEPTH_TEST);
-    // GLOW_SCOPED(disable, GL_CULL_FACE);
+    GLOW_SCOPED(enable, GL_CULL_FACE);
+    GLOW_SCOPED(cullFace, GL_BACK);
+
+    GLOW_SCOPED(clearColor, mBackgroundColor1);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);*/
+
+    
+    GLOW_SCOPED(disable, GL_CULL_FACE);
 
     GLOW_SCOPED(polygonMode, GL_FILL);
     auto shaderOutput = mShaderOutput->use();
