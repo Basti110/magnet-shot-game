@@ -78,17 +78,6 @@ void SceneManager::update(float elapsedSeconds)
 void SceneManager::render(glow::UsedProgram& shader, glm::mat4& projection, glm::mat4& view, bool shadowPass)
 {
     glm::vec3 camPos = this->getCamera()->getPos();
-    glm::vec3 lightPos;
-    glm::vec3 lightColor;
-
-    if (mLight)
-    {
-        lightPos = mLight->getPos();
-        shader.setUniform("light.position", lightPos);
-        shader.setUniform("light.ambient", mLight->getAmbient());
-        shader.setUniform("light.diffuse", mLight->getDiffuse());
-        shader.setUniform("light.specular", mLight->getSpecular());
-    }
 
 	shader.setUniform("viewPos", camPos);
     
@@ -97,6 +86,21 @@ void SceneManager::render(glow::UsedProgram& shader, glm::mat4& projection, glm:
         mDynamicObjects[i]->render(shader, projection, view, shadowPass);
 	}
     mRoot->render(shader, projection, view, shadowPass);
+}
+
+void SceneManager::setLight(glow::UsedProgram& shader) 
+{
+    glm::vec3 camPos = this->getCamera()->getPos();
+    if (mLight)
+    {
+        glm::vec3 lightPos;
+        lightPos = mLight->getPos();
+        shader.setUniform("light.position", lightPos);
+        shader.setUniform("light.ambient", mLight->getAmbient());
+        shader.setUniform("light.diffuse", mLight->getDiffuse());
+        shader.setUniform("light.specular", mLight->getSpecular());
+    }
+    shader.setUniform("viewPos", camPos);
 }
 
 void SceneManager::setCamera(Camera * camera)

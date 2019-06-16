@@ -37,7 +37,8 @@ private:
     // shaders
     glow::SharedProgram mShaderShadow;
     glow::SharedProgram mShaderOutput;
-    glow::SharedProgram mShaderObject;
+    glow::SharedProgram mShaderGeometry;
+    glow::SharedProgram mShaderLighting;
     glow::SharedProgram mShaderSkybox;
     glow::SharedProgram mShaderCrosshair;
 
@@ -52,6 +53,14 @@ private:
     glow::SharedTexture2D mTargetDepth;
 
     std::vector<glow::SharedTexture2D> mTargets;
+	
+	//SSAO
+    glow::SharedFramebuffer mGBuffer;
+    glow::SharedTexture2D mGPosition;
+    glow::SharedTexture2D mGNormal;
+    glow::SharedTexture2D mGAmbient;
+    glow::SharedTexture2D mGDiffuse;
+    glow::SharedTexture2D mGSpecular;
 
     // shadow map
     glow::SharedFramebuffer mShadowFramebuffer;

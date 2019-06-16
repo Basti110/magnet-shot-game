@@ -14,6 +14,7 @@ public:
     void RenderScene();
     void addDynamicObject(AbstractNode& node);
     void render(glow::UsedProgram& shader, glm::mat4& projection, glm::mat4& view, bool shadowPass);
+    void setLight(glow::UsedProgram& shader);
     void appendNode(AbstractNode* node);
     void removeNode(std::function<bool(AbstractNode*)> predicate);
     void update(float elapsedSeconds);
