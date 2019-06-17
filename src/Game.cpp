@@ -38,6 +38,8 @@
 #include <glow-extras/geometry/Quad.hh>
 #include <glow-extras/geometry/UVSphere.hh>
 
+#include <random>
+
 int SCR_WIDTH = 1080;
 int SCR_HEIGHT = 800;
 
@@ -98,23 +100,23 @@ void Game::init()
         });
         mCrosshair = glow::VertexArray::create(crosshairBuffer, GL_LINES);
 
-        // SSAO
+        // Deferred Shading / SSAO
         mGDepth = glow::Texture2D::create(SCR_WIDTH, SCR_HEIGHT, GL_DEPTH_COMPONENT32);
         mGPosition = glow::Texture2D::create(SCR_WIDTH, SCR_HEIGHT, GL_RGB16F);
         mGPosition->bind().setWrap(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
-        mGPosition->bind().setFilter(GL_LINEAR, GL_NEAREST);
+        mGPosition->bind().setFilter(GL_NEAREST, GL_NEAREST);
 
         mGNormal = glow::Texture2D::create(SCR_WIDTH, SCR_HEIGHT, GL_RGB16F);
-        mGNormal->bind().setFilter(GL_LINEAR, GL_NEAREST);
+        mGNormal->bind().setFilter(GL_NEAREST, GL_NEAREST);
 
         mGAmbient = glow::Texture2D::create(SCR_WIDTH, SCR_HEIGHT, GL_RGBA);
-        mGAmbient->bind().setFilter(GL_LINEAR, GL_NEAREST);
+        mGAmbient->bind().setFilter(GL_NEAREST, GL_NEAREST);
 
         mGDiffuse = glow::Texture2D::create(SCR_WIDTH, SCR_HEIGHT, GL_RGB);
-        mGDiffuse->bind().setFilter(GL_LINEAR, GL_NEAREST);
+        mGDiffuse->bind().setFilter(GL_NEAREST, GL_NEAREST);
 
         mGSpecular = glow::Texture2D::create(SCR_WIDTH, SCR_HEIGHT, GL_RGBA);
-        mGSpecular->bind().setFilter(GL_LINEAR, GL_NEAREST);
+        mGSpecular->bind().setFilter(GL_NEAREST, GL_NEAREST);
 
         mGBuffer = glow::Framebuffer::createDepthOnly(mGDepth);
         mGBuffer->bind().attachColor("gPosition", mGPosition);
@@ -123,6 +125,36 @@ void Game::init()
         mGBuffer->bind().attachColor("gDiffuse", mGDiffuse);
         mGBuffer->bind().attachColor("gSpecular", mGSpecular);
 
+		mSSAO_Color = glow::Texture2D::create(SCR_WIDTH, SCR_HEIGHT, GL_RED);
+        mSSAO_Color->bind().setFilter(GL_NEAREST, GL_NEAREST);
+        mSSAO_Buffer = glow::Framebuffer::create("FragColor", mSSAO_Color);
+
+		std::uniform_real_distribution<GLfloat> randomFloats(0.0, 1.0); 
+        std::default_random_engine generator;
+
+        for (unsigned int i = 0; i < 64; ++i)
+        {
+            glm::vec3 sample(randomFloats(generator) * 2.0 - 1.0, randomFloats(generator) * 2.0 - 1.0, randomFloats(generator));
+            sample = glm::normalize(sample);
+            sample *= randomFloats(generator);
+            float scale = float(i) / 64.0;
+            scale = 0.1f + scale * scale * (1.0f - 0.1f);
+            sample *= scale;
+            ssaoKernel.push_back(sample);
+        }
+
+		for (unsigned int i = 0; i < 16; i++)
+        {
+            glm::vec3 noise(randomFloats(generator) * 2.0 - 1.0, randomFloats(generator) * 2.0 - 1.0, 0.0f); // rotate around z-axis (in tangent space)
+            ssaoNoise.push_back(noise);
+        }
+
+		mSSAO_Noise = glow::Texture2D::create(4, 4, GL_RGB32F);
+        mSSAO_Noise->bind().setData(GL_RGB32F, 4, 4, GL_RGB, GL_FLOAT, &ssaoNoise[0]);
+        mSSAO_Noise->bind().setWrap(GL_REPEAT, GL_REPEAT);
+        mSSAO_Noise->bind().setFilter(GL_NEAREST, GL_NEAREST);
+
+		mShaderSSAO = glow::Program::createFromFile("../../data/shaders/ssao");
         // ----
 
         mShaderShadow = glow::Program::createFromFile("../../data/shaders/shadow");
@@ -319,6 +351,36 @@ void Game::render(float elapsedSeconds)
                 mScene->render(shader, projection, view, false);
             }
 
+			{
+                auto ssaoBuffer = mSSAO_Buffer->bind();
+                glClear(GL_COLOR_BUFFER_BIT);
+                auto shader = mShaderSSAO->use();
+
+				//ssaoKernel[50].x = 0.8;
+                // Send kernel + rotation
+                /*for (unsigned int i = 0; i < 64; ++i)
+                    shader.setUniform("samples[" + std::to_string(i) + "]", ssaoKernel[i]);*/
+                GLint id;
+                glGetIntegerv(GL_CURRENT_PROGRAM, &id);
+                //shader.setUniform("samples", ssaoKernel);
+                for (unsigned int i = 0; i < 64; ++i)
+                    glUniform3fv(glGetUniformLocation(id, ("samples[" + std::to_string(i) + "]").c_str()), 1, &(ssaoKernel[i])[0]);
+                shader.setUniform("projection", projection);
+                /*shader.setUniform("test", test1);
+                std::vector<glm::vec3> testV;
+                testV.push_back(test1);
+                testV.push_back(test2);
+                //shader.setUniform("testV", testV);
+                glUniform3fv(glGetUniformLocation(id, "testV[0]"), 1, &test1[0]);
+                glUniform3fv(glGetUniformLocation(id, "testV[1]"), 1, &test2[1]);
+                //shader.setUniform()
+                //shader.setUniform("testV[1]", test2);*/
+                shader.setTexture("gPosition", mGPosition);
+                shader.setTexture("gNormal", mGNormal);
+                shader.setTexture("texNoise", mSSAO_Noise);
+                mMeshQuad->bind().draw();
+			}
+
             GLOW_SCOPED(disable, GL_DEPTH_TEST);
 
 			GLOW_SCOPED(enable, GL_BLEND);
@@ -333,6 +395,7 @@ void Game::render(float elapsedSeconds)
                 shader.setTexture("gAmbient", mGAmbient);
                 shader.setTexture("gDiffuse", mGDiffuse);
                 shader.setTexture("gSpecular", mGSpecular);
+                shader.setTexture("ssao", mSSAO_Color);
                 mScene->setLight(shader);
                 mMeshQuad->bind().draw();
 			}

@@ -16,7 +16,7 @@ uniform mat4 projection;
 
 void main()
 {
-    vec4 pos = model * vec4(aPos, 1.0);
+    vec4 pos = view * model * vec4(aPos, 1.0);
     FragPos = pos.xyz; 
     TexCoord = aTexCoord;
     
@@ -24,5 +24,5 @@ void main()
     Normal = normalMatrix * aNormal;
     
     VertexColor = aColor;
-    gl_Position = projection * view * pos;
+    gl_Position = projection * pos;
 }

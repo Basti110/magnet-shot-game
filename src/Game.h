@@ -57,11 +57,20 @@ private:
 	//SSAO
     glow::SharedFramebuffer mGBuffer;
     glow::SharedTexture2D mGDepth;
+
     glow::SharedTexture2D mGPosition;
     glow::SharedTexture2D mGNormal;
     glow::SharedTexture2D mGAmbient;
     glow::SharedTexture2D mGDiffuse;
     glow::SharedTexture2D mGSpecular;
+
+	glow::SharedFramebuffer mSSAO_Buffer;
+	glow::SharedTexture2D mSSAO_Color;
+    glow::SharedTexture2D mSSAO_Noise;
+
+	glow::SharedProgram mShaderSSAO;
+	std::vector<glm::vec3> ssaoKernel;
+    std::vector<glm::vec3> ssaoNoise;
 
     // shadow map
     glow::SharedFramebuffer mShadowFramebuffer;

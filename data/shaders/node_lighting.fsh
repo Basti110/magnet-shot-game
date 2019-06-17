@@ -14,6 +14,7 @@ uniform sampler2D gNormal;
 uniform sampler2D gAmbient;
 uniform sampler2D gDiffuse;
 uniform sampler2D gSpecular;
+uniform sampler2D ssao;
 
 
 uniform vec3 viewPos; 
@@ -37,7 +38,7 @@ void main()
     float shininess = texture(gSpecular, TexCoords).a;
 
     // ambient
-    vec3 ambient = light.ambient * materialAmbient;
+    vec3 ambient = vec3(0.95); //light.ambient * materialAmbient * texture(ssao, TexCoords).r;
   	
     // diffuse 
     vec3 norm = normalize(Normal);
@@ -52,7 +53,7 @@ void main()
     vec3 specular = light.specular * (spec * materialSpecular); 
 
     // shadows
-    vec4 shadowPos = shadowTransform * vec4(FragPos, 1.0);
+    /*vec4 shadowPos = shadowTransform * vec4(FragPos, 1.0);
     shadowPos.xyz /= shadowPos.w;
     shadowPos.xyz += 1;
     shadowPos.xyz /= 2;
@@ -83,8 +84,8 @@ void main()
         if (shadowPos.z <= shadowDepth + shadowOffset) {
             shadowFactor += 1/16.0;
         }
-    }
+    }*/
 
-    vec3 result = (ambient + (0.5+0.5*shadowFactor) * diffuse + specular);
+    vec3 result = ambient * texture(ssao, TexCoords).r; //(ambient + (0.5+0.5*shadowFactor) * diffuse + specular);
     FragColor = vec4(result, alpha);
 }
