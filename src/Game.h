@@ -55,6 +55,7 @@ private:
     std::vector<glow::SharedTexture2D> mTargets;
 	
 	//SSAO
+    bool mSSOA_On = true;
     glow::SharedFramebuffer mGBuffer;
     glow::SharedTexture2D mGDepth;
 

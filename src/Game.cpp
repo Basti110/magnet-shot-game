@@ -304,11 +304,12 @@ void Game::update(float elapsedSeconds)
 void Game::render(float elapsedSeconds)
 {
     // shadow pass
+    glm::mat4 view = mScene->getCamera()->getViewMatrix();
     glm::vec3 camPos = mStartManager->getScene()->getCamera()->getPos();
     glm::vec3 lightPos = camPos + glm::vec3(10);
     glm::mat4 shadowView = glm::lookAt(lightPos, camPos, glm::vec3(0, 1, 0));
     glm::mat4 shadowProj = glm::ortho(-25.0f, 25.0f, -25.0f, 25.0f, 1.0f, 50.0f);
-    glm::mat4 shadowTransform = shadowProj * shadowView;
+    glm::mat4 shadowTransform = shadowProj * shadowView * glm::inverse(view);
     {
         GLOW_SCOPED(enable, GL_DEPTH_TEST);
         GLOW_SCOPED(cullFace, GL_FRONT);
@@ -327,7 +328,6 @@ void Game::render(float elapsedSeconds)
     {
         auto fb = mFramebuffer->bind();
 
-        glm::mat4 view = mScene->getCamera()->getViewMatrix();
         glm::mat4 projection = mScene->getCamera()->getProjectionMatrix();
         if (!mShowPhysicsDebug)
         {
@@ -353,6 +353,7 @@ void Game::render(float elapsedSeconds)
 
 			{
                 auto ssaoBuffer = mSSAO_Buffer->bind();
+                GLOW_SCOPED(clearColor, glm::vec4(1));
                 glClear(GL_COLOR_BUFFER_BIT);
                 auto shader = mShaderSSAO->use();
 
@@ -378,7 +379,8 @@ void Game::render(float elapsedSeconds)
                 shader.setTexture("gPosition", mGPosition);
                 shader.setTexture("gNormal", mGNormal);
                 shader.setTexture("texNoise", mSSAO_Noise);
-                mMeshQuad->bind().draw();
+                if (mSSOA_On)
+					mMeshQuad->bind().draw();
 			}
 
             GLOW_SCOPED(disable, GL_DEPTH_TEST);
@@ -515,6 +517,11 @@ void Game::notifyKeyInput(KeyMessage message)
         if (message.getInput() == GLFW_KEY_F7)
         {
             mShowPhysicsDebug = mShowPhysicsDebug ? false : true;
+        }
+
+		if (message.getInput() == GLFW_KEY_F6)
+        {
+            mSSOA_On = mSSOA_On ? false : true;
         }
     }
 }

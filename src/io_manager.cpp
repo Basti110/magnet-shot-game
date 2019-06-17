@@ -204,6 +204,11 @@ void IOManager::processInput()
 
     }
 
+	const int F6KeyState = glfwGetKey(window, GLFW_KEY_F6);
+    if (F6KeyState == GLFW_RELEASE && mPrevF6KeyState == GLFW_PRESS)
+        sendMessageKey(GLFW_KEY_F6, GLFW_PRESS, cameraSpeed);
+    mPrevF6KeyState = glfwGetKey(window, GLFW_KEY_F6);
+
     const int F7KeyState = glfwGetKey(window, GLFW_KEY_F7);
     if (F7KeyState == GLFW_RELEASE && mPrevF7KeyState == GLFW_PRESS)
         sendMessageKey(GLFW_KEY_F7, GLFW_PRESS, cameraSpeed);

@@ -91,7 +91,7 @@ void PhysicsNode::render(glow::UsedProgram& shader, glm::mat4& projection, glm::
 void PhysicsNode::setColor(const glm::vec3& color) 
 {
     mProperty.nodeID = this->getNodeId();
-    mProperty.ambient = 0.2f * color;
+    mProperty.ambient = 0.3f * color;
     mProperty.diffuse = color;
     mProperty.specular = color;
 }

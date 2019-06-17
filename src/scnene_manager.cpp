@@ -94,7 +94,7 @@ void SceneManager::setLight(glow::UsedProgram& shader)
     if (mLight)
     {
         glm::vec3 lightPos;
-        lightPos = mLight->getPos();
+        lightPos = glm::vec3(mViewCamera->getViewMatrix() * glm::vec4(mLight->getPos(), 1));
         shader.setUniform("light.position", lightPos);
         shader.setUniform("light.ambient", mLight->getAmbient());
         shader.setUniform("light.diffuse", mLight->getDiffuse());
