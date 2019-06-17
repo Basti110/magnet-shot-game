@@ -30,7 +30,7 @@ public:
             GROUP_NONE,
             0.0f
         );
-        mTop->setUseTexture(true);
+        mTop->setColorRatio(0.0);
         mTop->setShininess(200);
 
         addChild(mBase);

@@ -31,7 +31,6 @@ private:
     bool mIsPhysicsOn = false;
     unsigned int mTexture;
     std::vector<float> mVertices;
-    float mColorRatio;
     glm::vec3 mScale;
     RigidBodyInfo mRigidBodyinfo;
 };

@@ -9,7 +9,7 @@ PhysicsNode::PhysicsNode(PhysicsManager* physics) :
     mWorld(physics->getDynamicsWorld()), 
     mRigidBody(nullptr),
     mUseVertexColors(false),
-    mUseTexture(false),
+    mColorRatio(1.0f),
     mIsVisible(true),
     mDisableShadows(false),
     mAlpha(1.0f)
@@ -74,13 +74,12 @@ void PhysicsNode::render(glow::UsedProgram& shader, glm::mat4& projection, glm::
     shader.setUniform("material.ambient", mProperty.ambient);
     shader.setUniform("material.diffuse", mProperty.diffuse);
     shader.setUniform("material.specular", mProperty.specular); // specular lighting doesn't have full effect on this object's material
-    shader.setUniform("material.shininess", mProperty.shininess);
+    shader.setUniform("material.shininess", (int)mProperty.shininess);
     shader.setUniform("model", mGlobalTransformation);
-    shader.setUniform("colorRatio", 1.0f);
+    shader.setUniform("colorRatio", mColorRatio);
     //shader.setUniform("color", color);
     shader.setUniform("uAlpha", mAlpha);
     shader.setUniform("uUseVertexColors", mUseVertexColors);
-    shader.setUniform("uUseTexture", mUseTexture);
     mVertexArray->bind().draw();
     AbstractNode::render(shader, projection, view, shadowPass);
     if (mCoordinateAxes && mIsPicked)

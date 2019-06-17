@@ -22,8 +22,8 @@ public:
     void setColor(const glm::vec3& color);
     void setUseVertexColors(bool value) { mUseVertexColors = value; }
     bool getUseVertexColors() { return mUseVertexColors; }
-    void setUseTexture(bool value) { mUseTexture = value; }
-    bool getUseTexture() { return mUseTexture; }
+    void setColorRatio(float value) { mColorRatio = value; }
+    float getColorRatio() { return mColorRatio; }
     void setVisible(bool value) { mIsVisible = value; }
     bool getVisible() { return mIsVisible; }
     void setDisableShadows(bool value) { mDisableShadows = value; }
@@ -39,9 +39,8 @@ protected:
     btDynamicsWorld* mWorld;
     btRigidBody* mRigidBody;
     std::vector<btTypedConstraint*> mConstraints;
-
+    float mColorRatio;
     bool mUseVertexColors;
-    bool mUseTexture;
     bool mIsVisible;
     bool mDisableShadows;
     float mAlpha;

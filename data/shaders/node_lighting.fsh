@@ -15,16 +15,9 @@ uniform sampler2D gAmbient;
 uniform sampler2D gDiffuse;
 uniform sampler2D gSpecular;
 
-//uniform sampler2D uTexture;
-//uniform vec3 color;
-uniform vec3 lightPos; 
-uniform vec3 viewPos; 
-uniform vec3 lightColor;
-//uniform bool uUseVertexColors;
-//uniform bool uUseTexture;
 
+uniform vec3 viewPos; 
 uniform Light light;
-//uniform Material material;
 uniform sampler2D shadowMap;
 uniform mat4 shadowTransform;
 uniform float shadowOffset;
@@ -33,16 +26,7 @@ uniform float shadowSmoothness;
 
 void main()
 {
-    /*vec3 objectColor = vec3(1);
-
-    if (uUseTexture) {
-        objectColor = texture(uTexture, TexCoord).rgb;
-    }
-    else if (uUseVertexColors) {
-        objectColor = vColor;
-    }*/
-
-    // ambient
+    
     vec3 FragPos = texture(gPosition, TexCoords).rgb;
     vec3 Normal = texture(gNormal, TexCoords).rgb;
     vec3 materialAmbient = texture(gAmbient, TexCoords).rgb;
@@ -52,6 +36,7 @@ void main()
     float alpha = texture(gAmbient, TexCoords).a;
     float shininess = texture(gSpecular, TexCoords).a;
 
+    // ambient
     vec3 ambient = light.ambient * materialAmbient;
   	
     // diffuse 
@@ -63,8 +48,8 @@ void main()
     // specular
     vec3 viewDir = normalize(viewPos - FragPos);
     vec3 reflectDir = reflect(-lightDir, norm);  
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), shininess);
-    vec3 specular = light.specular * (spec * materialSpecular);  
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
+    vec3 specular = light.specular * (spec * materialSpecular); 
 
     // shadows
     vec4 shadowPos = shadowTransform * vec4(FragPos, 1.0);

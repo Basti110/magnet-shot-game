@@ -6,7 +6,7 @@ in vec2 aTexCoord;
 in vec3 aColor;
 
 out vec3 FragPos;
-out vec2 TexCoords;
+out vec2 TexCoord;
 out vec3 Normal;
 out vec3 VertexColor;
 
@@ -18,7 +18,7 @@ void main()
 {
     vec4 pos = model * vec4(aPos, 1.0);
     FragPos = pos.xyz; 
-    TexCoords = aTexCoord;
+    TexCoord = aTexCoord;
     
     mat3 normalMatrix = transpose(inverse(mat3(view * model)));
     Normal = normalMatrix * aNormal;
