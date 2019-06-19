@@ -18,6 +18,8 @@ public:
         mPositionParam(0),
         mRecoilParam(0)
     {
+        mProperty.ambient = glm::vec3(0);
+        mProperty.diffuse = glm::vec3(0);
         messageBus->addMouseClickReceiver([=](MouseClickMessage message) {
             if (mAttatchToCamera) this->notifyMouseClickInput(message);
         });

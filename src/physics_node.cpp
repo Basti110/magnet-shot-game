@@ -76,10 +76,10 @@ void PhysicsNode::render(glow::UsedProgram& shader, glm::mat4& projection, glm::
     shader.setUniform("material.specular", mProperty.specular); // specular lighting doesn't have full effect on this object's material
     shader.setUniform("material.shininess", (int)mProperty.shininess);
     shader.setUniform("model", mGlobalTransformation);
-    shader.setUniform("colorRatio", mColorRatio);
+    shader.setUniform("colorRatio", mColorRatio == 0.0f);
     //shader.setUniform("color", color);
     shader.setUniform("uAlpha", mAlpha);
-    shader.setUniform("uUseVertexColors", mUseVertexColors);
+    shader.setUniform("useVertexColors", mUseVertexColors);
     mVertexArray->bind().draw();
     AbstractNode::render(shader, projection, view, shadowPass);
     if (mCoordinateAxes && mIsPicked)
@@ -93,7 +93,7 @@ void PhysicsNode::setColor(const glm::vec3& color)
     mProperty.nodeID = this->getNodeId();
     mProperty.ambient = 0.3f * color;
     mProperty.diffuse = color;
-    mProperty.specular = color;
+    mProperty.specular = glm::vec3(1);
 }
 
 void PhysicsNode::notifyPickBody(PickBodyMessage message)

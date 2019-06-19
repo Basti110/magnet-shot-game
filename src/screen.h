@@ -31,6 +31,7 @@ public:
             0.0f
         );
         mTop->setColorRatio(0.0);
+        mTop->setColor(glm::vec3(0));
         mTop->setShininess(200);
 
         addChild(mBase);

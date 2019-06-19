@@ -98,14 +98,14 @@ void CoordinateAxes::render(glow::UsedProgram& shader, glm::mat4& projection, gl
 void CoordinateAxes::render(glow::UsedProgram& shader, glm::mat4& model, glm::vec3 color, glm::mat4& lineTranslate)
 {
     shader.setUniform("model", model);
-    shader.setUniform("colorRatio", 1.0f);
+    shader.setUniform("colorRatio", false);
     shader.setUniform("material.ambient", color);
     shader.setUniform("material.diffuse", glm::vec3(0));
     shader.setUniform("material.specular", glm::vec3(0));
     mVertexArray->bind().draw();
     model = lineTranslate * model;
     shader.setUniform("model", model);
-    shader.setUniform("colorRatio", 1.0f);
+    shader.setUniform("colorRatio", false);
     //shader.setUniform("color", color);
     mLineSVA->bind().draw();
 }

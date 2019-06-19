@@ -19,7 +19,8 @@ in vec3 VertexColor;
 
 uniform sampler2D uTexture;
 uniform float uAlpha;
-uniform float colorRatio;
+uniform bool colorRatio;
+uniform bool useVertexColors;
 uniform Material material;
 
 void main()
@@ -27,17 +28,19 @@ void main()
     // store the fragment position vector in the first gbuffer texture
     vec3 texColor = vec3(0);
 
-    if (colorRatio < 1.0)
-        texColor = texture(uTexture, TexCoord).rgb * (1 - colorRatio);
+    if (colorRatio)
+        texColor = texture(uTexture, TexCoord).rgb;
+    else if (useVertexColors)
+        texColor = VertexColor;
 
     gPosition = FragPos;
     // also store the per-fragment normals into the gbuffer
     gNormal = normalize(Normal);
     // and the per-fragment color
-    gAmbient.rgb = material.ambient * colorRatio + texColor * 0.2;
+    gAmbient.rgb = material.ambient + texColor * 0.2;
     gAmbient.a = uAlpha;
 
-    gDiffuse.rgb = material.diffuse * colorRatio + texColor * 0.8;
+    gDiffuse.rgb = material.diffuse + texColor * 0.8;
 
     gSpecular.rgb = material.specular;
     gSpecular.a = material.shininess;
