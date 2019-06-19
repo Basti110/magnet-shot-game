@@ -43,6 +43,8 @@
 int SCR_WIDTH = 1080;
 int SCR_HEIGHT = 800;
 
+
+
 Game::Game() : GlfwApp(Gui::ImGui) {}
 
 void Game::init()
@@ -65,9 +67,6 @@ void Game::init()
     setCursorMode(glow::glfw::CursorMode::Disabled);
 
     {
-        // Camera* cam = new Camera();
-        // mScene->setCamera(cam);
-
         // create framebuffer (16bit color + 32bit depth)
         // size is 1x1 for now and is changed onResize
         mTargets.push_back(mTargetColor = glow::Texture2D::create(1, 1, GL_RGB16F));
@@ -100,63 +99,6 @@ void Game::init()
         });
         mCrosshair = glow::VertexArray::create(crosshairBuffer, GL_LINES);
 
-        // Deferred Shading / SSAO
-        mGDepth = glow::Texture2D::create(SCR_WIDTH, SCR_HEIGHT, GL_DEPTH_COMPONENT32);
-        mGPosition = glow::Texture2D::create(SCR_WIDTH, SCR_HEIGHT, GL_RGB16F);
-        mGPosition->bind().setWrap(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
-        mGPosition->bind().setFilter(GL_NEAREST, GL_NEAREST);
-
-        mGNormal = glow::Texture2D::create(SCR_WIDTH, SCR_HEIGHT, GL_RGB16F);
-        mGNormal->bind().setFilter(GL_NEAREST, GL_NEAREST);
-
-        mGAmbient = glow::Texture2D::create(SCR_WIDTH, SCR_HEIGHT, GL_RGBA);
-        mGAmbient->bind().setFilter(GL_NEAREST, GL_NEAREST);
-
-        mGDiffuse = glow::Texture2D::create(SCR_WIDTH, SCR_HEIGHT, GL_RGB);
-        mGDiffuse->bind().setFilter(GL_NEAREST, GL_NEAREST);
-
-        mGSpecular = glow::Texture2D::create(SCR_WIDTH, SCR_HEIGHT, GL_RGBA);
-        mGSpecular->bind().setFilter(GL_NEAREST, GL_NEAREST);
-
-        mGBuffer = glow::Framebuffer::createDepthOnly(mGDepth);
-        mGBuffer->bind().attachColor("gPosition", mGPosition);
-        mGBuffer->bind().attachColor("gNormal", mGNormal);
-        mGBuffer->bind().attachColor("gAmbient", mGAmbient);
-        mGBuffer->bind().attachColor("gDiffuse", mGDiffuse);
-        mGBuffer->bind().attachColor("gSpecular", mGSpecular);
-
-		mSSAO_Color = glow::Texture2D::create(SCR_WIDTH, SCR_HEIGHT, GL_RED);
-        mSSAO_Color->bind().setFilter(GL_NEAREST, GL_NEAREST);
-        mSSAO_Buffer = glow::Framebuffer::create("FragColor", mSSAO_Color);
-
-		std::uniform_real_distribution<GLfloat> randomFloats(0.0, 1.0); 
-        std::default_random_engine generator;
-
-        for (unsigned int i = 0; i < 64; ++i)
-        {
-            glm::vec3 sample(randomFloats(generator) * 2.0 - 1.0, randomFloats(generator) * 2.0 - 1.0, randomFloats(generator));
-            sample = glm::normalize(sample);
-            sample *= randomFloats(generator);
-            float scale = float(i) / 64.0;
-            scale = 0.1f + scale * scale * (1.0f - 0.1f);
-            sample *= scale;
-            ssaoKernel.push_back(sample);
-        }
-
-		for (unsigned int i = 0; i < 16; i++)
-        {
-            glm::vec3 noise(randomFloats(generator) * 2.0 - 1.0, randomFloats(generator) * 2.0 - 1.0, 0.0f); // rotate around z-axis (in tangent space)
-            ssaoNoise.push_back(noise);
-        }
-
-		mSSAO_Noise = glow::Texture2D::create(4, 4, GL_RGB32F);
-        mSSAO_Noise->bind().setData(GL_RGB32F, 4, 4, GL_RGB, GL_FLOAT, &ssaoNoise[0]);
-        mSSAO_Noise->bind().setWrap(GL_REPEAT, GL_REPEAT);
-        mSSAO_Noise->bind().setFilter(GL_NEAREST, GL_NEAREST);
-
-		mShaderSSAO = glow::Program::createFromFile("../../data/shaders/ssao");
-        // ----
-
         mShaderShadow = glow::Program::createFromFile("../../data/shaders/shadow");
         mShaderGeometry = glow::Program::createFromFile("../../data/shaders/node_geometry");
         mShaderLighting = glow::Program::createFromFile("../../data/shaders/node_lighting");
@@ -164,111 +106,7 @@ void Game::init()
         mShaderSkybox = glow::Program::createFromFile("../../data/shaders/skybox");
         mShaderCrosshair = glow::Program::createFromFile("../../data/shaders/crosshair");
 
-        Node* root = new Node;
 
-        // add light
-        glm::mat4 trans = glm::mat4(1.0f);
-        trans = glm::translate(trans, glm::vec3(30.0f, 25.0f, 25.0f));
-        Light* light = new Light(trans, Color{1.0f, 1.0f, 1.0f});
-        root->addChild(light);
-        mScene->setLight(light);
-
-        // add level
-        MeshNode* level = new MeshNode(glm::mat4(1), "../../data/meshes/FirstRoom.obj", mPhysics, GROUP_STATIC_OBJECTS, GROUP_DYNAMIC_OBJECTS, 0.0f);
-        root->addChild(level);
-
-        // add screens & cables
-        for (int i = 0; i < 3; i++)
-        {
-            const glm::vec3 position(1.34631f + i * 1.525f, 0.0f, -18.5735f);
-            const glm::mat4 transform = glm::translate(glm::mat4(1), position);
-            root->addChild(new Screen(i, transform, mPhysics, messageBus));
-            root->addChild(new Cable(i, mPhysics, messageBus));
-        }
-
-        // add left bridge
-        glm::mat4 bridgeTransform = glm::translate(glm::mat4(1), glm::vec3(-26.0f, -0.75f, -16.0f));
-        FloatingBridge* bridge = new FloatingBridge(bridgeTransform, mPhysics);
-        bridge->setColor(red);
-        root->addChild(bridge);
-
-        // add right bridge
-        bridgeTransform = glm::translate(glm::mat4(1), glm::vec3(29.0f, -0.75f, -17.6296f));
-        bridge = new FloatingBridge(bridgeTransform, mPhysics);
-        bridge->setColor(red);
-        root->addChild(bridge);
-
-        // add gun
-        mMagnetGun = new MagnetGun(glm::vec3(2.5, 1.5, 1.5), mPhysics, messageBus, mScene->getCamera());
-        root->addChild(mMagnetGun);
-
-        // add obstacle
-        glm::mat4 obstacleTransform = glm::translate(glm::mat4(1), glm::vec3(-1.5f, 1.5f, -40.0f));
-        glm::vec3 obstacleScale(8.5f, 1.5f, 1.0f);
-        BoxNode* obstacle = new BoxNode(obstacleTransform, obstacleScale, mPhysics, GROUP_DYNAMIC_OBJECTS, GROUP_STATIC_OBJECTS | GROUP_DYNAMIC_OBJECTS, 1.0f);
-        obstacle->setColor(red);
-        obstacle->getRigidBody()->setLinearFactor(btVector3(1, 0, 0));
-        obstacle->getRigidBody()->setAngularFactor(btVector3(0, 0, 0));
-        obstacle->getRigidBody()->setFriction(0.5f);
-        root->addChild(obstacle);
-
-        // add trees
-        auto treeParams = {// position, rotation z
-                           std::make_pair(glm::vec3(-4.35f, 0.27f, -6.2f), -45.0f), std::make_pair(glm::vec3(-4.35f, 0.27f, -9.5f), -45.0f),
-                           std::make_pair(glm::vec3(11.0f, 0.27f, -12.18f), 0.0f)};
-        for (const auto& param : treeParams)
-        {
-            glm::mat4 transform = glm::translate(glm::mat4(1), param.first);
-            transform = glm::rotate(transform, glm::radians(param.second), glm::vec3(0, 1, 0));
-            MeshNode* base = new MeshNode(transform, "../../data/meshes/TreeBase.obj", mPhysics, GROUP_STATIC_OBJECTS, GROUP_DYNAMIC_OBJECTS, 0.0f);
-            base->setColor(brown);
-            root->addChild(base);
-            MeshNode* top = new MeshNode(transform, "../../data/meshes/TreeTop.obj", mPhysics, GROUP_STATIC_OBJECTS, GROUP_DYNAMIC_OBJECTS, 0.0f);
-            top->setColor(green);
-            root->addChild(top);
-        }
-
-        // add solar panel
-        glm::mat4 panelTransform = glm::translate(glm::mat4(1), glm::vec3(1.75, 4, -40.25));
-        panelTransform = glm::rotate(panelTransform, glm::radians(45.0f), glm::vec3(0, 1, 0));
-        root->addChild(new SolarPanel(panelTransform, glm::pi<float>(), mPhysics, messageBus));
-
-        // add wind turbines
-        auto turbineParams = {// position, rotation z, initial blade angle
-                              std::make_tuple(glm::vec3(-36.5f, 0.0f, 3.5f), 30.0f, 0.0f), std::make_tuple(glm::vec3(-44.0f, 0.0f, -4.0f), 30.0f, 22.5f)};
-        for (const auto& param : turbineParams)
-        {
-            glm::mat4 transform = glm::translate(glm::mat4(1), std::get<0>(param));
-            transform = glm::rotate(transform, glm::radians(std::get<1>(param)), glm::vec3(0, 1, 0));
-            root->addChild(new WindTurbine(transform, glm::radians(std::get<2>(param)), mPhysics));
-        }
-
-        // add dispenser
-        glm::mat4 dispenserTransform = glm::mat4(1);
-        dispenserTransform = glm::translate(dispenserTransform, glm::vec3(12, 0, 5));
-        dispenserTransform = glm::rotate(dispenserTransform, glm::pi<float>(), glm::vec3(0, 1, 0));
-        root->addChild(new Dispenser(dispenserTransform, mPhysics));
-
-        root->createBuffer();
-        mScene->setSceneRoot(root);
-
-        // add a bunch of cubes for testing
-        RigidBodyInfo info;
-        info.mass = 5.0;
-        info.friction = 0.5;
-        for (int i = 0; i < 4; i++)
-        {
-            glm::mat4 trans = glm::translate(glm::mat4(1.0), glm::vec3(1, i * 5 + 5, -7));
-            Cube* newCube = new Cube(trans, Color{1.0f, 1.0f, 1.0f}, mStartManager->getPhysicsManager());
-            mScene->appendNode(newCube);
-            newCube->createBuffer();
-            newCube->addPhysics(glm::vec3(1.0f), info);
-        }
-
-        // add stairs
-        glm::mat4 stairsTransform = glm::translate(glm::mat4(1), glm::vec3(-3.45f, 2.866667f, -34.6f));
-        Stairs* stairs = new Stairs(stairsTransform, mPhysics, messageBus);
-        root->addChild(stairs);
 
         // register location events
         auto locationEventManager = mStartManager->getLocationEventManager();
@@ -276,6 +114,9 @@ void Game::init()
         locationEventManager->registerEvent(glm::vec3(-6, 4, -39), glm::vec3(-1, 7, -35), LocationEventId::ActivateStairs);
         locationEventManager->registerEvent(glm::vec3(-6, 0, -38), glm::vec3(-1, 7, -23), LocationEventId::DeactivateStairs);
     }
+
+    initSSOA();
+    initLevel();
 }
 
 void Game::update(float elapsedSeconds)
@@ -301,15 +142,18 @@ void Game::update(float elapsedSeconds)
     }
 }
 
+// TODO: Add window size to parameter
 void Game::render(float elapsedSeconds)
 {
-    // shadow pass
+    //Data
     glm::mat4 view = mScene->getCamera()->getViewMatrix();
     glm::vec3 camPos = mStartManager->getScene()->getCamera()->getPos();
     glm::vec3 lightPos = camPos + glm::vec3(10);
     glm::mat4 shadowView = glm::lookAt(lightPos, camPos, glm::vec3(0, 1, 0));
     glm::mat4 shadowProj = glm::ortho(-25.0f, 25.0f, -25.0f, 25.0f, 1.0f, 50.0f);
     glm::mat4 shadowTransform = shadowProj * shadowView * glm::inverse(view);
+    
+    // shadow pass
     {
         GLOW_SCOPED(enable, GL_DEPTH_TEST);
         GLOW_SCOPED(cullFace, GL_FRONT);
@@ -322,9 +166,9 @@ void Game::render(float elapsedSeconds)
         mScene->render(shader, shadowProj, shadowView, true);
     }
 
-    // TODO: Add window size to parameter
+    
 
-
+    //Render World in 4 Phases
     {
         auto fb = mFramebuffer->bind();
 
@@ -333,7 +177,9 @@ void Game::render(float elapsedSeconds)
         {
             GLOW_SCOPED(clearColor, mBackgroundColor1);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			//Render Geometry in G-Buffer
+			
+            // Phase 1 : render scene's geometry data into Gbuffer
+            // 5 Texture Buffer for each pixel: gPosition, gNormal, gAmbient, gDiffuse, gSpecular
             {
                 auto gBuffer = mGBuffer->bind();
 
@@ -351,11 +197,13 @@ void Game::render(float elapsedSeconds)
                 mScene->render(shader, projection, view, false);
             }
 
+            // Phase 2 : Generate SSAO texture from gPosition 
 			{
+
                 auto ssaoBuffer = mSSAO_Buffer->bind();
+                auto shader = mShaderSSAO->use();
                 GLOW_SCOPED(clearColor, glm::vec4(1));
                 glClear(GL_COLOR_BUFFER_BIT);
-                auto shader = mShaderSSAO->use();
 
                 GLint id;
                 glGetIntegerv(GL_CURRENT_PROGRAM, &id);
@@ -370,12 +218,27 @@ void Game::render(float elapsedSeconds)
 					mMeshQuad->bind().draw();
 			}
 
-            GLOW_SCOPED(disable, GL_DEPTH_TEST);
+            // Phase 3: Blur the SSOA texture
+            {
 
-			GLOW_SCOPED(enable, GL_BLEND);
-            GLOW_SCOPED(blendFunc, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-			
+                auto ssaoBuffer = mSSAO_BufferBlur->bind();
+                auto shader = mShaderBlurSSAO->use();
+                GLOW_SCOPED(clearColor, glm::vec4(1));
+                glClear(GL_COLOR_BUFFER_BIT);
+
+                shader.setTexture("ssaoInput", mSSAO_Color);
+
+                if (mSSOA_On)
+                    mMeshQuad->bind().draw();
+            }
+
+            // Phase 4: Traditional lighting with SSOA. Uses the texture Information from the phases before.
 			{
+                GLOW_SCOPED(disable, GL_DEPTH_TEST);
+
+                GLOW_SCOPED(enable, GL_BLEND);
+                GLOW_SCOPED(blendFunc, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
                 auto shader = mShaderLighting->use();
 				shader.setUniform("shadowTransform", shadowTransform);
 				shader.setTexture("shadowMap", mShadowMap);
@@ -384,7 +247,7 @@ void Game::render(float elapsedSeconds)
                 shader.setTexture("gAmbient", mGAmbient);
                 shader.setTexture("gDiffuse", mGDiffuse);
                 shader.setTexture("gSpecular", mGSpecular);
-                shader.setTexture("ssao", mSSAO_Color);
+                shader.setTexture("ssao", mSSAO_ColorBlur);
                 mScene->setLight(shader);
                 mMeshQuad->bind().draw();
 			}
@@ -511,4 +374,183 @@ void Game::notifyKeyInput(KeyMessage message)
             mSSOA_On = mSSOA_On ? false : true;
         }
     }
+}
+
+void Game::initSSOA() 
+{
+    // GBuffer Textures and Framebuffer
+    mTargets.push_back(mGDepth = glow::Texture2D::create(1, 1, GL_DEPTH_COMPONENT32));
+    mTargets.push_back(mGPosition = glow::Texture2D::create(1, 1, GL_RGB16F));
+    mGPosition->bind().setWrap(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
+    mGPosition->bind().setFilter(GL_NEAREST, GL_NEAREST);
+
+    mTargets.push_back(mGNormal = glow::Texture2D::create(1, 1, GL_RGB16F));
+    mGNormal->bind().setFilter(GL_NEAREST, GL_NEAREST);
+
+    mTargets.push_back(mGAmbient = glow::Texture2D::create(1, 1, GL_RGBA));
+    mGAmbient->bind().setFilter(GL_NEAREST, GL_NEAREST);
+
+    mTargets.push_back(mGDiffuse = glow::Texture2D::create(1, 1, GL_RGB));
+    mGDiffuse->bind().setFilter(GL_NEAREST, GL_NEAREST);
+
+    mTargets.push_back(mGSpecular = glow::Texture2D::create(1, 1, GL_RGBA));
+    mGSpecular->bind().setFilter(GL_NEAREST, GL_NEAREST);
+
+    mGBuffer = glow::Framebuffer::createDepthOnly(mGDepth);
+    mGBuffer->bind().attachColor("gPosition", mGPosition);
+    mGBuffer->bind().attachColor("gNormal", mGNormal);
+    mGBuffer->bind().attachColor("gAmbient", mGAmbient);
+    mGBuffer->bind().attachColor("gDiffuse", mGDiffuse);
+    mGBuffer->bind().attachColor("gSpecular", mGSpecular);
+
+    // SSAO Buffer
+    mTargets.push_back(mSSAO_Color = glow::Texture2D::create(1, 1, GL_RED));
+    mSSAO_Color->bind().setFilter(GL_NEAREST, GL_NEAREST);
+    mSSAO_Buffer = glow::Framebuffer::create("FragColor", mSSAO_Color);
+
+    // SSOA Blur Buffer
+    mTargets.push_back(mSSAO_ColorBlur = glow::Texture2D::create(1, 1, GL_RED));
+    mSSAO_ColorBlur->bind().setFilter(GL_NEAREST, GL_NEAREST);
+    mSSAO_BufferBlur = glow::Framebuffer::create("FragColor", mSSAO_ColorBlur);
+
+    std::uniform_real_distribution<GLfloat> randomFloats(0.0, 1.0);
+    std::default_random_engine generator;
+
+    // SSAO Kernelfunction
+    for (unsigned int i = 0; i < 64; ++i)
+    {
+        glm::vec3 sample(randomFloats(generator) * 2.0 - 1.0, randomFloats(generator) * 2.0 - 1.0, randomFloats(generator));
+        sample = glm::normalize(sample);
+        sample *= randomFloats(generator);
+        float scale = float(i) / 64.0;
+        scale = 0.1f + scale * scale * (1.0f - 0.1f);
+        sample *= scale;
+        ssaoKernel.push_back(sample);
+    }
+
+    // SSAO Noise for random values
+    for (unsigned int i = 0; i < 16; i++)
+    {
+        glm::vec3 noise(randomFloats(generator) * 2.0 - 1.0, randomFloats(generator) * 2.0 - 1.0, 0.0f); // rotate around z-axis (in tangent space)
+        ssaoNoise.push_back(noise);
+    }
+
+    mSSAO_Noise = glow::Texture2D::create(4, 4, GL_RGB32F);
+    mSSAO_Noise->bind().setData(GL_RGB32F, 4, 4, GL_RGB, GL_FLOAT, &ssaoNoise[0]);
+    mSSAO_Noise->bind().setWrap(GL_REPEAT, GL_REPEAT);
+    mSSAO_Noise->bind().setFilter(GL_NEAREST, GL_NEAREST);
+
+    // SSAO Shader
+    mShaderSSAO = glow::Program::createFromFile("../../data/shaders/ssao");
+    mShaderBlurSSAO = glow::Program::createFromFile("../../data/shaders/ssao_blur");
+}
+
+void Game::initLevel() 
+{
+    auto messageBus = mStartManager->getMessageBus();
+    Node* root = new Node;
+
+    // add light
+    glm::mat4 trans = glm::mat4(1.0f);
+    trans = glm::translate(trans, glm::vec3(30.0f, 25.0f, 25.0f));
+    Light* light = new Light(trans, Color{1.0f, 1.0f, 1.0f});
+    root->addChild(light);
+    mScene->setLight(light);
+
+    // add level
+    MeshNode* level = new MeshNode(glm::mat4(1), "../../data/meshes/FirstRoom.obj", mPhysics, GROUP_STATIC_OBJECTS, GROUP_DYNAMIC_OBJECTS, 0.0f);
+    root->addChild(level);
+
+    // add screens & cables
+    for (int i = 0; i < 3; i++)
+    {
+        const glm::vec3 position(1.34631f + i * 1.525f, 0.0f, -18.5735f);
+        const glm::mat4 transform = glm::translate(glm::mat4(1), position);
+        root->addChild(new Screen(i, transform, mPhysics, messageBus));
+        root->addChild(new Cable(i, mPhysics, messageBus));
+    }
+
+    // add left bridge
+    glm::mat4 bridgeTransform = glm::translate(glm::mat4(1), glm::vec3(-26.0f, -0.75f, -16.0f));
+    FloatingBridge* bridge = new FloatingBridge(bridgeTransform, mPhysics);
+    bridge->setColor(red);
+    root->addChild(bridge);
+
+    // add right bridge
+    bridgeTransform = glm::translate(glm::mat4(1), glm::vec3(29.0f, -0.75f, -17.6296f));
+    bridge = new FloatingBridge(bridgeTransform, mPhysics);
+    bridge->setColor(red);
+    root->addChild(bridge);
+
+    // add gun
+    mMagnetGun = new MagnetGun(glm::vec3(2.5, 1.5, 1.5), mPhysics, messageBus, mScene->getCamera());
+    root->addChild(mMagnetGun);
+
+    // add obstacle
+    glm::mat4 obstacleTransform = glm::translate(glm::mat4(1), glm::vec3(-1.5f, 1.5f, -40.0f));
+    glm::vec3 obstacleScale(8.5f, 1.5f, 1.0f);
+    BoxNode* obstacle = new BoxNode(obstacleTransform, obstacleScale, mPhysics, GROUP_DYNAMIC_OBJECTS, GROUP_STATIC_OBJECTS | GROUP_DYNAMIC_OBJECTS, 1.0f);
+    obstacle->setColor(red);
+    obstacle->getRigidBody()->setLinearFactor(btVector3(1, 0, 0));
+    obstacle->getRigidBody()->setAngularFactor(btVector3(0, 0, 0));
+    obstacle->getRigidBody()->setFriction(0.5f);
+    root->addChild(obstacle);
+
+    // add trees
+    auto treeParams = {// position, rotation z
+                       std::make_pair(glm::vec3(-4.35f, 0.27f, -6.2f), -45.0f), std::make_pair(glm::vec3(-4.35f, 0.27f, -9.5f), -45.0f),
+                       std::make_pair(glm::vec3(11.0f, 0.27f, -12.18f), 0.0f)};
+    for (const auto& param : treeParams)
+    {
+        glm::mat4 transform = glm::translate(glm::mat4(1), param.first);
+        transform = glm::rotate(transform, glm::radians(param.second), glm::vec3(0, 1, 0));
+        MeshNode* base = new MeshNode(transform, "../../data/meshes/TreeBase.obj", mPhysics, GROUP_STATIC_OBJECTS, GROUP_DYNAMIC_OBJECTS, 0.0f);
+        base->setColor(brown);
+        root->addChild(base);
+        MeshNode* top = new MeshNode(transform, "../../data/meshes/TreeTop.obj", mPhysics, GROUP_STATIC_OBJECTS, GROUP_DYNAMIC_OBJECTS, 0.0f);
+        top->setColor(green);
+        root->addChild(top);
+    }
+
+    // add solar panel
+    glm::mat4 panelTransform = glm::translate(glm::mat4(1), glm::vec3(1.75, 4, -40.25));
+    panelTransform = glm::rotate(panelTransform, glm::radians(45.0f), glm::vec3(0, 1, 0));
+    root->addChild(new SolarPanel(panelTransform, glm::pi<float>(), mPhysics, messageBus));
+
+    // add wind turbines
+    auto turbineParams = {// position, rotation z, initial blade angle
+                          std::make_tuple(glm::vec3(-36.5f, 0.0f, 3.5f), 30.0f, 0.0f), std::make_tuple(glm::vec3(-44.0f, 0.0f, -4.0f), 30.0f, 22.5f)};
+    for (const auto& param : turbineParams)
+    {
+        glm::mat4 transform = glm::translate(glm::mat4(1), std::get<0>(param));
+        transform = glm::rotate(transform, glm::radians(std::get<1>(param)), glm::vec3(0, 1, 0));
+        root->addChild(new WindTurbine(transform, glm::radians(std::get<2>(param)), mPhysics));
+    }
+
+    // add dispenser
+    glm::mat4 dispenserTransform = glm::mat4(1);
+    dispenserTransform = glm::translate(dispenserTransform, glm::vec3(12, 0, 5));
+    dispenserTransform = glm::rotate(dispenserTransform, glm::pi<float>(), glm::vec3(0, 1, 0));
+    root->addChild(new Dispenser(dispenserTransform, mPhysics));
+
+    root->createBuffer();
+    mScene->setSceneRoot(root);
+
+    // add a bunch of cubes for testing
+    RigidBodyInfo info;
+    info.mass = 5.0;
+    info.friction = 0.5;
+    for (int i = 0; i < 4; i++)
+    {
+        glm::mat4 trans = glm::translate(glm::mat4(1.0), glm::vec3(1, i * 5 + 5, -7));
+        Cube* newCube = new Cube(trans, Color{1.0f, 1.0f, 1.0f}, mStartManager->getPhysicsManager());
+        mScene->appendNode(newCube);
+        newCube->createBuffer();
+        newCube->addPhysics(glm::vec3(1.0f), info);
+    }
+
+    // add stairs
+    glm::mat4 stairsTransform = glm::translate(glm::mat4(1), glm::vec3(-3.45f, 2.866667f, -34.6f));
+    Stairs* stairs = new Stairs(stairsTransform, mPhysics, messageBus);
+    root->addChild(stairs);
 }

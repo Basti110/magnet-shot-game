@@ -34,6 +34,11 @@ private:
 
     // gfx objects
 private:
+
+    void initSSOA();
+    void initShader();
+    void initLevel();
+
     // shaders
     glow::SharedProgram mShaderShadow;
     glow::SharedProgram mShaderOutput;
@@ -68,8 +73,11 @@ private:
 	glow::SharedFramebuffer mSSAO_Buffer;
 	glow::SharedTexture2D mSSAO_Color;
     glow::SharedTexture2D mSSAO_Noise;
+    glow::SharedFramebuffer mSSAO_BufferBlur;
+    glow::SharedTexture2D mSSAO_ColorBlur;
 
 	glow::SharedProgram mShaderSSAO;
+    glow::SharedProgram mShaderBlurSSAO;
 	std::vector<glm::vec3> ssaoKernel;
     std::vector<glm::vec3> ssaoNoise;
 
