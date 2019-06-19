@@ -357,25 +357,12 @@ void Game::render(float elapsedSeconds)
                 glClear(GL_COLOR_BUFFER_BIT);
                 auto shader = mShaderSSAO->use();
 
-				//ssaoKernel[50].x = 0.8;
-                // Send kernel + rotation
-                /*for (unsigned int i = 0; i < 64; ++i)
-                    shader.setUniform("samples[" + std::to_string(i) + "]", ssaoKernel[i]);*/
                 GLint id;
                 glGetIntegerv(GL_CURRENT_PROGRAM, &id);
-                //shader.setUniform("samples", ssaoKernel);
                 for (unsigned int i = 0; i < 64; ++i)
                     glUniform3fv(glGetUniformLocation(id, ("samples[" + std::to_string(i) + "]").c_str()), 1, &(ssaoKernel[i])[0]);
                 shader.setUniform("projection", projection);
-                /*shader.setUniform("test", test1);
-                std::vector<glm::vec3> testV;
-                testV.push_back(test1);
-                testV.push_back(test2);
-                //shader.setUniform("testV", testV);
-                glUniform3fv(glGetUniformLocation(id, "testV[0]"), 1, &test1[0]);
-                glUniform3fv(glGetUniformLocation(id, "testV[1]"), 1, &test2[1]);
-                //shader.setUniform()
-                //shader.setUniform("testV[1]", test2);*/
+
                 shader.setTexture("gPosition", mGPosition);
                 shader.setTexture("gNormal", mGNormal);
                 shader.setTexture("texNoise", mSSAO_Noise);

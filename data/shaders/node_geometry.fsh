@@ -25,7 +25,7 @@ uniform Material material;
 void main()
 {    
     // store the fragment position vector in the first gbuffer texture
-    vec3 texColor;
+    vec3 texColor = vec3(0);
 
     if (colorRatio < 1.0)
         texColor = texture(uTexture, TexCoord).rgb * (1 - colorRatio);
