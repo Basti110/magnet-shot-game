@@ -86,8 +86,9 @@ void main()
             shadowFactor += 1/16.0;
         }
     }
-
+    if (alpha < 1)
+        shadowFactor = 1;
     //vec3 result = vec3(.95) * texture(ssao, TexCoords).r;
-    vec3 result = (ambient + (0.5+0.5*shadowFactor) * diffuse + specular);
-    FragColor = vec4(result, alpha);
+    vec3 result = (ambient + (0.5+0.5*shadowFactor) * diffuse + shadowFactor * specular);
+    FragColor = vec4(result, 1);
 }

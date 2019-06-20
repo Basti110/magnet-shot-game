@@ -108,7 +108,6 @@ void Game::init()
         mShaderCrosshair = glow::Program::createFromFile("../../data/shaders/crosshair");
 
 
-
         // register location events
         auto locationEventManager = mStartManager->getLocationEventManager();
         locationEventManager->registerEvent(glm::vec3(2, 0, 1), glm::vec3(3, 5, 2), LocationEventId::MagnetGunPickUp);
@@ -146,14 +145,14 @@ void Game::update(float elapsedSeconds)
 // TODO: Add window size to parameter
 void Game::render(float elapsedSeconds)
 {
-    //Data
+    // Data
     glm::mat4 view = mScene->getCamera()->getViewMatrix();
     glm::vec3 camPos = mStartManager->getScene()->getCamera()->getPos();
     glm::vec3 lightPos = camPos + glm::vec3(10);
     glm::mat4 shadowView = glm::lookAt(lightPos, camPos, glm::vec3(0, 1, 0));
     glm::mat4 shadowProj = glm::ortho(-25.0f, 25.0f, -25.0f, 25.0f, 1.0f, 50.0f);
     glm::mat4 shadowTransform = shadowProj * shadowView * glm::inverse(view);
-    
+
     // shadow pass
     {
         GLOW_SCOPED(enable, GL_DEPTH_TEST);
@@ -167,40 +166,48 @@ void Game::render(float elapsedSeconds)
         mScene->render(shader, shadowProj, shadowView, true);
     }
 
-    
 
-    //Render World in 4 Phases
+    // Render World in 4 Phases
     {
         auto fb = mFramebuffer->bind();
 
         glm::mat4 projection = mScene->getCamera()->getProjectionMatrix();
         if (!mShowPhysicsDebug)
         {
-            GLOW_SCOPED(clearColor, mBackgroundColor1);
+            GLOW_SCOPED(clearColor, glm::vec4(0.5, 0.5, 0.5, 1));
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			
+
             // Phase 1 : render scene's geometry data into Gbuffer
             // 5 Texture Buffer for each pixel: gPosition, gNormal, gAmbient, gDiffuse, gSpecular
             {
+                //GLOW_SCOPED(polygonMode, GL_LINE);
+                // GLOW_SCOPED(depthFunc, GL_LEQUAL);
                 auto gBuffer = mGBuffer->bind();
+                GLOW_SCOPED(clearColor, glm::vec4(0.5,0.5,0.5, 1));
+                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-				GLOW_SCOPED(enable, GL_DEPTH_TEST);
+                GLOW_SCOPED(enable, GL_DEPTH_TEST);
+                {           
+                    auto shaderSkybox = mShaderSkybox->use();
+
+                    shaderSkybox.setUniform("uTransform", projection * glm::mat4(glm::mat3(view)));
+                    shaderSkybox.setUniform("uColor1", mBackgroundColor1);
+                    shaderSkybox.setUniform("uColor2", mBackgroundColor2);
+                    mSkybox->bind().draw();
+                }
 
                 GLOW_SCOPED(enable, GL_CULL_FACE);
                 GLOW_SCOPED(cullFace, GL_BACK);
-
-                GLOW_SCOPED(clearColor, mBackgroundColor1);
-                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
                 auto shader = mShaderGeometry->use();
                 shader.setUniform("projection", projection);
                 shader.setUniform("view", view);
                 mScene->render(shader, projection, view, false);
+                GLOW_SCOPED(polygonMode, GL_FILL);
             }
 
-            // Phase 2 : Generate SSAO texture from gPosition 
-			{
-
+            // Phase 2 : Generate SSAO texture from gPosition
+            {
                 auto ssaoBuffer = mSSAO_Buffer->bind();
                 auto shader = mShaderSSAO->use();
                 GLOW_SCOPED(clearColor, glm::vec4(1));
@@ -216,12 +223,11 @@ void Game::render(float elapsedSeconds)
                 shader.setTexture("gNormal", mGNormal);
                 shader.setTexture("texNoise", mSSAO_Noise);
                 if (mSSOA_On)
-					mMeshQuad->bind().draw();
-			}
+                    mMeshQuad->bind().draw();
+            }
 
             // Phase 3: Blur the SSOA texture
             {
-
                 auto ssaoBuffer = mSSAO_BufferBlur->bind();
                 auto shader = mShaderBlurSSAO->use();
                 GLOW_SCOPED(clearColor, glm::vec4(1));
@@ -234,24 +240,24 @@ void Game::render(float elapsedSeconds)
             }
 
             // Phase 4: Traditional lighting with SSOA. Uses the texture Information from the phases before.
-			{
+            {
                 GLOW_SCOPED(disable, GL_DEPTH_TEST);
 
                 GLOW_SCOPED(enable, GL_BLEND);
                 GLOW_SCOPED(blendFunc, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
                 auto shader = mShaderLighting->use();
-				shader.setUniform("shadowTransform", shadowTransform);
-				shader.setTexture("shadowMap", mShadowMap);
+                shader.setUniform("shadowTransform", shadowTransform);
+                shader.setTexture("shadowMap", mShadowMap);
                 shader.setTexture("gPosition", mGPosition);
                 shader.setTexture("gNormal", mGNormal);
                 shader.setTexture("gAmbient", mGAmbient);
                 shader.setTexture("gDiffuse", mGDiffuse);
                 shader.setTexture("gSpecular", mGSpecular);
-                shader.setTexture("ssao", mSSAO_ColorBlur);
+                shader.setTexture("ssao", mSSAO_Color);
                 mScene->setLight(shader);
                 mMeshQuad->bind().draw();
-			}
+            }
         }
         else
         {
@@ -277,7 +283,7 @@ void Game::render(float elapsedSeconds)
     GLOW_SCOPED(clearColor, mBackgroundColor1);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);*/
 
-    
+
     GLOW_SCOPED(disable, GL_CULL_FACE);
 
     GLOW_SCOPED(polygonMode, GL_FILL);
@@ -370,14 +376,14 @@ void Game::notifyKeyInput(KeyMessage message)
             mShowPhysicsDebug = mShowPhysicsDebug ? false : true;
         }
 
-		if (message.getInput() == GLFW_KEY_F6)
+        if (message.getInput() == GLFW_KEY_F6)
         {
             mSSOA_On = mSSOA_On ? false : true;
         }
     }
 }
 
-void Game::initSSOA() 
+void Game::initSSOA()
 {
     // GBuffer Textures and Framebuffer
     mTargets.push_back(mGDepth = glow::Texture2D::create(1, 1, GL_DEPTH_COMPONENT32));
@@ -446,7 +452,7 @@ void Game::initSSOA()
     mShaderBlurSSAO = glow::Program::createFromFile("../../data/shaders/ssao_blur");
 }
 
-void Game::initLevel() 
+void Game::initLevel()
 {
     auto messageBus = mStartManager->getMessageBus();
     Node* root = new Node;
