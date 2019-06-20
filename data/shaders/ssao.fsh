@@ -14,7 +14,7 @@ uniform vec3 testV[2];
 
 
 // parameters (you'd probably want to use them as uniforms to more easily tweak the effect)
-int kernelSize = 64;
+int kernelSize = 32;
 float radius = 0.5;
 float bias = 0.025;
 

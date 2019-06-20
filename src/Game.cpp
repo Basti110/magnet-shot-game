@@ -43,6 +43,7 @@
 int SCR_WIDTH = 1080;
 int SCR_HEIGHT = 800;
 
+#define SAMPLES 32
 
 
 Game::Game() : GlfwApp(Gui::ImGui) {}
@@ -207,7 +208,7 @@ void Game::render(float elapsedSeconds)
 
                 GLint id;
                 glGetIntegerv(GL_CURRENT_PROGRAM, &id);
-                for (unsigned int i = 0; i < 64; ++i)
+                for (unsigned int i = 0; i < SAMPLES; ++i)
                     glUniform3fv(glGetUniformLocation(id, ("samples[" + std::to_string(i) + "]").c_str()), 1, &(ssaoKernel[i])[0]);
                 shader.setUniform("projection", projection);
 
@@ -417,12 +418,12 @@ void Game::initSSOA()
     std::default_random_engine generator;
 
     // SSAO Kernelfunction
-    for (unsigned int i = 0; i < 64; ++i)
+    for (unsigned int i = 0; i < SAMPLES; ++i)
     {
         glm::vec3 sample(randomFloats(generator) * 2.0 - 1.0, randomFloats(generator) * 2.0 - 1.0, randomFloats(generator));
         sample = glm::normalize(sample);
         sample *= randomFloats(generator);
-        float scale = float(i) / 64.0;
+        float scale = float(i) / SAMPLES;
         scale = 0.1f + scale * scale * (1.0f - 0.1f);
         sample *= scale;
         ssaoKernel.push_back(sample);
