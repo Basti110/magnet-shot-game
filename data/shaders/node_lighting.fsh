@@ -86,6 +86,7 @@ void main()
             shadowFactor += 1/16.0;
         }
     }
+    
     if (alpha < 1)
         shadowFactor = 1;
     //vec3 result = vec3(.95) * texture(ssao, TexCoords).r;

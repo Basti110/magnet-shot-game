@@ -5,6 +5,6 @@ out vec3 vPosition;
 
 
 void main() {
-    vPosition = 250 * aPos;
+    vPosition = 100 * aPos;
     gl_Position = uTransform * vec4(vPosition, 1.0);
 }

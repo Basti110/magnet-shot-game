@@ -190,7 +190,7 @@ void Game::render(float elapsedSeconds)
                 {           
                     auto shaderSkybox = mShaderSkybox->use();
 
-                    shaderSkybox.setUniform("uTransform", projection * glm::mat4(glm::mat3(view)));
+                    shaderSkybox.setUniform("uTransform", projection * view); // * glm::mat4(glm::mat3(view)));
                     shaderSkybox.setUniform("uColor1", mBackgroundColor1);
                     shaderSkybox.setUniform("uColor2", mBackgroundColor2);
                     mSkybox->bind().draw();
@@ -347,9 +347,24 @@ void Game::notifyGuiInput(Message* message)
         {
             mBackgroundColor1 = glm::vec4(m->getValue(), 1.0f);
         }
-        if (m->getSetting() == GuiSettings::BACKGROUND_COLOR2)
+        else if (m->getSetting() == GuiSettings::BACKGROUND_COLOR2)
         {
             mBackgroundColor2 = glm::vec4(m->getValue(), 1.0f);
+        }
+        else if (m->getSetting() == GuiSettings::SUN_COLOR)
+        {
+            auto shader = mShaderSkybox->use();
+            shader.setUniform("sunColor", m->getValue());
+        }
+        else if (m->getSetting() == GuiSettings::SUNSET_BACKGROUND1)
+        {
+            auto shader = mShaderSkybox->use();
+            shader.setUniform("sunsetBackground1", m->getValue());
+        }
+        else if (m->getSetting() == GuiSettings::SUNSET_BACKGROUND2)
+        {
+            auto shader = mShaderSkybox->use();
+            shader.setUniform("sunsetBackground2", m->getValue());
         }
     }
     if (auto m = dynamic_cast<GuiFloatMessage*>(message))
@@ -359,10 +374,15 @@ void Game::notifyGuiInput(Message* message)
             auto shader = mShaderLighting->use();
             shader.setUniform("shadowOffset", m->getValue());
         }
-        if (m->getSetting() == GuiSettings::SHADOW_SMOOTHNESS)
+        else if (m->getSetting() == GuiSettings::SHADOW_SMOOTHNESS)
         {
             auto shader = mShaderLighting->use();
             shader.setUniform("shadowSmoothness", m->getValue());
+        }
+        else if (m->getSetting() == GuiSettings::SUN_ANGLE)
+        {
+            auto shader = mShaderSkybox->use();
+            shader.setUniform("sunAngle", m->getValue());
         }
     }
 }

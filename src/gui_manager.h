@@ -39,8 +39,12 @@ private:
     std::pair<glm::vec3, glm::vec3> mLightAmbient;
     std::pair<glm::vec3, glm::vec3> mLightDiffuse;
     std::pair<glm::vec3, glm::vec3> mLightSpecular;
+    std::pair<glm::vec3, glm::vec3> mSunColor;
+    std::pair<glm::vec3, glm::vec3> mSunsetColor1;
+    std::pair<glm::vec3, glm::vec3> mSunsetColor2;
     //std::pair<bool, bool> mSSOA;
     std::pair<float, float> mShadowOffset;
+    std::pair<float, float> mSunAngle;
     std::pair<float, float> mShadowSmoothness;
 
     //------------------------------------------------

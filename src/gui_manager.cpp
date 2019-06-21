@@ -27,15 +27,23 @@ GuiManager::GuiManager(MessageBus* messageBus, GLFWwindow* window, SceneManager*
     mLightDiffuse.first = glm::vec3(1.0);
     mLightSpecular.first = glm::vec3(1.0);
     mShadowOffset.first = 0.0005;
+    mSunAngle.first = 0;
     mShadowSmoothness.first = 0.0006;
-    
+    mSunColor.first = glm::vec3(233 / 255.0, 154 / 255.0, 65 / 255.0);
+    mSunsetColor1.first = glm::vec3(210 / 255.0, 151 / 255.0, 76 / 255.0);
+    mSunsetColor2.first = glm::vec3(184 / 255.0, 1.0, 1.0);
+
     sendVec3Message(mBackgroundColor1, GuiSettings::BACKGROUND_COLOR1);
     sendVec3Message(mBackgroundColor2, GuiSettings::BACKGROUND_COLOR2);
     sendVec3Message(mLightAmbient, GuiSettings::LIGHT_AMBIENT);
     sendVec3Message(mLightDiffuse, GuiSettings::LIGHT_DIFFUSE);
     sendVec3Message(mLightSpecular, GuiSettings::LIGHT_SPECULAR);
     sendFloatMessage(mShadowOffset, GuiSettings::SHADOW_OFFSET);
+    sendFloatMessage(mSunAngle, GuiSettings::SUN_ANGLE);
     sendFloatMessage(mShadowSmoothness, GuiSettings::SHADOW_SMOOTHNESS);
+    sendVec3Message(mSunColor, GuiSettings::SUN_COLOR);
+    sendVec3Message(mSunsetColor1, GuiSettings::SUNSET_BACKGROUND1);
+    sendVec3Message(mSunsetColor2, GuiSettings::SUNSET_BACKGROUND2);
     
     //Cube Settings
 
@@ -112,16 +120,30 @@ void GuiManager::update()
   
     if (mBackgroundColor1.first != mBackgroundColor1.second)
         sendVec3Message(mBackgroundColor1, GuiSettings::BACKGROUND_COLOR1);
+
     if (mBackgroundColor2.first != mBackgroundColor2.second)
         sendVec3Message(mBackgroundColor2, GuiSettings::BACKGROUND_COLOR2);
 
+    if (mSunAngle.first != mSunAngle.second)
+        sendFloatMessage(mSunAngle, GuiSettings::SUN_ANGLE);
+
     if (mShadowOffset.first != mShadowOffset.second)
         sendFloatMessage(mShadowOffset, GuiSettings::SHADOW_OFFSET);
+
     if (mShadowSmoothness.first != mShadowSmoothness.second)
         sendFloatMessage(mShadowSmoothness, GuiSettings::SHADOW_SMOOTHNESS);
 
     if (mCubeSize.first != mCubeSize.second)
         sendFloatMessage(mCubeSize, GuiSettings::CUBE_SIZE);
+
+    if (mSunColor.first != mSunColor.second)
+        sendVec3Message(mSunColor, GuiSettings::SUN_COLOR);
+
+    if (mSunsetColor1.first != mSunsetColor1.second)
+        sendVec3Message(mSunsetColor1, GuiSettings::SUNSET_BACKGROUND1);
+
+    if (mSunsetColor2.first != mSunsetColor2.second)
+        sendVec3Message(mSunsetColor2, GuiSettings::SUNSET_BACKGROUND2);
 
     
     //Cube
@@ -252,6 +274,10 @@ void GuiManager::renderWorldSettings()
             ImGui::ColorEdit3("Light Specular", &mLightSpecular.first.r);
             ImGui::SliderFloat("Shadow Offset", &mShadowOffset.first, 0.0f, 0.0025f, "%.5f");
             ImGui::SliderFloat("Shadow Smoothness", &mShadowSmoothness.first, 0.0f, 0.0025f, "%.5f");
+            ImGui::SliderFloat("Sun Angle", &mSunAngle.first, 0.0f, 6.28318530f);
+            ImGui::ColorEdit3("Sun Color", &mSunColor.first.r);
+            ImGui::ColorEdit3("Sunset Color 1", &mSunsetColor1.first.r);
+            ImGui::ColorEdit3("Sunset Color 2", &mSunsetColor2.first.r);
         }
     }
     ImGui::End();
