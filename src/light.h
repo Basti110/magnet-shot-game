@@ -13,6 +13,7 @@ public:
     void setAmbient(const glm::vec3& color);
     void setDiffuse(const glm::vec3& color);
     void setSpecular(const glm::vec3& color);
+    void setRenderColor(const glm::vec3& color);
     glm::vec3 getAmbient();
     glm::vec3 getDiffuse();
     glm::vec3 getSpecular();
@@ -26,5 +27,6 @@ private:
     glm::vec3 mAmbient;
     glm::vec3 mDiffuse;
     glm::vec3 mSpecular;
+    glm::vec3 mRenderColor;
 };
 

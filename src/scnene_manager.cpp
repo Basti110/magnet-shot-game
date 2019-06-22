@@ -1,12 +1,12 @@
 #include "scnene_manager.h"
 #include <algorithm>
-
+#include <glm/gtc/matrix_transform.hpp>
 
 SceneManager::SceneManager()
 {
 	//this->root.createBuffer();
 	mRoot = new Node();
-    mLight = nullptr;
+    mSun = nullptr;
     mViewCamera = new Camera();
 }
 
@@ -43,14 +43,41 @@ Camera * SceneManager::getCamera()
     return mViewCamera;
 }
 
-Light * SceneManager::getLight()
+Light * SceneManager::getSun()
 {
-    return mLight;
+    return mSun;
 }
 
-void SceneManager::setLight(Light * light)
+void SceneManager::setSun(Light * light)
 {
-    mLight = light;
+    glm::mat4 transform = glm::translate(glm::mat4(1), glm::vec3(0.f, 99.f, 0.f));
+    light->setLocalTransformation(transform);
+    mSun = light;
+}
+
+void SceneManager::setSunAngle(float angle) 
+{ 
+    mSunAngle = angle;
+    if (angle > 3.141592653)
+    {
+        float ratio = -0.8 * pow(mSunAngle - 4.712388, 2) + 2;
+        if (ratio >= 1)
+            angle = angle - 3.141592653;
+    }
+    
+    float theta = -angle - 4.712388;
+    float phi = 0;
+    float r = 98;
+    float x = r * sin(theta) * sin(phi);
+    float y = r * cos(theta);
+    float z = r * sin(theta) * cos(phi);
+    glm::mat4 transform = glm::translate(glm::mat4(1), glm::vec3(x, y, z));
+    mSun->setLocalTransformation(transform);
+}
+
+glm::vec3 SceneManager::getSunPos()
+{
+    return glm::vec3(mSun->getGlobalTransformation()[3]);
 }
 
 void SceneManager::appendNode(AbstractNode* node)
@@ -90,15 +117,49 @@ void SceneManager::render(glow::UsedProgram& shader, glm::mat4& projection, glm:
 
 void SceneManager::setLight(glow::UsedProgram& shader) 
 {
-    glm::vec3 camPos = this->getCamera()->getPos();
-    if (mLight)
+    glm::vec3 sunAmbient;
+    glm::vec3 sunDiffuse;
+    glm::vec3 sunSpecular;
+    glm::vec3 backAmbient;
+    glm::vec3 backDiffuse;
+    glm::vec3 backSpecular;
+    float sunSetRatio;
+
+    sunAmbient = glm::vec3(1.0, 220 / 255., 199 / 255.);
+    sunDiffuse = glm::vec3(251 / 255., 155 / 255., 79 / 255.);
+    sunSpecular = glm::vec3(248 / 255., 125 / 255., 18 / 255.);
+
+    if (mSunAngle < 3.141592653)
+    {
+        sunSetRatio = -0.8 * pow(mSunAngle - 1.5707963, 2) + 2;
+        sunSetRatio = glm::max(glm::min(sunSetRatio, 1.0f), 0.0f);
+        backAmbient = mSun->getAmbient();
+        backDiffuse = mSun->getDiffuse();
+        backSpecular = mSun->getSpecular();
+
+    }
+    else
+    {
+        sunSetRatio = -0.8 * pow(mSunAngle - 4.712388, 2) + 2;
+        sunSetRatio = glm::max(glm::min(sunSetRatio, 1.f), 0.f);
+        backAmbient = glm::vec3(9 / 255., 9 / 255., 9 / 255.);
+        backDiffuse = glm::vec3(1 / 255., 1 / 255., 1 / 255.);
+        backSpecular = glm::vec3(0., 0., 0.);
+    }
+
+    sunAmbient = sunSetRatio * backAmbient + (1 - sunSetRatio) * sunAmbient;
+    sunDiffuse = sunSetRatio * backDiffuse + (1 - sunSetRatio) * sunDiffuse;
+    sunSpecular = sunSetRatio * backSpecular + (1 - sunSetRatio) * sunSpecular;
+    
+        glm::vec3 camPos = this->getCamera()->getPos();
+    if (mSun)
     {
         glm::vec3 lightPos;
-        lightPos = glm::vec3(mViewCamera->getViewMatrix() * glm::vec4(mLight->getPos(), 1));
+        lightPos = glm::vec3(mViewCamera->getViewMatrix() * glm::vec4(mSun->getPos(), 1));
         shader.setUniform("light.position", lightPos);
-        shader.setUniform("light.ambient", mLight->getAmbient());
-        shader.setUniform("light.diffuse", mLight->getDiffuse());
-        shader.setUniform("light.specular", mLight->getSpecular());
+        shader.setUniform("light.ambient", sunAmbient);
+        shader.setUniform("light.diffuse", sunDiffuse);
+        shader.setUniform("light.specular", sunSpecular);
     }
     shader.setUniform("viewPos", camPos);
 }

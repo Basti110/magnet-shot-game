@@ -39,11 +39,11 @@ GuiManager::GuiManager(MessageBus* messageBus, GLFWwindow* window, SceneManager*
     sendVec3Message(mLightDiffuse, GuiSettings::LIGHT_DIFFUSE);
     sendVec3Message(mLightSpecular, GuiSettings::LIGHT_SPECULAR);
     sendFloatMessage(mShadowOffset, GuiSettings::SHADOW_OFFSET);
-    sendFloatMessage(mSunAngle, GuiSettings::SUN_ANGLE);
     sendFloatMessage(mShadowSmoothness, GuiSettings::SHADOW_SMOOTHNESS);
     sendVec3Message(mSunColor, GuiSettings::SUN_COLOR);
     sendVec3Message(mSunsetColor1, GuiSettings::SUNSET_BACKGROUND1);
     sendVec3Message(mSunsetColor2, GuiSettings::SUNSET_BACKGROUND2);
+    sendFloatMessage(mSunAngle, GuiSettings::SUN_ANGLE);
     
     //Cube Settings
 

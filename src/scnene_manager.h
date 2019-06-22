@@ -1,10 +1,10 @@
 #pragma once
-#include "node.h"
+#include <functional>
+#include <glow/objects/Program.hh>
 #include "camera.h"
 #include "light.h"
-#include <glow/objects/Program.hh>
-#include <functional>
-//class Camera;
+#include "node.h"
+// class Camera;
 
 class SceneManager
 {
@@ -18,23 +18,25 @@ public:
     void appendNode(AbstractNode* node);
     void removeNode(std::function<bool(AbstractNode*)> predicate);
     void update(float elapsedSeconds);
+    void setSunAngle(float angle);
+    void setSunColor(glm::vec3 sunColor);
+    glm::vec3 getSunPos();
 
-    //Setter
-    void setCamera(Camera* camera);
+        // Setter
+        void setCamera(Camera* camera);
     void setSceneRoot(Node* node);
-    void setLight(Light* light);
+    void setSun(Light* light);
 
-    //Getter
-	Node* getSceneRoot();
+    // Getter
+    Node* getSceneRoot();
     Camera* getCamera();
-    Light* getLight();
+    Light* getSun();
 
 private:
-
-	//std::vector<AbstractNode&> nodes;
-	std::vector<AbstractNode*> mDynamicObjects;
-	Node* mRoot;
+    // std::vector<AbstractNode&> nodes;
+    std::vector<AbstractNode*> mDynamicObjects;
+    Node* mRoot;
     Camera* mViewCamera;
-    Light* mLight;
+    Light* mSun;
+    float mSunAngle;
 };
-

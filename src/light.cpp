@@ -101,7 +101,7 @@ void Light::render(glow::UsedProgram& shader, glm::mat4& projection, glm::mat4& 
         shader.setUniform("model", mGlobalTransformation);
         shader.setUniform("projection", projection);
         shader.setUniform("view", view);
-        shader.setUniform("color", mDiffuse);
+        shader.setUniform("color", mRenderColor);
         glBindVertexArray(this->VAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
     }
@@ -120,6 +120,11 @@ void Light::setDiffuse(const glm::vec3& color)
 void Light::setSpecular(const glm::vec3& color) 
 {
     mSpecular = color;
+}
+
+void Light::setRenderColor(const glm::vec3& color) 
+{
+    mRenderColor = color;
 }
 
 glm::vec3 Light::getAmbient()

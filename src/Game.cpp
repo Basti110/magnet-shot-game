@@ -148,9 +148,9 @@ void Game::render(float elapsedSeconds)
     // Data
     glm::mat4 view = mScene->getCamera()->getViewMatrix();
     glm::vec3 camPos = mStartManager->getScene()->getCamera()->getPos();
-    glm::vec3 lightPos = camPos + glm::vec3(10);
-    glm::mat4 shadowView = glm::lookAt(lightPos, camPos, glm::vec3(0, 1, 0));
-    glm::mat4 shadowProj = glm::ortho(-25.0f, 25.0f, -25.0f, 25.0f, 1.0f, 50.0f);
+    glm::vec3 lightPos = mScene->getSunPos(); // camPos + glm::vec3(10);
+    glm::mat4 shadowView = glm::lookAt(lightPos, glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+    glm::mat4 shadowProj = glm::ortho(-25.0f, 25.0f, -25.0f, 25.0f, 1.0f, 190.0f);
     glm::mat4 shadowTransform = shadowProj * shadowView * glm::inverse(view);
 
     // shadow pass
@@ -190,9 +190,30 @@ void Game::render(float elapsedSeconds)
                 {           
                     auto shaderSkybox = mShaderSkybox->use();
 
+                    glm::vec3 back1;
+                    glm::vec3 back2;
+                    if (mSunAngle < 3.141592653)
+                    {
+                        float sunSetRatio = -0.8 * pow(mSunAngle - 1.5707963, 2) + 2;
+                        sunSetRatio = glm::max(glm::min(sunSetRatio, 1.f), 0.f);
+                        back1 = sunSetRatio * glm::vec3(mBackgroundColor1) + (1 - sunSetRatio) * mSunsetBackground1;
+                        back2 = sunSetRatio * glm::vec3(mBackgroundColor2) + (1 - sunSetRatio) * mSunsetBackground2;
+                    }
+                    else
+                    {
+                        glm::vec3 dark1 = glm::vec3(0, 3 / 255., 8 / 255.);
+                        glm::vec3 dark2 = glm::vec3(2 / 255., 7 / 255., 48 / 255.);
+                        float sunSetRatio = -0.8 * pow(mSunAngle - 4.712388, 2) + 2;
+                        sunSetRatio = glm::max(glm::min(sunSetRatio, 1.f), 0.f);
+                        back1 = sunSetRatio * glm::vec3(dark1) + (1 - sunSetRatio) * mSunsetBackground1;
+                        back2 = sunSetRatio * glm::vec3(dark2) + (1 - sunSetRatio) * mSunsetBackground2;
+                    }
+
+
                     shaderSkybox.setUniform("uTransform", projection * view); // * glm::mat4(glm::mat3(view)));
-                    shaderSkybox.setUniform("uColor1", mBackgroundColor1);
-                    shaderSkybox.setUniform("uColor2", mBackgroundColor2);
+                    shaderSkybox.setUniform("uColor1", back1);
+                    shaderSkybox.setUniform("uColor2", back2);
+                    
                     mSkybox->bind().draw();
                 }
 
@@ -354,17 +375,18 @@ void Game::notifyGuiInput(Message* message)
         else if (m->getSetting() == GuiSettings::SUN_COLOR)
         {
             auto shader = mShaderSkybox->use();
-            shader.setUniform("sunColor", m->getValue());
+            mScene->getSun()->setRenderColor(m->getValue());       
+            mSunColor = m->getValue();
         }
         else if (m->getSetting() == GuiSettings::SUNSET_BACKGROUND1)
         {
             auto shader = mShaderSkybox->use();
-            shader.setUniform("sunsetBackground1", m->getValue());
+            mSunsetBackground1 = m->getValue();
         }
         else if (m->getSetting() == GuiSettings::SUNSET_BACKGROUND2)
         {
             auto shader = mShaderSkybox->use();
-            shader.setUniform("sunsetBackground2", m->getValue());
+            mSunsetBackground2 = m->getValue();
         }
     }
     if (auto m = dynamic_cast<GuiFloatMessage*>(message))
@@ -381,8 +403,28 @@ void Game::notifyGuiInput(Message* message)
         }
         else if (m->getSetting() == GuiSettings::SUN_ANGLE)
         {
+            float angle;
+            float sunSetRatio = -0.8 * pow(m->getValue() - 1.5707963, 2) + 2;
+            sunSetRatio = glm::max(glm::min(sunSetRatio, 1.0f), 0.0f);
+            glm::vec3 color;
+
+            if (m->getValue() > 3.141592653)
+            {
+                angle = m->getValue() - 3.141592653;
+                color = glm::vec3(1);
+            }
+            else
+            {
+                angle = m->getValue();
+                color = sunSetRatio * glm::vec3(1.0) + (1 - sunSetRatio) * mSunColor;
+            }
+
+            mScene->getSun()->setRenderColor(color);
+            mScene->setSunAngle(m->getValue());
             auto shader = mShaderSkybox->use();
-            shader.setUniform("sunAngle", m->getValue());
+            shader.setUniform("sunColor", color);
+            shader.setUniform("sunAngle", angle);
+            mSunAngle = m->getValue();
         }
     }
 }
@@ -482,7 +524,7 @@ void Game::initLevel()
     trans = glm::translate(trans, glm::vec3(30.0f, 25.0f, 25.0f));
     Light* light = new Light(trans, Color{1.0f, 1.0f, 1.0f});
     root->addChild(light);
-    mScene->setLight(light);
+    mScene->setSun(light);
 
     // add level
     MeshNode* level = new MeshNode(glm::mat4(1), "../../data/meshes/FirstRoom.obj", mPhysics, GROUP_STATIC_OBJECTS, GROUP_DYNAMIC_OBJECTS, 0.0f);

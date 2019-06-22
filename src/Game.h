@@ -23,10 +23,14 @@ class Game : public glow::glfw::GlfwApp
 private:
     glm::vec4 mBackgroundColor1;
     glm::vec4 mBackgroundColor2;
+    glm::vec3 mSunColor;
+    glm::vec3 mSunsetBackground1;
+    glm::vec3 mSunsetBackground2;
     bool mShowWireframe = false;
     bool mShowPostProcess = false;
     bool mShowPhysicsDebug = false;
     float mBounceF = 0;
+    float mSunAngle = 0;
     Starter* mStartManager;
     SceneManager* mScene;
     PhysicsManager* mPhysics;
@@ -80,6 +84,7 @@ private:
     glow::SharedProgram mShaderBlurSSAO;
 	std::vector<glm::vec3> ssaoKernel;
     std::vector<glm::vec3> ssaoNoise;
+
 
     // shadow map
     glow::SharedFramebuffer mShadowFramebuffer;

@@ -270,21 +270,21 @@ void Editor::notifyGuiInput(Message* message)
 
         if (m->getSetting() == GuiSettings::LIGHT_AMBIENT)
         {
-            Light* light = mScene->getLight();
+            Light* light = mScene->getSun();
             if (light)
                 light->setAmbient(m->getValue());
         }
 
 		if (m->getSetting() == GuiSettings::LIGHT_DIFFUSE)
         {
-            Light* light = mScene->getLight();
+            Light* light = mScene->getSun();
             if (light)
                 light->setDiffuse(m->getValue());
         }
 
 		if (m->getSetting() == GuiSettings::LIGHT_SPECULAR)
         {
-            Light* light = mScene->getLight();
+            Light* light = mScene->getSun();
             if (light)
                 light->setSpecular(m->getValue());
         }

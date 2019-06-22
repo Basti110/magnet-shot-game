@@ -38,7 +38,7 @@ void main()
     float shininess = texture(gSpecular, TexCoords).a;
 
     // ambient
-    float occlusion = texture(ssao, TexCoords).r;
+    float occlusion = max(texture(ssao, TexCoords).r, 1 - alpha);
     vec3 ambient = light.ambient * materialAmbient * occlusion;
   	
     // diffuse 
