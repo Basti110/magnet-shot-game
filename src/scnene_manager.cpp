@@ -193,11 +193,12 @@ void SceneManager::setLightInShader(glow::UsedProgram& shader)
     {
         if (!mPointLights[i]->getOn())
             continue;
+        
         glm::vec3 lightPos = glm::vec3(mViewCamera->getViewMatrix() * glm::vec4(mPointLights[i]->getPos(), 1));
-        glUniform3fv(glGetUniformLocation(id, ("pointLights[" + std::to_string(i) + "].Position").c_str()), 1, &lightPos[0]);
-        glUniform3fv(glGetUniformLocation(id, ("pointLights[" + std::to_string(i) + "].Color").c_str()), 1, &(mPointLights[i]->getAmbient())[0]);
-        glUniform1f(glGetUniformLocation(id, ("pointLights[" + std::to_string(i) + "].Linear").c_str()), mPointLights[i]->getLinear());
-        glUniform1f(glGetUniformLocation(id, ("pointLights[" + std::to_string(i) + "].Quadratic").c_str()), mPointLights[i]->getQuadratic());
+        glUniform3fv(glGetUniformLocation(id, ("pointLights[" + std::to_string(lightCounter) + "].Position").c_str()), 1, &lightPos[0]);
+        glUniform3fv(glGetUniformLocation(id, ("pointLights[" + std::to_string(lightCounter) + "].Color").c_str()), 1, &(mPointLights[i]->getAmbient())[0]);
+        glUniform1f(glGetUniformLocation(id, ("pointLights[" + std::to_string(lightCounter) + "].Linear").c_str()), mPointLights[i]->getLinear());
+        glUniform1f(glGetUniformLocation(id, ("pointLights[" + std::to_string(lightCounter) + "].Quadratic").c_str()), mPointLights[i]->getQuadratic());
         lightCounter++;
         /*shaderLightingPass.setVec3("lights[" + std::to_string(i) + "].Position", lightPositions[i]);
         shaderLightingPass.setVec3("lights[" + std::to_string(i) + "].Color", lightColors[i]);

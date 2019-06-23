@@ -23,7 +23,7 @@ public:
 
 protected:
     void setVertices();
-    float mAlpha = 1.0f;
+    //float mAlpha = 1.0f;
 
     static bool isInit;
     static unsigned int VBO;

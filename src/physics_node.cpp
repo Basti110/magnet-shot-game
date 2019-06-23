@@ -96,6 +96,11 @@ void PhysicsNode::setColor(const glm::vec3& color)
     mProperty.specular = glm::vec3(1);
 }
 
+void PhysicsNode::setAmbient(const glm::vec3& color)
+{
+    mProperty.ambient = color;
+}
+
 void PhysicsNode::notifyPickBody(PickBodyMessage message)
 {
     if (message.body == nullptr)

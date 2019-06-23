@@ -594,7 +594,9 @@ void Game::initLevel()
     {
         glm::mat4 transform = glm::translate(glm::mat4(1), std::get<0>(param));
         transform = glm::rotate(transform, glm::radians(std::get<1>(param)), glm::vec3(0, 1, 0));
-        root->addChild(new WindTurbine(transform, glm::radians(std::get<2>(param)), mPhysics));
+        WindTurbine* turbine = new WindTurbine(transform, glm::radians(std::get<2>(param)), mPhysics, mScene);
+        //mScene->addPointLight(turbine->getLight());
+        root->addChild(turbine);
     }
 
     // add dispenser

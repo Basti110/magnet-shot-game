@@ -1,6 +1,6 @@
 #include "point_light.h"
 
-PointLight::PointLight(glm::mat4& transformation, Color color) 
+PointLight::PointLight(const glm::mat4& transformation, Color color) 
 {
     mAmbient = {color.red, color.green, color.blue};
     mDiffuse = {color.red, color.green, color.blue};

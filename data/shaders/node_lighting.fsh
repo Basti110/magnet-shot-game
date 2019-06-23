@@ -26,7 +26,7 @@ uniform sampler2D ssao;
 
 uniform vec3 viewPos; 
 uniform Light light;
-uniform PointLight pointLights[5];
+uniform PointLight pointLights[10];
 uniform sampler2D shadowMap;
 uniform mat4 shadowTransform;
 uniform float shadowOffset;
@@ -64,7 +64,7 @@ void main()
     vec3 specular = light.specular * (spec * materialSpecular); 
     
     //viewDir = normalize(viewPos - FragPos);
-    /*for(int i = 0; i < sizePointLight; ++i)
+    for(int i = 0; i < sizePointLight; ++i)
     {
         // diffuse
         vec3 lightDir = normalize(pointLights[i].Position - FragPos);
@@ -81,7 +81,7 @@ void main()
         specularPoint *= attenuation;
         diffuse += diffusePoint;
         specular += specularPoint;     
-    }*/
+    }
 
     // shadows
     vec4 shadowPos = shadowTransform * vec4(FragPos, 1.0);

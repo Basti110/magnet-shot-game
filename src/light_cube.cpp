@@ -21,7 +21,10 @@ LightCube::LightCube(const glm::mat4& transformation, Color color, PhysicsManage
     mNightColor = glm::vec3(color.red, color.green, color.blue);
     mLight->setOn(false);
 
-    MessageBus::getInstance()->addSceneEventReceiver([=](SceneEventMessage message) { this->notifySceneEvent(message); });
+    MessageBus::getInstance()->addSceneEventReceiver([=](SceneEventMessage message) {
+        if (mControlActivated)
+            this->notifySceneEvent(message);
+    });
 }
 
 LightCube::~LightCube() 

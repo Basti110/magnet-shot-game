@@ -12,7 +12,7 @@
 class PointLight : public AbstractNode
 {
 public:
-    PointLight(glm::mat4& transformation, Color color);
+    PointLight(const glm::mat4& transformation, Color color);
     ~PointLight();
     GETSETR(glm::vec3, Ambient)
     GETSETR(glm::vec3, Diffuse)
