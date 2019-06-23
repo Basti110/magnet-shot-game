@@ -8,7 +8,9 @@ class LightCube : public Cube
 public:
     LightCube(const glm::mat4& transformation, Color color, PhysicsManager* physics, SceneManager* m);
     ~LightCube();
+    void notifySceneEvent(SceneEventMessage message);
 
 private:
     PointLight* mLight;
+    glm::vec3 mNightColor;
 };

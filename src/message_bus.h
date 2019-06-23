@@ -20,7 +20,7 @@ enum MType
     GUI_VEC3,
     BODY_PROPERTIES_OUT,
 	BODY_PROPERTIES_IN,
-    SCENE,
+    SCENE_EVENT,
     RENDERSYSTEM,
     PICK_BODY,
 };
@@ -63,6 +63,12 @@ enum class LocationEventId
     MagnetGunPickUp,
     ActivateStairs,
     DeactivateStairs
+};
+
+enum class SceneEventId
+{
+    Night,
+    Day
 };
 
 enum class LocationEventType
@@ -226,6 +232,16 @@ public:
     const LocationEventType eventType;
 };
 
+class SceneEventMessage : public Message
+{
+public:
+    SceneEventMessage(SceneEventId eventId) : eventId(eventId)
+    {
+        this->type = SCENE_EVENT;
+    }
+    const SceneEventId eventId;
+};
+
 class ActivateScreenMessage : public Message
 {
 public:
@@ -263,6 +279,11 @@ public:
     void addLocationEventReceiver(std::function<void(LocationEventMessage)> messageReceiver)
     {
         this->locationEventReceiver.push_back(messageReceiver);
+    }
+
+    void addSceneEventReceiver(std::function<void(SceneEventMessage)> messageReceiver)
+    {
+        this->sceneEventReceiver.push_back(messageReceiver);
     }
 
     void addActivateScreenReceiver(std::function<void(ActivateScreenMessage)> messageReceiver)
@@ -351,6 +372,14 @@ public:
                 return; // TODO: Error
             locationEventMessage = new LocationEventMessage(*locationEventMessage);
             this->locationEventMessages.push(locationEventMessage);
+        }
+        else if (message->getType() == MType::SCENE_EVENT)
+        {
+            SceneEventMessage* m = dynamic_cast<SceneEventMessage*>(message);
+            if (!m)
+                return; // TODO: Error
+            m = new SceneEventMessage(*m);
+            this->sceneEventMessages.push(m);
         }
         else if (message->getType() == MType::M_ACTIVATE_SCREEN)
         {
@@ -452,6 +481,17 @@ public:
             delete m;
         }
 
+        while (!sceneEventMessages.empty())
+        {
+            for (auto iter = sceneEventReceiver.begin(); iter != sceneEventReceiver.end(); iter++)
+            {
+                (*iter)(SceneEventMessage(*sceneEventMessages.front()));
+            }
+            SceneEventMessage* m = sceneEventMessages.front();
+            sceneEventMessages.pop();
+            delete m;
+        }
+
         while (!activateScreenMessages.empty())
         {
             for (auto iter = activateScreenReceiver.begin(); iter != activateScreenReceiver.end(); iter++)
@@ -473,6 +513,7 @@ private:
     std::vector<std::function<void(Message*)>> guiOutReceiver;
     std::vector<std::function<void(PickBodyMessage)>> pickBodyReceiver;
     std::vector<std::function<void(LocationEventMessage)>> locationEventReceiver;
+    std::vector<std::function<void(SceneEventMessage)>> sceneEventReceiver;
     std::vector<std::function<void(ActivateScreenMessage)>> activateScreenReceiver;
     std::queue<GameModeMessage*> gameModeMessages;
     std::queue<KeyMessage*> keyMessages;
@@ -482,5 +523,6 @@ private:
     std::queue<Message*> guiOutMessages;
     std::queue<PickBodyMessage*> pickBodyMessages;
     std::queue<LocationEventMessage*> locationEventMessages;
+    std::queue<SceneEventMessage*> sceneEventMessages;
     std::queue<ActivateScreenMessage*> activateScreenMessages;
 };

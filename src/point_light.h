@@ -19,7 +19,8 @@ public:
     GETSETR(glm::vec3, Specular)
     GETSET(float, Constant)
     GETSET(float, Linear)
-    GETSET(float, Quadratic)
+    GETSET(float, Quadratic) 
+    GETSET(bool, On)
     void setFunc(float q, float l, float c);
 
 private:
@@ -29,6 +30,6 @@ private:
     float mConstant;
     float mLinear;
     float mQuadratic;
-
+    bool mOn = true;
 };
 

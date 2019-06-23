@@ -42,4 +42,5 @@ private:
     Camera* mViewCamera;
     Light* mSun;
     float mSunAngle;
+    bool isNight = false;
 };

@@ -1,5 +1,6 @@
 #include "scnene_manager.h"
 #include "point_light.h"
+#include "message_bus.h"
 #include <algorithm>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -23,7 +24,7 @@ void SceneManager::RenderScene()
 
 }
 
-void SceneManager::addDynamicObject(AbstractNode & node)
+void SceneManager::addDynamicObject(AbstractNode& node)
 {
 
 }
@@ -64,6 +65,19 @@ void SceneManager::setSun(Light * light)
 
 void SceneManager::setSunAngle(float angle) 
 { 
+    if (angle > 3.65 && !isNight)
+    {
+        isNight = true;
+        SceneEventMessage m(SceneEventId::Night);
+        MessageBus::getInstance()->sendMessage(&m);
+    }
+    else if (angle < 3.65 && isNight)
+    {
+        isNight = false;
+        SceneEventMessage m(SceneEventId::Day);
+        MessageBus::getInstance()->sendMessage(&m);
+    }
+
     mSunAngle = angle;
     if (angle > 3.141592653)
     {
@@ -169,17 +183,21 @@ void SceneManager::setLightInShader(glow::UsedProgram& shader)
         shader.setUniform("light.specular", sunSpecular);
     }
     shader.setUniform("viewPos", camPos);
-    shader.setUniform("sizePointLight", (int)mPointLights.size());
+    
     GLint id;
     glGetIntegerv(GL_CURRENT_PROGRAM, &id);
+    
+    int lightCounter = 0;
     for (unsigned int i = 0; i < mPointLights.size(); i++)
     {
+        if (!mPointLights[i]->getOn())
+            continue;
         glm::vec3 lightPos = glm::vec3(mViewCamera->getViewMatrix() * glm::vec4(mPointLights[i]->getPos(), 1));
         glUniform3fv(glGetUniformLocation(id, ("pointLights[" + std::to_string(i) + "].Position").c_str()), 1, &lightPos[0]);
         glUniform3fv(glGetUniformLocation(id, ("pointLights[" + std::to_string(i) + "].Color").c_str()), 1, &(mPointLights[i]->getAmbient())[0]);
         glUniform1f(glGetUniformLocation(id, ("pointLights[" + std::to_string(i) + "].Linear").c_str()), mPointLights[i]->getLinear());
         glUniform1f(glGetUniformLocation(id, ("pointLights[" + std::to_string(i) + "].Quadratic").c_str()), mPointLights[i]->getQuadratic());
-
+        lightCounter++;
         /*shaderLightingPass.setVec3("lights[" + std::to_string(i) + "].Position", lightPositions[i]);
         shaderLightingPass.setVec3("lights[" + std::to_string(i) + "].Color", lightColors[i]);
         // update attenuation parameters and calculate radius
@@ -189,6 +207,7 @@ void SceneManager::setLightInShader(glow::UsedProgram& shader)
         shaderLightingPass.setFloat("lights[" + std::to_string(i) + "].Linear", linear);
         shaderLightingPass.setFloat("lights[" + std::to_string(i) + "].Quadratic", quadratic);*/
     }
+    shader.setUniform("sizePointLight", lightCounter);
 }
 
 void SceneManager::setCamera(Camera * camera)

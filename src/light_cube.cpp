@@ -3,7 +3,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 LightCube::LightCube(const glm::mat4& transformation, Color color, PhysicsManager* physics, SceneManager* m) : 
-    Cube(transformation, color, physics), 
+    Cube(transformation, {0.9, 0.9, 0.9}, physics), 
     mLight(nullptr)
 {
     PointLight* light = new PointLight(glm::translate(glm::mat4(1), glm::vec3(0.0f, 0.0f, 0.0f)), color);
@@ -15,12 +15,33 @@ LightCube::LightCube(const glm::mat4& transformation, Color color, PhysicsManage
     light->setFunc(1.8, 0.7, 1);
     mLight = light;
 
-    mAlpha = 0.0;
+    mAlpha = 1.0;
 
-    mProperty.ambient = 0.9f * glm::vec3(color.red, color.green, color.blue);
+    //mProperty.ambient = 0.9f * glm::vec3(color.red, color.green, color.blue);
+    mNightColor = glm::vec3(color.red, color.green, color.blue);
+    mLight->setOn(false);
+
+    MessageBus::getInstance()->addSceneEventReceiver([=](SceneEventMessage message) { this->notifySceneEvent(message); });
 }
 
 LightCube::~LightCube() 
 {
     this->removeChild(mLight);
+}
+
+void LightCube::notifySceneEvent(SceneEventMessage message) 
+{
+    if (message.eventId == SceneEventId::Night)
+    {
+        setColor(mNightColor);
+        mProperty.ambient = 0.9f * mNightColor;
+        mAlpha = 0.0;
+        mLight->setOn(true);
+    }
+    else if (message.eventId == SceneEventId::Day)
+    {
+        setColor({0.9, 0.9, 0.9});
+        mAlpha = 1.0;
+        mLight->setOn(false);
+    }
 }
