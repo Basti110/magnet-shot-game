@@ -202,8 +202,8 @@ void Game::render(float elapsedSeconds)
                     }
                     else
                     {
-                        glm::vec3 dark1 = glm::vec3(0, 3 / 255., 8 / 255.);
-                        glm::vec3 dark2 = glm::vec3(2 / 255., 7 / 255., 48 / 255.);
+                        glm::vec3 dark1 = glm::vec3(0, 3 / 255., 8 / 255.) * glm::vec3(9 / 255. , 9 / 255., 9 / 255.);
+                        glm::vec3 dark2 = glm::vec3(2 / 255., 7 / 255., 48 / 255.) * glm::vec3(9 / 255. , 9 / 255., 9 / 255.);
                         float sunSetRatio = -0.8 * pow(mSunAngle - 4.712388, 2) + 2;
                         sunSetRatio = glm::max(glm::min(sunSetRatio, 1.f), 0.f);
                         back1 = sunSetRatio * glm::vec3(dark1) + (1 - sunSetRatio) * mSunsetBackground1;
@@ -457,7 +457,7 @@ void Game::initSSOA()
     mTargets.push_back(mGNormal = glow::Texture2D::create(1, 1, GL_RGB16F));
     mGNormal->bind().setFilter(GL_NEAREST, GL_NEAREST);
 
-    mTargets.push_back(mGAmbient = glow::Texture2D::create(1, 1, GL_RGBA));
+    mTargets.push_back(mGAmbient = glow::Texture2D::create(1, 1, GL_RGBA16F));
     mGAmbient->bind().setFilter(GL_NEAREST, GL_NEAREST);
 
     mTargets.push_back(mGDiffuse = glow::Texture2D::create(1, 1, GL_RGB));

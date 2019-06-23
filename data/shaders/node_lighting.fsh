@@ -32,6 +32,7 @@ uniform mat4 shadowTransform;
 uniform float shadowOffset;
 uniform float shadowSmoothness;
 uniform int sizePointLight;
+uniform bool sunShadowOn;
 
 
 void main()
@@ -63,7 +64,7 @@ void main()
     vec3 specular = light.specular * (spec * materialSpecular); 
     
     //viewDir = normalize(viewPos - FragPos);
-    for(int i = 0; i < sizePointLight; ++i)
+    /*for(int i = 0; i < sizePointLight; ++i)
     {
         // diffuse
         vec3 lightDir = normalize(pointLights[i].Position - FragPos);
@@ -80,7 +81,7 @@ void main()
         specularPoint *= attenuation;
         diffuse += diffusePoint;
         specular += specularPoint;     
-    }
+    }*/
 
     // shadows
     vec4 shadowPos = shadowTransform * vec4(FragPos, 1.0);
@@ -107,12 +108,15 @@ void main()
         vec2( 0.056197787889993,  0.4244375483310844)
     );
 
-    float shadowFactor = 0;
-    for (int i = 0; i < 16; i++){
-        vec2 noise = poisson[i] * shadowSmoothness;
-        float shadowDepth = texture(shadowMap, shadowPos.xy + noise).x;
-        if (shadowPos.z <= shadowDepth + shadowOffset) {
-            shadowFactor += 1/16.0;
+    float shadowFactor = 1;
+    if(sunShadowOn) {
+        shadowFactor = 0;
+        for (int i = 0; i < 16; i++){
+            vec2 noise = poisson[i] * shadowSmoothness;
+            float shadowDepth = texture(shadowMap, shadowPos.xy + noise).x;
+            if (shadowPos.z <= shadowDepth + shadowOffset) {
+                shadowFactor += 1/16.0;
+            }
         }
     }
     

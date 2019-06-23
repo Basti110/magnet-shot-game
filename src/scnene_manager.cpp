@@ -157,7 +157,7 @@ void SceneManager::setLightInShader(glow::UsedProgram& shader)
         backAmbient = mSun->getAmbient();
         backDiffuse = mSun->getDiffuse();
         backSpecular = mSun->getSpecular();
-
+        shader.setUniform("sunShadowOn", true);
     }
     else
     {
@@ -166,6 +166,7 @@ void SceneManager::setLightInShader(glow::UsedProgram& shader)
         backAmbient = glm::vec3(9 / 255., 9 / 255., 9 / 255.);
         backDiffuse = glm::vec3(1 / 255., 1 / 255., 1 / 255.);
         backSpecular = glm::vec3(0., 0., 0.);
+        shader.setUniform("sunShadowOn", false);
     }
 
     sunAmbient = sunSetRatio * backAmbient + (1 - sunSetRatio) * sunAmbient;
