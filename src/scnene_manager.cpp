@@ -1,6 +1,8 @@
 #include "scnene_manager.h"
+#include "point_light.h"
 #include <algorithm>
 #include <glm/gtc/matrix_transform.hpp>
+
 
 SceneManager::SceneManager()
 {
@@ -24,6 +26,11 @@ void SceneManager::RenderScene()
 void SceneManager::addDynamicObject(AbstractNode & node)
 {
 
+}
+
+void SceneManager::addPointLight(PointLight* light) 
+{
+    mPointLights.push_back(light);
 }
 
 Node* SceneManager::getSceneRoot()
@@ -115,7 +122,7 @@ void SceneManager::render(glow::UsedProgram& shader, glm::mat4& projection, glm:
     mRoot->render(shader, projection, view, shadowPass);
 }
 
-void SceneManager::setLight(glow::UsedProgram& shader) 
+void SceneManager::setLightInShader(glow::UsedProgram& shader)
 {
     glm::vec3 sunAmbient;
     glm::vec3 sunDiffuse;
@@ -151,7 +158,7 @@ void SceneManager::setLight(glow::UsedProgram& shader)
     sunDiffuse = sunSetRatio * backDiffuse + (1 - sunSetRatio) * sunDiffuse;
     sunSpecular = sunSetRatio * backSpecular + (1 - sunSetRatio) * sunSpecular;
     
-        glm::vec3 camPos = this->getCamera()->getPos();
+    glm::vec3 camPos = this->getCamera()->getPos();
     if (mSun)
     {
         glm::vec3 lightPos;
@@ -162,6 +169,26 @@ void SceneManager::setLight(glow::UsedProgram& shader)
         shader.setUniform("light.specular", sunSpecular);
     }
     shader.setUniform("viewPos", camPos);
+    shader.setUniform("sizePointLight", (int)mPointLights.size());
+    GLint id;
+    glGetIntegerv(GL_CURRENT_PROGRAM, &id);
+    for (unsigned int i = 0; i < mPointLights.size(); i++)
+    {
+        glm::vec3 lightPos = glm::vec3(mViewCamera->getViewMatrix() * glm::vec4(mPointLights[i]->getPos(), 1));
+        glUniform3fv(glGetUniformLocation(id, ("pointLights[" + std::to_string(i) + "].Position").c_str()), 1, &lightPos[0]);
+        glUniform3fv(glGetUniformLocation(id, ("pointLights[" + std::to_string(i) + "].Color").c_str()), 1, &(mPointLights[i]->getAmbient())[0]);
+        glUniform1f(glGetUniformLocation(id, ("pointLights[" + std::to_string(i) + "].Linear").c_str()), mPointLights[i]->getLinear());
+        glUniform1f(glGetUniformLocation(id, ("pointLights[" + std::to_string(i) + "].Quadratic").c_str()), mPointLights[i]->getQuadratic());
+
+        /*shaderLightingPass.setVec3("lights[" + std::to_string(i) + "].Position", lightPositions[i]);
+        shaderLightingPass.setVec3("lights[" + std::to_string(i) + "].Color", lightColors[i]);
+        // update attenuation parameters and calculate radius
+        const float constant = 1.0; // note that we don't send this to the shader, we assume it is always 1.0 (in our case)
+        const float linear = 0.7;
+        const float quadratic = 1.8;
+        shaderLightingPass.setFloat("lights[" + std::to_string(i) + "].Linear", linear);
+        shaderLightingPass.setFloat("lights[" + std::to_string(i) + "].Quadratic", quadratic);*/
+    }
 }
 
 void SceneManager::setCamera(Camera * camera)

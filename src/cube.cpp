@@ -75,7 +75,7 @@ void Cube::render(glow::UsedProgram& shader, glm::mat4& projection, glm::mat4& v
         shader.setUniform("material.shininess", (int)mProperty.shininess);
         shader.setUniform("model", mGlobalTransformation);
         shader.setUniform("colorRatio", mColorRatio == 0.0f);
-        shader.setUniform("uAlpha", 1.0f);
+        shader.setUniform("uAlpha", mAlpha);
         shader.setUniform("uUseVertexColors", false);
         shader.setUniform("uUseTexture", false);
         glBindVertexArray(this->VAO);
@@ -92,7 +92,7 @@ void Cube::render(glow::UsedProgram& shader, glm::mat4& projection, glm::mat4& v
 void Cube::update(float elapsedSeconds) 
 {
     PhysicsNode::update(elapsedSeconds);
-    mGlobalTransformation = glm::scale(mGlobalTransformation, mScale);
+    this->setGlobalTransformation(glm::scale(mGlobalTransformation, mScale));
 }
 
 void Cube::setColorRatio(float ratio)

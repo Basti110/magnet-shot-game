@@ -5,6 +5,7 @@
 #include "light.h"
 #include "node.h"
 // class Camera;
+class PointLight;
 
 class SceneManager
 {
@@ -13,8 +14,9 @@ public:
     ~SceneManager();
     void RenderScene();
     void addDynamicObject(AbstractNode& node);
+    void addPointLight(PointLight* light);
     void render(glow::UsedProgram& shader, glm::mat4& projection, glm::mat4& view, bool shadowPass);
-    void setLight(glow::UsedProgram& shader);
+    void setLightInShader(glow::UsedProgram& shader);
     void appendNode(AbstractNode* node);
     void removeNode(std::function<bool(AbstractNode*)> predicate);
     void update(float elapsedSeconds);
@@ -23,7 +25,7 @@ public:
     glm::vec3 getSunPos();
 
         // Setter
-        void setCamera(Camera* camera);
+    void setCamera(Camera* camera);
     void setSceneRoot(Node* node);
     void setSun(Light* light);
 
@@ -34,6 +36,7 @@ public:
 
 private:
     // std::vector<AbstractNode&> nodes;
+    std::vector<PointLight*> mPointLights;
     std::vector<AbstractNode*> mDynamicObjects;
     Node* mRoot;
     Camera* mViewCamera;

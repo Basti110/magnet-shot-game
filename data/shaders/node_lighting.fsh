@@ -9,6 +9,13 @@ struct Light {
     vec3 specular;
 };
 
+struct PointLight {
+    vec3 Position;
+    vec3 Color;
+    float Linear;
+    float Quadratic;
+};
+
 uniform sampler2D gPosition;
 uniform sampler2D gNormal;
 uniform sampler2D gAmbient;
@@ -19,10 +26,12 @@ uniform sampler2D ssao;
 
 uniform vec3 viewPos; 
 uniform Light light;
+uniform PointLight pointLights[5];
 uniform sampler2D shadowMap;
 uniform mat4 shadowTransform;
 uniform float shadowOffset;
 uniform float shadowSmoothness;
+uniform int sizePointLight;
 
 
 void main()
@@ -52,6 +61,26 @@ void main()
     vec3 reflectDir = reflect(-lightDir, norm);  
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
     vec3 specular = light.specular * (spec * materialSpecular); 
+    
+    //viewDir = normalize(viewPos - FragPos);
+    for(int i = 0; i < sizePointLight; ++i)
+    {
+        // diffuse
+        vec3 lightDir = normalize(pointLights[i].Position - FragPos);
+        vec3 diffusePoint = max(dot(Normal, lightDir), 0.0) * materialDiffuse * pointLights[i].Color;
+        // specular
+        
+        vec3 halfwayDir = normalize(lightDir + viewDir);  
+        float spec = pow(max(dot(Normal, halfwayDir), 0.0), 16.0);
+        vec3 specularPoint = pointLights[i].Color * spec * materialSpecular;
+        // attenuation
+        float distance = length(pointLights[i].Position - FragPos);
+        float attenuation = 1.0 / (1.0 + pointLights[i].Linear * distance + pointLights[i].Quadratic * distance * distance);
+        diffusePoint *= attenuation;
+        specularPoint *= attenuation;
+        diffuse += diffusePoint;
+        specular += specularPoint;     
+    }
 
     // shadows
     vec4 shadowPos = shadowTransform * vec4(FragPos, 1.0);
@@ -87,9 +116,14 @@ void main()
         }
     }
     
-    if (alpha < 1)
-        shadowFactor = 1;
+    vec3 result;
+    if (alpha < 1) {
+        result = materialAmbient * occlusion + (diff * materialDiffuse);
+    }
+    else {
+        result = (ambient + (0.5+0.5*shadowFactor) * diffuse + shadowFactor * specular);
+    }
     //vec3 result = vec3(.95) * texture(ssao, TexCoords).r;
-    vec3 result = (ambient + (0.5+0.5*shadowFactor) * diffuse + shadowFactor * specular);
+    //result = (ambient + (0.5+0.5*shadowFactor) * diffuse + shadowFactor * specular);
     FragColor = vec4(result, 1);
 }

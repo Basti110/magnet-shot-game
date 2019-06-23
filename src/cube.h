@@ -21,8 +21,9 @@ public:
     glm::vec3 getColor();
     const RigidBodyInfo& getRigidBodyInfo();
 
-private:
+protected:
     void setVertices();
+    float mAlpha = 1.0f;
 
     static bool isInit;
     static unsigned int VBO;

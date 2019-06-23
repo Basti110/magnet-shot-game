@@ -21,6 +21,7 @@
 #include "solar_panel.h"
 #include "stairs.h"
 #include "wind_turbine.h"
+#include "light_cube.h"
 
 // glow OpenGL wrapper
 #include <glow/common/log.hh>
@@ -276,7 +277,7 @@ void Game::render(float elapsedSeconds)
                 shader.setTexture("gDiffuse", mGDiffuse);
                 shader.setTexture("gSpecular", mGSpecular);
                 shader.setTexture("ssao", mSSAO_Color);
-                mScene->setLight(shader);
+                mScene->setLightInShader(shader);
                 mMeshQuad->bind().draw();
             }
         }
@@ -609,17 +610,30 @@ void Game::initLevel()
     RigidBodyInfo info;
     info.mass = 5.0;
     info.friction = 0.5;
+    std::vector<Color> colors;
+    colors.push_back({1, 1, 0});
+    colors.push_back({0, 1, 0});
+    colors.push_back({0, 0, 1});
+    colors.push_back({0, 1, 1});
+
     for (int i = 0; i < 4; i++)
     {
         glm::mat4 trans = glm::translate(glm::mat4(1.0), glm::vec3(1, i * 5 + 5, -7));
-        Cube* newCube = new Cube(trans, Color{1.0f, 1.0f, 1.0f}, mStartManager->getPhysicsManager());
-        mScene->appendNode(newCube);
-        newCube->createBuffer();
-        newCube->addPhysics(glm::vec3(1.0f), info);
+        LightCube* cubeLight = new LightCube(trans, colors[i], mStartManager->getPhysicsManager(), mScene);
+        mScene->appendNode(cubeLight);
+        cubeLight->createBuffer();
+        cubeLight->addPhysics(glm::vec3(1.0f), info);
     }
 
     // add stairs
     glm::mat4 stairsTransform = glm::translate(glm::mat4(1), glm::vec3(-3.45f, 2.866667f, -34.6f));
     Stairs* stairs = new Stairs(stairsTransform, mPhysics, messageBus);
     root->addChild(stairs);
+
+
+    glm::mat4 lightCubeTransform = glm::translate(glm::mat4(1), glm::vec3(0, 5, -10));
+    LightCube* cubeLight = new LightCube(lightCubeTransform, {1, 0, 0}, mPhysics, mScene);
+    cubeLight->addPhysics(glm::vec3(1.0f), info);
+    root->addChild(cubeLight);
+
 }

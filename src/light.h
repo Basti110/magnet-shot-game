@@ -18,7 +18,7 @@ public:
     glm::vec3 getDiffuse();
     glm::vec3 getSpecular();
 
-private:
+protected:
     static bool mIsInit;
     static glow::SharedProgram mShader;
     static unsigned int VBO;
