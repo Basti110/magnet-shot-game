@@ -173,10 +173,11 @@ void Game::render(float elapsedSeconds)
         auto fb = mFramebuffer->bind();
 
         glm::mat4 projection = mScene->getCamera()->getProjectionMatrix();
+        GLOW_SCOPED(clearColor, glm::vec4(0.5, 0.5, 0.5, 1));
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         if (!mShowPhysicsDebug)
         {
-            GLOW_SCOPED(clearColor, glm::vec4(0.5, 0.5, 0.5, 1));
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 
             // Phase 1 : render scene's geometry data into Gbuffer
             // 5 Texture Buffer for each pixel: gPosition, gNormal, gAmbient, gDiffuse, gSpecular

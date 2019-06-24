@@ -14,6 +14,7 @@ struct PointLight {
     vec3 Color;
     float Linear;
     float Quadratic;
+    float Radius;
 };
 
 uniform sampler2D gPosition;
@@ -63,24 +64,36 @@ void main()
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
     vec3 specular = light.specular * (spec * materialSpecular); 
     
+    //float constant = 1;
+    //float linear = 0.7;
+    //float quadratic = 1.8;
     //viewDir = normalize(viewPos - FragPos);
     for(int i = 0; i < sizePointLight; ++i)
     {
-        // diffuse
-        vec3 lightDir = normalize(pointLights[i].Position - FragPos);
-        vec3 diffusePoint = max(dot(Normal, lightDir), 0.0) * materialDiffuse * pointLights[i].Color;
-        // specular
-        
-        vec3 halfwayDir = normalize(lightDir + viewDir);  
-        float spec = pow(max(dot(Normal, halfwayDir), 0.0), 16.0);
-        vec3 specularPoint = pointLights[i].Color * spec * materialSpecular;
-        // attenuation
+        //float lightMax = max(max(pointLights[i].Color.r, pointLights[i].Color.g), pointLights[i].Color.b);
+        //float mRadius = (-linear + sqrt(linear * linear - 4 * quadratic * (constant - (256.0 / 5.0) * lightMax))) / (2 * quadratic);
         float distance = length(pointLights[i].Position - FragPos);
-        float attenuation = 1.0 / (1.0 + pointLights[i].Linear * distance + pointLights[i].Quadratic * distance * distance);
-        diffusePoint *= attenuation;
-        specularPoint *= attenuation;
-        diffuse += diffusePoint;
-        specular += specularPoint;     
+        
+        //if(distance < 5 * mRadius)
+        if(distance < 5 * pointLights[i].Radius)
+        {
+            // diffuse
+            vec3 lightDir = normalize(pointLights[i].Position - FragPos);
+            vec3 diffusePoint = max(dot(Normal, lightDir), 0.0) * materialDiffuse * pointLights[i].Color;
+            // specular
+            
+            vec3 halfwayDir = normalize(lightDir + viewDir);  
+            float spec = pow(max(dot(Normal, halfwayDir), 0.0), 16.0);
+            vec3 specularPoint = pointLights[i].Color * spec * materialSpecular;
+            // attenuation
+            
+            float attenuation = 1.0 / (1.0 + pointLights[i].Linear * distance + pointLights[i].Quadratic * distance * distance);
+            //float attenuation = 1.0 / (constant + linear * distance + quadratic * distance * distance);
+            diffusePoint *= attenuation;
+            specularPoint *= attenuation;
+            diffuse += diffusePoint;
+            specular += specularPoint; 
+        }    
     }
 
     // shadows
@@ -122,7 +135,7 @@ void main()
     
     vec3 result;
     if (alpha < 1) {
-        result = materialAmbient * occlusion + (diff * materialDiffuse);
+        result = materialAmbient * occlusion + (diff * materialDiffuse) + specular;
     }
     else {
         result = (ambient + (0.5+0.5*shadowFactor) * diffuse + shadowFactor * specular);

@@ -30,6 +30,7 @@ public:
             GROUP_NONE,
             0.0f
         );
+        mTop->setAlpha(0.0);
         mTop->setColorRatio(0.0);
         mTop->setColor(glm::vec3(0));
         mTop->setShininess(200);
