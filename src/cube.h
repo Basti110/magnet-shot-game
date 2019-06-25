@@ -34,4 +34,5 @@ protected:
     std::vector<float> mVertices;
     glm::vec3 mScale;
     RigidBodyInfo mRigidBodyinfo;
+    glm::mat4 mSpawnPosition;
 };

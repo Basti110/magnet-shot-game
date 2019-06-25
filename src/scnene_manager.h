@@ -4,6 +4,7 @@
 #include "camera.h"
 #include "light.h"
 #include "node.h"
+#include "message_bus.h"
 // class Camera;
 class PointLight;
 
@@ -21,15 +22,19 @@ public:
     void removeNode(std::function<bool(AbstractNode*)> predicate);
     void update(float elapsedSeconds);
     void setSunAngle(float angle);
-    void setSunColor(glm::vec3 sunColor);
+    //void setSunColor(glm::vec3 sunColor);
     glm::vec3 getSunPos();
 
         // Setter
     void setCamera(Camera* camera);
+    void notifyLocationEvent(LocationEventMessage message);
     void setSceneRoot(Node* node);
     void setSun(Light* light);
+    void setSunColor(glm::vec3 v) { mSunColor = v; }
 
     // Getter
+    glm::vec3 getSunColor() { return mSunColor; }
+    float getSunAngle() {return mSunAngle;}
     Node* getSceneRoot();
     Camera* getCamera();
     Light* getSun();
@@ -41,6 +46,8 @@ private:
     Node* mRoot;
     Camera* mViewCamera;
     Light* mSun;
+    glm::vec3 mSunColor;
     float mSunAngle;
     bool isNight = false;
+    bool mToNight = false;
 };

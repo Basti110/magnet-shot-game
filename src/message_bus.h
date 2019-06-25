@@ -62,7 +62,8 @@ enum class LocationEventId
     GameOver,
     MagnetGunPickUp,
     ActivateStairs,
-    DeactivateStairs
+    DeactivateStairs,
+    Island2
 };
 
 enum class SceneEventId

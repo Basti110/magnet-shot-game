@@ -112,6 +112,7 @@ void Game::init()
         // register location events
         auto locationEventManager = mStartManager->getLocationEventManager();
         locationEventManager->registerEvent(glm::vec3(2, 0, 1), glm::vec3(3, 5, 2), LocationEventId::MagnetGunPickUp);
+        locationEventManager->registerEvent(glm::vec3(-23.6, 0, -17.8), glm::vec3(-18.6, 5, -14.8), LocationEventId::Island2);
         locationEventManager->registerEvent(glm::vec3(-6, 4, -39), glm::vec3(-1, 7, -35), LocationEventId::ActivateStairs);
         locationEventManager->registerEvent(glm::vec3(-6, 0, -38), glm::vec3(-1, 7, -23), LocationEventId::DeactivateStairs);
     }
@@ -191,12 +192,12 @@ void Game::render(float elapsedSeconds)
                 GLOW_SCOPED(enable, GL_DEPTH_TEST);
                 {           
                     auto shaderSkybox = mShaderSkybox->use();
-
+                    float sunAngle = mScene->getSunAngle();
                     glm::vec3 back1;
                     glm::vec3 back2;
-                    if (mSunAngle < 3.141592653)
+                    if (sunAngle < 3.141592653)
                     {
-                        float sunSetRatio = -0.8 * pow(mSunAngle - 1.5707963, 2) + 2;
+                        float sunSetRatio = -0.8 * pow(sunAngle - 1.5707963, 2) + 2;
                         sunSetRatio = glm::max(glm::min(sunSetRatio, 1.f), 0.f);
                         back1 = sunSetRatio * glm::vec3(mBackgroundColor1) + (1 - sunSetRatio) * mSunsetBackground1;
                         back2 = sunSetRatio * glm::vec3(mBackgroundColor2) + (1 - sunSetRatio) * mSunsetBackground2;
@@ -205,17 +206,21 @@ void Game::render(float elapsedSeconds)
                     {
                         glm::vec3 dark1 = glm::vec3(0, 3 / 255., 8 / 255.) * glm::vec3(9 / 255. , 9 / 255., 9 / 255.);
                         glm::vec3 dark2 = glm::vec3(2 / 255., 7 / 255., 48 / 255.) * glm::vec3(9 / 255. , 9 / 255., 9 / 255.);
-                        float sunSetRatio = -0.8 * pow(mSunAngle - 4.712388, 2) + 2;
+                        float sunSetRatio = -0.8 * pow(sunAngle - 4.712388, 2) + 2;
                         sunSetRatio = glm::max(glm::min(sunSetRatio, 1.f), 0.f);
                         back1 = sunSetRatio * glm::vec3(dark1) + (1 - sunSetRatio) * mSunsetBackground1;
                         back2 = sunSetRatio * glm::vec3(dark2) + (1 - sunSetRatio) * mSunsetBackground2;
                     }
 
+                    float angle =  mScene->getSunAngle();
+                    if (angle > 3.141592653)
+                        angle -= 3.141592653;
 
                     shaderSkybox.setUniform("uTransform", projection * view); // * glm::mat4(glm::mat3(view)));
                     shaderSkybox.setUniform("uColor1", back1);
                     shaderSkybox.setUniform("uColor2", back2);
-                    
+                    shaderSkybox.setUniform("sunAngle", angle);
+                    shaderSkybox.setUniform("sunColor", mScene->getSunColor());
                     mSkybox->bind().draw();
                 }
 
@@ -378,7 +383,7 @@ void Game::notifyGuiInput(Message* message)
         {
             auto shader = mShaderSkybox->use();
             mScene->getSun()->setRenderColor(m->getValue());       
-            mSunColor = m->getValue();
+            mScene->setSunColor(m->getValue());
         }
         else if (m->getSetting() == GuiSettings::SUNSET_BACKGROUND1)
         {
@@ -405,28 +410,9 @@ void Game::notifyGuiInput(Message* message)
         }
         else if (m->getSetting() == GuiSettings::SUN_ANGLE)
         {
-            float angle;
-            float sunSetRatio = -0.8 * pow(m->getValue() - 1.5707963, 2) + 2;
-            sunSetRatio = glm::max(glm::min(sunSetRatio, 1.0f), 0.0f);
-            glm::vec3 color;
+            mScene->setSunAngle(m->getValue());        
+            //float sunAngle = m->getValue();
 
-            if (m->getValue() > 3.141592653)
-            {
-                angle = m->getValue() - 3.141592653;
-                color = glm::vec3(1);
-            }
-            else
-            {
-                angle = m->getValue();
-                color = sunSetRatio * glm::vec3(1.0) + (1 - sunSetRatio) * mSunColor;
-            }
-
-            mScene->getSun()->setRenderColor(color);
-            mScene->setSunAngle(m->getValue());
-            auto shader = mShaderSkybox->use();
-            shader.setUniform("sunColor", color);
-            shader.setUniform("sunAngle", angle);
-            mSunAngle = m->getValue();
         }
     }
 }

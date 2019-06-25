@@ -17,7 +17,7 @@ Cube::Cube(const glm::mat4& transformation, Color color, PhysicsManager* physics
 {
     mLocalTransformation = transformation;
     mGlobalTransformation = transformation;
-
+    mSpawnPosition = transformation;
     mIsVisible = true;
     mColorRatio = 1;
     setColor({color.red, color.green, color.blue});
@@ -92,6 +92,12 @@ void Cube::render(glow::UsedProgram& shader, glm::mat4& projection, glm::mat4& v
 void Cube::update(float elapsedSeconds) 
 {
     PhysicsNode::update(elapsedSeconds);
+
+    if (mGlobalTransformation[3].y < -10)
+    {
+        mGlobalTransformation = mSpawnPosition;
+        mRigidBody->setCenterOfMassTransform(to_bullet(mSpawnPosition));
+    }
     this->setGlobalTransformation(glm::scale(mGlobalTransformation, mScale));
 }
 

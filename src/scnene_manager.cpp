@@ -1,6 +1,5 @@
 #include "scnene_manager.h"
 #include "point_light.h"
-#include "message_bus.h"
 #include <algorithm>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -11,6 +10,10 @@ SceneManager::SceneManager()
 	mRoot = new Node();
     mSun = nullptr;
     mViewCamera = new Camera();
+
+    MessageBus::getInstance()->addLocationEventReceiver([=](LocationEventMessage message) { 
+        this->notifyLocationEvent(message); 
+    });
 }
 
 
@@ -65,6 +68,21 @@ void SceneManager::setSun(Light * light)
 
 void SceneManager::setSunAngle(float angle) 
 { 
+    float sunSetRatio = -0.8 * pow(angle - 1.5707963, 2) + 2;
+    sunSetRatio = glm::max(glm::min(sunSetRatio, 1.0f), 0.0f);
+    float a = angle;
+    if (angle > 3.141592653)
+    {
+        a = angle - 3.141592653;
+        mSunColor = glm::vec3(1);
+    }
+    else
+    {
+        a = angle;
+        mSunColor = sunSetRatio * glm::vec3(1.0) + (1 - sunSetRatio) * mSunColor;
+    }
+    getSun()->setRenderColor(mSunColor);
+
     if (angle > 3.65 && !isNight)
     {
         isNight = true;
@@ -121,6 +139,22 @@ void SceneManager::update(float elapsedSeconds)
         mDynamicObjects[i]->update(elapsedSeconds);
     }
     mRoot->update(elapsedSeconds);
+
+    if (!mToNight)
+        return;
+
+    if (mSunAngle > 4) 
+    {
+        setSunAngle(mSunAngle - 0.2 * elapsedSeconds);
+        if (mSunAngle <= 4)
+            mToNight = false;
+    }
+    else
+    {
+        setSunAngle(mSunAngle + 0.2 * elapsedSeconds);
+        if (mSunAngle >= 4)
+            mToNight = false;
+    }
 }
 
 void SceneManager::render(glow::UsedProgram& shader, glm::mat4& projection, glm::mat4& view, bool shadowPass)
@@ -184,6 +218,7 @@ void SceneManager::setLightInShader(glow::UsedProgram& shader)
         shader.setUniform("light.specular", sunSpecular);
     }
     shader.setUniform("viewPos", camPos);
+
     
     GLint id;
     glGetIntegerv(GL_CURRENT_PROGRAM, &id);
@@ -218,3 +253,10 @@ void SceneManager::setCamera(Camera * camera)
     mViewCamera = camera;
 }
 
+void SceneManager::notifyLocationEvent(LocationEventMessage message)
+{
+    if (message.eventId == LocationEventId::Island2 && message.eventType == LocationEventType::Enter)
+    {
+        mToNight = true;
+    }
+}
