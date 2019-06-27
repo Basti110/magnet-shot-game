@@ -223,15 +223,23 @@ void Game::render(float elapsedSeconds)
                     shaderSkybox.setUniform("sunColor", mScene->getSunColor());
                     mSkybox->bind().draw();
                 }
+                
 
+                
                 GLOW_SCOPED(enable, GL_CULL_FACE);
                 GLOW_SCOPED(cullFace, GL_BACK);
+
+                if (mDebugLine)
+                    GLOW_SCOPED(polygonMode, GL_LINE);
+                else
+                    GLOW_SCOPED(polygonMode, GL_FILL);
 
                 auto shader = mShaderGeometry->use();
                 shader.setUniform("projection", projection);
                 shader.setUniform("view", view);
                 mScene->render(shader, projection, view, false);
-                GLOW_SCOPED(polygonMode, GL_FILL);
+                
+                //GLOW_SCOPED(polygonMode, GL_FILL);
             }
 
             // Phase 2 : Generate SSAO texture from gPosition
@@ -430,6 +438,11 @@ void Game::notifyKeyInput(KeyMessage message)
         {
             mSSOA_On = mSSOA_On ? false : true;
         }
+
+        if (message.getInput() == GLFW_KEY_F8)
+        {
+            mDebugLine = mDebugLine ? false : true;
+        }
     }
 }
 
@@ -524,8 +537,9 @@ void Game::initLevel()
         const glm::vec3 position(1.34631f + i * 1.525f, 0.0f, -18.5735f);
         const glm::mat4 transform = glm::translate(glm::mat4(1), position);
         root->addChild(new Screen(i, transform, mPhysics, messageBus));
-        root->addChild(new Cable(i, mPhysics, messageBus));
+        
     }
+    root->addChild(new Cable(1, mPhysics, messageBus));
 
     // add left bridge
     glm::mat4 bridgeTransform = glm::translate(glm::mat4(1), glm::vec3(-26.0f, -0.75f, -16.0f));

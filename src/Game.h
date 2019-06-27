@@ -30,6 +30,7 @@ private:
     bool mShowPostProcess = false;
     bool mShowPhysicsDebug = false;
     float mBounceF = 0;
+    bool mDebugLine = false;
     Starter* mStartManager;
     SceneManager* mScene;
     PhysicsManager* mPhysics;

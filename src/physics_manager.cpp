@@ -1,6 +1,8 @@
 #include "physics_manager.h"
 #include "debug_drawer.h"
 #include <btBulletDynamicsCommon.h> // bullet physics
+#include <BulletSoftBody/btSoftBody.h>
+#include <BulletSoftBody/btSoftRigidDynamicsWorld.h>
 #include "BulletCollision/NarrowPhaseCollision/btRaycastCallback.h"
 #include "bullet_helper.hh"
 
@@ -24,6 +26,26 @@ PhysicsManager::PhysicsManager()
     mBulletWorld->setGravity(btVector3(0, -10, 0)); // set initial gravity
     mDebugDrawer = new DebugDrawer();
     mBulletWorld->setDebugDrawer(mDebugDrawer);
+
+    mSoftBodyWorldInfo = new btSoftBodyWorldInfo();
+    mSoftBodyWorldInfo->m_dispatcher = mBulletCollisionDispatcher;
+
+    btVector3 worldAabbMin(-1000, -1000, -1000);
+    btVector3 worldAabbMax(1000, 1000, 1000);
+    btBroadphaseInterface* bP = new btAxisSweep3(worldAabbMin, worldAabbMax, 32766);
+
+    mBulletSoftworld = new btSoftRigidDynamicsWorld(mBulletCollisionDispatcher, bP, mBulletSolver, 0);
+    mBulletSoftworld->getDispatchInfo().m_enableSPU = true;
+
+
+    mSoftBodyWorldInfo->m_broadphase = bP;
+    mSoftBodyWorldInfo->m_gravity.setValue(0, -10, 0);
+    mSoftBodyWorldInfo->m_sparsesdf.Initialize();
+    mSoftBodyWorldInfo->air_density = (btScalar)1.2;
+    mSoftBodyWorldInfo->water_density = 0;
+    mSoftBodyWorldInfo->water_offset = 0;
+    mSoftBodyWorldInfo->water_normal = btVector3(0, 0, 0);
+    mSoftBodyWorldInfo->m_gravity.setValue(0, -10, 0);
 }
 
 PhysicsManager::~PhysicsManager()
@@ -74,6 +96,7 @@ void PhysicsManager::update(float elapsedSeconds)
     }
 
     mBulletWorld->stepSimulation(elapsedSeconds, 10);
+    mBulletSoftworld->stepSimulation(elapsedSeconds, 10);
 }
 
 int PhysicsManager::addPlane(glm::vec3 normal, float planeConstant)
@@ -156,6 +179,35 @@ void PhysicsManager::deleteId(int id)
 
 }
 
+void PhysicsManager::drawSoftBody(btSoftBody* psb)
+{
+    const btScalar scl = (btScalar)0.1;
+    const btScalar nscl = scl * 5;
+    const btVector3 lcolor = btVector3(0, 0, 0);
+    const btVector3 ncolor = btVector3(1, 1, 1);
+    const btVector3 ccolor = btVector3(1, 0, 0);
+    int i, j, nj;
+
+
+    for (i = 0; i < psb->m_nodes.size(); ++i)
+    {
+        const btSoftBody::Node& n = psb->m_nodes[i];
+        if (0 == (n.m_material->m_flags & btSoftBody::fMaterial::DebugDraw))
+            continue;
+        mDebugDrawer->drawLine(n.m_x - btVector3(scl, 0, 0), n.m_x + btVector3(scl, 0, 0), btVector3(1, 0, 0));
+        mDebugDrawer->drawLine(n.m_x - btVector3(0, scl, 0), n.m_x + btVector3(0, scl, 0), btVector3(0, 1, 0));
+        mDebugDrawer->drawLine(n.m_x - btVector3(0, 0, scl), n.m_x + btVector3(0, 0, scl), btVector3(0, 0, 1));
+    }
+
+    for (i = 0; i < psb->m_links.size(); ++i)
+    {
+        const btSoftBody::Link& l = psb->m_links[i];
+        if (0 == (l.m_material->m_flags & btSoftBody::fMaterial::DebugDraw))
+            continue;
+        mDebugDrawer->drawLine(l.m_n[0]->m_x, l.m_n[1]->m_x, lcolor);
+    }
+}
+
 void PhysicsManager::renderDebug(glm::mat4& projection, glm::mat4& view, float updateRate)
 {
     bool laodNew = (glfwGetTime() - mLastPhysicsUpdate) > updateRate;
@@ -163,6 +215,11 @@ void PhysicsManager::renderDebug(glm::mat4& projection, glm::mat4& view, float u
     {
         mDebugDrawer->resetLines();
         mBulletWorld->debugDrawWorld();
+        for (int i = 0; i < mBulletSoftworld->getSoftBodyArray().size(); i++)
+        {
+            btSoftBody* psb = (btSoftBody*)mBulletSoftworld->getSoftBodyArray()[i];
+            drawSoftBody(psb);
+        }
         mLastPhysicsUpdate = glfwGetTime();
     }       
     mDebugDrawer->draw(projection, view, laodNew);

@@ -10,9 +10,12 @@ class btBroadphaseInterface;
 class btDefaultCollisionConfiguration;
 class btCollisionDispatcher;
 class btDiscreteDynamicsWorld;
+class btSoftRigidDynamicsWorld;
 class btSequentialImpulseConstraintSolver;
 class btTypedConstraint;
 class DebugDrawer;
+class btSoftBodyWorldInfo;
+class btSoftBody;
 
 
 enum CollisionGroup
@@ -44,6 +47,7 @@ public:
     void addMagnet(btRigidBody* body, bool red);
     void clearMagnets();
     void deleteId(int id);
+    void drawSoftBody(btSoftBody* psb);
     void renderDebug(glm::mat4& projection, glm::mat4& view, float updateRate);
 
     btDiscreteDynamicsWorld* getDynamicsWorld();
@@ -58,16 +62,22 @@ public:
     int addRigidBody(btRigidBody* body, short group = GROUP_NONE, short mask = GROUP_NONE);
     bool getTransformation(int idx, glm::mat4& transform);
     btRigidBody* getRigidBody(int id);
+    btSoftBodyWorldInfo* getSoftWorldInfo() { return mSoftBodyWorldInfo; }
+    btSoftRigidDynamicsWorld* getSoftWorld() { return mBulletSoftworld; }
 
 private:
+    //void drawSoftBody(btSoftBody* psb);
+
     btBroadphaseInterface* mBulletBroadphase = nullptr;
     btDefaultCollisionConfiguration* mBulletCollisionConfig = nullptr;
     btCollisionDispatcher* mBulletCollisionDispatcher = nullptr;
     btSequentialImpulseConstraintSolver* mBulletSolver = nullptr;
     btDiscreteDynamicsWorld* mBulletWorld = nullptr;
     btDiscreteDynamicsWorld* mBulletCoordinateAxes = nullptr;
+    btSoftRigidDynamicsWorld* mBulletSoftworld = nullptr;
+    btSoftBodyWorldInfo* mSoftBodyWorldInfo;
     DebugDrawer* mDebugDrawer = nullptr;
-
+    
     std::vector<btRigidBody*> mRigidBodies;
     std::vector<btRigidBody*> mRedMagnets;
     std::vector<btRigidBody*> mBlueMagnets;

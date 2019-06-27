@@ -170,7 +170,7 @@ void InteractionController::notifyKeyInput(KeyMessage message)
         if (message.getInput() == GLFW_KEY_R)
             cam->resetPosition();
 
-        if (message.getInput() == GLFW_KEY_F8)
+        /*if (message.getInput() == GLFW_KEY_F8)
         {
             if (this->lineOn)
             {
@@ -182,7 +182,7 @@ void InteractionController::notifyKeyInput(KeyMessage message)
                 glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
                 this->lineOn = true;
             }
-        }
+        }*/
     }
 }
 

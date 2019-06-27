@@ -116,6 +116,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
 	json
     BulletCollision
     BulletDynamics
+	BulletSoftBody
 )
 
 # Compile flags
