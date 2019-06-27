@@ -1,4 +1,5 @@
 #pragma once
+#include <utility>
 #include "mesh_node.h"
 //#include <btSoftBodyInternals.h>
 //#include <btSoftBodyHelpers.h>
@@ -9,6 +10,7 @@
 #include <glow/objects/VertexArray.hh>
 #include "bullet_helper.hh"
 
+
 class Cable : public MeshNode
 {
 public:
@@ -17,35 +19,32 @@ public:
     {
         messageBus->addActivateScreenReceiver([=](ActivateScreenMessage message) { this->notifyActivateScreen(message); });
 
-        btSoftBody* psb = createRope(*(physics->getSoftWorldInfo()), btVector3(-9.5, 4, -20.5), btVector3(8, 4, -20.5), 16, 1 + 2);
-        psb->m_cfg.piterations = 4;
-        psb->m_materials[0]->m_kLST = 0.9 + (1 / (btScalar)(15 - 1)) * 0.9;
-        psb->setTotalMass(1);
-        physics->getSoftWorld()->addSoftBody(psb);
-        mSoftbodies.push_back(psb);
+        std::vector<std::pair<btVector3, btVector3>> cablePositions;
+        cablePositions.push_back({btVector3(-9.6, 4, -20.5), btVector3(7.85, 4, -20.5)});
+        cablePositions.push_back({btVector3(-9.6, 4, -21), btVector3(7.85, 4, -21)});
+        cablePositions.push_back({btVector3(-9.6, 4, -19.5), btVector3(7.85, 4, -19.5)});
+        cablePositions.push_back({btVector3(-9.6, 4, -19), btVector3(7.85, 4, -19)});
 
-        psb = createRope(*(physics->getSoftWorldInfo()), btVector3(-9.5, 4, -21), btVector3(8, 4, -21), 16, 1 + 2);
-        psb->m_cfg.piterations = 4;
-        psb->m_materials[0]->m_kLST = 0.9 + (1 / (btScalar)(15 - 1)) * 0.9;
-        psb->setTotalMass(1);
-        physics->getSoftWorld()->addSoftBody(psb);
-        mSoftbodies.push_back(psb);
+        cablePositions.push_back({btVector3(7.85, 4, -20.5), btVector3(37.1, 4, -20.5)});
+        cablePositions.push_back({btVector3(7.85, 4, -21), btVector3(37.1, 4, -21)});
+        cablePositions.push_back({btVector3(7.85, 4, -19.5), btVector3(37.1, 4, -19.5)});
+        cablePositions.push_back({btVector3(7.85, 4, -19), btVector3(37.1, 4, -19)});
 
-        psb = createRope(*(physics->getSoftWorldInfo()), btVector3(-9.5, 4, -19.5), btVector3(8, 4, -19.5), 16, 1 + 2);
-        psb->m_cfg.piterations = 4;
-        psb->m_materials[0]->m_kLST = 0.9 + (1 / (btScalar)(15 - 1)) * 0.9;
-        psb->setTotalMass(1);
-        physics->getSoftWorld()->addSoftBody(psb);
-        mSoftbodies.push_back(psb);
+        cablePositions.push_back({btVector3(-33.1, 4, -20.5), btVector3(-9.6, 4, -20.5)});
+        cablePositions.push_back({btVector3(-33.1, 4, -21), btVector3(-9.6, 4, -21)});
+        cablePositions.push_back({btVector3(-33.1, 4, -19.5), btVector3(-9.6, 4, -19.5)});
+        cablePositions.push_back({btVector3(-33.1, 4, -19), btVector3(-9.6, 4, -19)});
 
-        psb = createRope(*(physics->getSoftWorldInfo()), btVector3(-9.5, 4, -19), btVector3(8, 4, -19), 16, 1 + 2);
-        psb->m_cfg.piterations = 4;
-        psb->m_materials[0]->m_kLST = 0.9 + (1 / (btScalar)(15 - 1)) * 0.9;
-        psb->setTotalMass(1);
-        physics->getSoftWorld()->addSoftBody(psb);
-        mSoftbodies.push_back(psb);
-
-        
+        for (int i = 0; i < cablePositions.size(); ++i)
+        {
+            btSoftBody* psb = createRope(*(physics->getSoftWorldInfo()), cablePositions[i].first, cablePositions[i].second, 16, 1 + 2);
+            psb->m_cfg.piterations = 4;
+            psb->m_materials[0]->m_kLST = 0.9 + (1 / (btScalar)(15 - 1)) * 0.9;
+            psb->setTotalMass(1);
+            physics->getSoftWorld()->addSoftBody(psb);
+            mSoftbodies.push_back(psb);
+        }
+   
         generateData();
         generateVertexArray();
     }
@@ -77,7 +76,7 @@ public:
         
         if (++mUpdates >= 100)
         {
-            glow::info() << "Cable Update Time: " << (mUpdateTime / 100) * 1000.f << " ms";
+            //glow::info() << "Cable Update Time: " << (mUpdateTime / 100) * 1000.f << " ms";
             mUpdateTime = 0;
             mUpdates = 0;
         }
