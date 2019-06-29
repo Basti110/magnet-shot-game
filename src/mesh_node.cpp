@@ -68,6 +68,8 @@ MeshNode::MeshNode(const glm::mat4& transform, const std::string& filename, Phys
     else if (extension == ".ply") {
         mVertexArray = load_mesh_from_ply(filename);
         setUseVertexColors(true);
+        mProperty.ambient = glm::vec3(0);
+        mProperty.diffuse = glm::vec3(0);
     }
 }
 
