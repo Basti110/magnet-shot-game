@@ -27,5 +27,5 @@ void PointLight::setFunc(float q, float l, float c)
 void PointLight::computeRadius() 
 {
     float lightMax = std::fmaxf(std::fmaxf(mDiffuse.x, mDiffuse.y), mDiffuse.z);
-    mRadius = (-mLinear + std::sqrtf(mLinear * mLinear - 4 * mQuadratic * (mConstant - (256.0 / 5.0) * lightMax))) / (2 * mQuadratic);
+    mRadius = (-mLinear + std::sqrt(mLinear * mLinear - 4 * mQuadratic * (mConstant - (256.0 / 5.0) * lightMax))) / (2 * mQuadratic);
 }
