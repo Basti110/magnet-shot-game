@@ -83,8 +83,6 @@ void GuiManager::init()
     ImGui::StyleColorsDark();
     ImGui_ImplGlfw_InitForOpenGL(mWindow, true);
     ImGui_ImplOpenGL3_Init(glsl_version);
-
-    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 }
 
 void GuiManager::render()
@@ -145,13 +143,13 @@ void GuiManager::update()
     if (mSunsetColor2.first != mSunsetColor2.second)
         sendVec3Message(mSunsetColor2, GuiSettings::SUNSET_BACKGROUND2);
 
-    
+
     //Cube
-    
-    if (mLightAmbient.first != mLightAmbient.second)   
+
+    if (mLightAmbient.first != mLightAmbient.second)
         sendVec3Message(mLightAmbient, GuiSettings::LIGHT_AMBIENT);
 
-	if (mLightDiffuse.first != mLightDiffuse.second)
+    if (mLightDiffuse.first != mLightDiffuse.second)
         sendVec3Message(mLightDiffuse, GuiSettings::LIGHT_DIFFUSE);
 
     if (mLightSpecular.first != mLightSpecular.second)
@@ -304,11 +302,11 @@ void GuiManager::renderEditorSettings()
 
         // left
         ImGui::BeginChild("left pane", ImVec2(150, 0), true);
-        for (int i = 0; i < mObjects.size(); i++)
+        for (size_t i = 0; i < mObjects.size(); i++)
         {
             // char label[128];
             // sprintf(label, "MyObject %d", i);
-            if (ImGui::Selectable(mObjects[i].c_str(), mSelectedObject == i))
+            if (ImGui::Selectable(mObjects[i].c_str(), mSelectedObject >= 0 && (size_t)mSelectedObject == i))
                 mSelectedObject = i;
         }
         ImGui::EndChild();

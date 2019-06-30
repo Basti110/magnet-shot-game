@@ -281,9 +281,7 @@ void IOManager::sendMessageKey(int key, int action, float speed) {
 
 void IOManager::sendMessageMouseMove()
 {
-    float deltaX = mMouseLastDeltaX;
-    float deltaY = mMouseLastDeltaY;
-    if (deltaX >= 9999 | deltaY >= 9999)
+    if (mMouseLastDeltaX >= 9999 || mMouseLastDeltaY >= 9999)
         return;
     MouseMoveMessage m(mMousePositionX, mMousePositionY, mMouseLastDeltaX, mMouseLastDeltaY);
     this->messageBus->sendMessage(&m);

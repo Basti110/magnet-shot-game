@@ -131,7 +131,6 @@ void Camera::setViewportSize(int w, int h)
 {
     mHeight = h;
     mWidth = w;
-    glm::mat4 projection = glm::mat4(1.0f);
     mProjectionMatrix = glm::perspective(glm::radians(75.0f), (float)w / (float)h, 0.1f, 500.0f);
 }
 

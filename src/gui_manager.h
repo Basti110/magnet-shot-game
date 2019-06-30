@@ -27,8 +27,8 @@ private:
     void renderEditorSettings();
     void renderPropertyView();
 
-    GLFWwindow* mWindow;
     MessageBus* mMessageBus;
+    GLFWwindow* mWindow;
     SceneManager* mScene;
 
     GameMode mGameMode = GameMode::Gameplay;

@@ -35,7 +35,7 @@ public:
         cablePositions.push_back({btVector3(-33.1, 4, -19.5), btVector3(-9.6, 4, -19.5)});
         cablePositions.push_back({btVector3(-33.1, 4, -19), btVector3(-9.6, 4, -19)});
 
-        for (int i = 0; i < cablePositions.size(); ++i)
+        for (size_t i = 0; i < cablePositions.size(); ++i)
         {
             btSoftBody* psb = createRope(*(physics->getSoftWorldInfo()), cablePositions[i].first, cablePositions[i].second, 16, 1 + 2);
             psb->m_cfg.piterations = 4;
@@ -85,7 +85,7 @@ public:
         if (mSecondCount >= 3)
         {
             mSecondCount = 0;
-            for (int i = 0; i < mSoftbodies.size(); ++i)
+            for (size_t i = 0; i < mSoftbodies.size(); ++i)
             {
                 mSoftbodies[i]->addForce({0, 0, -2});
             }
@@ -99,7 +99,7 @@ public:
         aNormal = {};
         aTangent = {};
         aTexCoord = {};
-        for (int i = 0; i < mSoftbodies.size(); ++i)
+        for (size_t i = 0; i < mSoftbodies.size(); ++i)
         {
             generateData(mSoftbodies[i]);
         }
@@ -107,7 +107,7 @@ public:
 
     void generateDataPosNormal()
     {
-        for (int i = 0; i < mSoftbodies.size(); ++i)
+        for (size_t i = 0; i < mSoftbodies.size(); ++i)
         {
             generateDataPosNormal(mSoftbodies[i], i);
         }

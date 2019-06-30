@@ -40,11 +40,11 @@ protected:
     btDynamicsWorld* mWorld;
     btRigidBody* mRigidBody;
     std::vector<btTypedConstraint*> mConstraints;
-    float mColorRatio;
     bool mUseVertexColors;
     bool mIsVisible;
     bool mDisableShadows;
     float mAlpha;
+    float mColorRatio;
 
     CoordinateAxes* mCoordinateAxes = nullptr;
     glow::SharedVertexArray mVertexArray;

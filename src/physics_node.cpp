@@ -9,10 +9,10 @@ PhysicsNode::PhysicsNode(PhysicsManager* physics) :
     mWorld(physics->getDynamicsWorld()), 
     mRigidBody(nullptr),
     mUseVertexColors(false),
-    mColorRatio(1.0f),
     mIsVisible(true),
     mDisableShadows(false),
-    mAlpha(1.0f)
+    mAlpha(1.0f),
+    mColorRatio(1.0f)
 {
     mMessageBus = MessageBus::getInstance();
     mMessageBus->addPickBodyReceiver([=](PickBodyMessage message) { this->notifyPickBody(message); });

@@ -176,12 +176,9 @@ void CoordinateAxes::createConeBuffer(float length, float radius, int fineness)
     std::vector<glm::vec3> aTangent;
     std::vector<glm::vec2> aTexCoord;
 
-    std::vector<float> coneVertices;
     float LenHalf = length / 2;
     float circleStep = (glm::pi<float>() * 2) / fineness;
     glm::vec2 prevCoord = {glm::cos(0) * radius, glm::sin(0) * radius};
-    glm::vec3 center = {0, -LenHalf, 0};
-    float PrevAngle = 0;
 
     for (int i = 1; i <= fineness; ++i)
     {

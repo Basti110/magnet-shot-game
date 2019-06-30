@@ -182,12 +182,8 @@ void PhysicsManager::deleteId(int id)
 void PhysicsManager::drawSoftBody(btSoftBody* psb)
 {
     const btScalar scl = (btScalar)0.1;
-    const btScalar nscl = scl * 5;
     const btVector3 lcolor = btVector3(0, 0, 0);
-    const btVector3 ncolor = btVector3(1, 1, 1);
-    const btVector3 ccolor = btVector3(1, 0, 0);
-    int i, j, nj;
-
+    int i;
 
     for (i = 0; i < psb->m_nodes.size(); ++i)
     {
@@ -289,7 +285,7 @@ bool PhysicsManager::bodyWithinReach(const glm::vec3& pos, const glm::vec3& rayT
 
 btRigidBody* PhysicsManager::getRigidBody(int id)
 {
-    if (id < 0 || id > mRigidBodies.size())
+    if (id < 0 || (size_t)id > mRigidBodies.size())
         return nullptr;
     return mRigidBodies[id];
 }

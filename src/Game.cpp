@@ -149,8 +149,7 @@ void Game::render(float elapsedSeconds)
 {
     // Data
     glm::mat4 view = mScene->getCamera()->getViewMatrix();
-    glm::vec3 camPos = mStartManager->getScene()->getCamera()->getPos();
-    glm::vec3 lightPos = mScene->getSunPos(); // camPos + glm::vec3(10);
+    glm::vec3 lightPos = mScene->getSunPos();
     glm::mat4 shadowView = glm::lookAt(lightPos, glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
     glm::mat4 shadowProj = glm::ortho(-25.0f, 25.0f, -25.0f, 25.0f, 1.0f, 190.0f);
     glm::mat4 shadowTransform = shadowProj * shadowView * glm::inverse(view);

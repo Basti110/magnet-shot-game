@@ -81,10 +81,11 @@ add_subdirectory(extern/glow-extras)
 add_subdirectory(extern/bullet)
 
 
-# Folder grouping
+# Folder grouping and no warnings for externals
 foreach(TARGET_NAME glfw ctracer glad glow glow-extras imgui json lodepng stb polymesh BulletCollision BulletDynamics
     BulletFileLoader BulletSoftBody BulletWorldImporter BulletXmlWorldImporter ConvexDecomposition GIMPACTUtils HACD LinearMath)
-  set_property(TARGET ${TARGET_NAME} PROPERTY FOLDER "Extern") 
+  set_property(TARGET ${TARGET_NAME} PROPERTY FOLDER "Extern")
+  target_compile_options(${TARGET_NAME} PRIVATE -w)
 endforeach()
 
 
@@ -93,7 +94,7 @@ endforeach()
 file(GLOB_RECURSE SOURCES
     "src/*.cc"
     "src/*.hh"
-	"src/*.cpp"
+    "src/*.cpp"
     "src/*.h"
     "data/*.*sh"
     "data/*.glsl"
@@ -113,20 +114,19 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
     glow-extras
     polymesh
     imgui
-	json
+    json
     BulletCollision
     BulletDynamics
-	BulletSoftBody
+    BulletSoftBody
 )
 
 # Compile flags
-
 if(MSVC)
-    target_compile_options(${PROJECT_NAME} PUBLIC 
+    target_compile_options(${PROJECT_NAME} PUBLIC
         /MP # multi-core compiling
     )
 else()
-    target_compile_options(${PROJECT_NAME} PUBLIC 
+    target_compile_options(${PROJECT_NAME} PUBLIC
         -Wall # useful warnings
         -Wno-unused-variable # not a useful warning
     )

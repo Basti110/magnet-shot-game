@@ -19,12 +19,12 @@ private:
     btGeneric6DofConstraint* mConstraint;
     SceneManager* mScene;
     GLFWwindow* mWindow;
+    GameMode mGameMode;
     PhysicsManager* mPhysics;
     Cube* mCube;
     Node* mNode;
     int mCubeIndex;
     Cube* mCubeX;
-    GameMode mGameMode;
     bool lineOn = false;
     bool mMovement = false;
     float mJumpTime = 0;

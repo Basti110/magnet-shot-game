@@ -70,15 +70,12 @@ void SceneManager::setSunAngle(float angle)
 { 
     float sunSetRatio = -0.8 * pow(angle - 1.5707963, 2) + 2;
     sunSetRatio = glm::max(glm::min(sunSetRatio, 1.0f), 0.0f);
-    float a = angle;
     if (angle > 3.141592653)
     {
-        a = angle - 3.141592653;
         mSunColor = glm::vec3(1);
     }
     else
     {
-        a = angle;
         mSunColor = sunSetRatio * glm::vec3(1.0) + (1 - sunSetRatio) * mSunColor;
     }
     getSun()->setRenderColor(mSunColor);
@@ -134,7 +131,7 @@ void SceneManager::removeNode(std::function<bool(AbstractNode*)> predicate)
 
 void SceneManager::update(float elapsedSeconds) 
 {
-    for (int i = 0; i < mDynamicObjects.size(); ++i)
+    for (size_t i = 0; i < mDynamicObjects.size(); ++i)
     {
         mDynamicObjects[i]->update(elapsedSeconds);
     }
@@ -163,7 +160,7 @@ void SceneManager::render(glow::UsedProgram& shader, glm::mat4& projection, glm:
 
 	shader.setUniform("viewPos", camPos);
     
-    for (int i = 0; i < mDynamicObjects.size(); ++i)
+    for (size_t i = 0; i < mDynamicObjects.size(); ++i)
     {
         mDynamicObjects[i]->render(shader, projection, view, shadowPass);
 	}

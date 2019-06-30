@@ -108,9 +108,7 @@ void InteractionController::notifyKeyInput(KeyMessage message)
     if (message.getAction() == GLFW_PRESS)
     {
         body->activate(true);
-        glm::mat3 rotation = glm::mat3(cam->getGlobalTransformation());
         float cameraSpeed = message.getSpeed();
-        glm::mat4 trans = glm::translate(mNode->getGlobalTransformation(), glm::vec3(0.0f, 0.0f, -0.1f));
 
         if (mGameMode == GameMode::Editor || mGameMode == GameMode::Editor2)
         {
