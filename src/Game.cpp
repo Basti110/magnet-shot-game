@@ -9,7 +9,8 @@
 #include "physics_manager.h"
 #include "scnene_manager.h"
 
-#include "cable.h"
+#include "dynamic_cable.h"
+#include "static_cable.h"
 #include "cube.h"
 #include "dispenser.h"
 #include "floating_bridge.h"
@@ -536,9 +537,9 @@ void Game::initLevel()
         const glm::vec3 position(1.34631f + i * 1.525f, 0.0f, -18.5735f);
         const glm::mat4 transform = glm::translate(glm::mat4(1), position);
         root->addChild(new Screen(i, transform, mPhysics, messageBus));
-        
+        root->addChild(new StaticCable(i, mPhysics, messageBus));
     }
-    root->addChild(new Cable(1, mPhysics, messageBus));
+    root->addChild(new DynamicCable(1, mPhysics, messageBus));
 
     // add left bridge
     glm::mat4 bridgeTransform = glm::translate(glm::mat4(1), glm::vec3(-26.0f, -0.75f, -16.0f));
