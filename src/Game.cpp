@@ -520,6 +520,11 @@ void Game::initLevel()
     auto messageBus = mStartManager->getMessageBus();
     Node* root = new Node;
 
+    // cube properties
+    RigidBodyInfo info;
+    info.mass = 5.0;
+    info.friction = 0.5;
+
     // add light
     glm::mat4 trans = glm::mat4(1.0f);
     trans = glm::translate(trans, glm::vec3(30.0f, 25.0f, 25.0f));
@@ -600,6 +605,42 @@ void Game::initLevel()
         root->addChild(top);
     }
 
+    // add lamps
+    auto lampParams = {
+        glm::vec3(-30.180437088012695, 0, 3.300933361053467),
+        glm::vec3(-30.180437088012695, 0, -2.3650665283203125),
+        glm::vec3(-30.180437088012695, 0, -8.030097961425781),
+        glm::vec3(-46.677364349365234, 0, -8.030097961425781),
+        glm::vec3(-46.677364349365234, 0, -13.696098327636719),
+        glm::vec3(-46.677364349365234, 0, -19.362098693847656),
+        glm::vec3(-46.677364349365234, 0, -2.3650665283203125),
+        glm::vec3(-46.677364349365234, 0, 3.300933361053467),
+        glm::vec3(-30.180437088012695, 0, -25.028099060058594),
+        glm::vec3(-35.67943572998047, 0, -25.028099060058594),
+        glm::vec3(-41.17836380004883, 0, -25.028099060058594),
+        glm::vec3(-46.677364349365234, 0, -25.028099060058594),
+        glm::vec3(-41.17836380004883, 0, 8.966933250427246),
+        glm::vec3(-35.67943572998047, 0, 8.966933250427246),
+        glm::vec3(-46.677364349365234, 0, 8.966933250427246),
+        glm::vec3(-30.180437088012695, 0, 8.966933250427246)
+    };
+    for (const auto& param : lampParams)
+    {
+        glm::mat4 transform = glm::translate(glm::mat4(1), param);
+        MeshNode* base = new MeshNode(
+            transform, "../../data/meshes/Lamp.obj",
+            mPhysics, GROUP_STATIC_OBJECTS, GROUP_DYNAMIC_OBJECTS, 0.0f
+        );
+        root->addChild(base);
+
+        transform = glm::translate(glm::mat4(1), param +  glm::vec3(0, 1.5f, 0));
+        LightCube* cubeLight = new LightCube(transform, {1,1,1}, mPhysics, mScene);
+        mScene->appendNode(cubeLight);
+        cubeLight->setScale(glm::vec3(0.1f));
+        cubeLight->createBuffer();
+        cubeLight->addPhysics(glm::vec3(0.1f), info);
+    }
+
     // add solar panel
     glm::mat4 panelTransform = glm::translate(glm::mat4(1), glm::vec3(1.75, 4, -40.25));
     panelTransform = glm::rotate(panelTransform, glm::radians(45.0f), glm::vec3(0, 1, 0));
@@ -627,6 +668,24 @@ void Game::initLevel()
         mPhysics, GROUP_STATIC_OBJECTS, GROUP_DYNAMIC_OBJECTS, 0.0f
     ));
 
+    // add stack of cubes
+    auto cubeParams = {
+        // position, rotation y, light color
+        std::make_tuple(glm::vec3(-43.7046f, 0.5f, -22.3377f), -65.00f, Color{1, 1, 0}),
+        std::make_tuple(glm::vec3(-44.1246f, 0.5f, -21.1082f), - 6.83f, Color{0, 1, 0}),
+        std::make_tuple(glm::vec3(-45.0203f, 0.5f, -22.1135f), -26.60f, Color{0, 0, 1}),
+        std::make_tuple(glm::vec3(-44.3483f, 1.5f, -21.8468f),   0.00f, Color{0, 1, 1})
+    };
+    for (const auto& param : cubeParams)
+    {
+        glm::mat4 transform = glm::translate(glm::mat4(1), std::get<0>(param));
+        transform = glm::rotate(transform, glm::radians(std::get<1>(param)), glm::vec3(0, 1, 0));
+        LightCube* cubeLight = new LightCube(transform, std::get<2>(param), mPhysics, mScene);
+        mScene->appendNode(cubeLight);
+        cubeLight->createBuffer();
+        cubeLight->addPhysics(glm::vec3(1.0f), info);
+    }
+
     // add clock tower
     root->addChild(new MeshNode(
         glm::translate(glm::mat4(1), glm::vec3(-40.0f, 0.0f, -33.0f)),
@@ -651,9 +710,6 @@ void Game::initLevel()
     mScene->setSceneRoot(root);
 
     // add a bunch of cubes for testing
-    RigidBodyInfo info;
-    info.mass = 5.0;
-    info.friction = 0.5;
     std::vector<Color> colors;
     colors.push_back({1, 1, 0});
     colors.push_back({0, 1, 0});
