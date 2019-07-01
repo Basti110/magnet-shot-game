@@ -11,11 +11,14 @@
 #include "bullet_helper.hh"
 
 
-class DynamicCable : public MeshNode
+class DynamicCable : public PhysicsNode
 {
 public:
     DynamicCable(int id, PhysicsManager* physics, MessageBus* messageBus)
-      : MeshNode(glm::mat4(), getFilename(id), physics, GROUP_NONE, GROUP_NONE, 0.0f), mId(id), mStartAnimation(false), mAnimationTimer(0)
+      : PhysicsNode(physics),
+        mId(id), 
+        mStartAnimation(false), 
+        mAnimationTimer(0)
     {
         messageBus->addActivateScreenReceiver([=](ActivateScreenMessage message) { this->notifyActivateScreen(message); });
 
@@ -39,8 +42,8 @@ public:
         {
             btSoftBody* psb = createRope(*(physics->getSoftWorldInfo()), cablePositions[i].first, cablePositions[i].second, 16, 1 + 2);
             psb->m_cfg.piterations = 4;
-            psb->m_materials[0]->m_kLST = 0.9 + (1 / (btScalar)(15 - 1)) * 0.9;
-            psb->setTotalMass(1);
+            psb->m_materials[0]->m_kLST = 0.99 + (1 / (btScalar)(15 - 1)) * 0.9;
+            psb->setTotalMass(0.5);
             physics->getSoftWorld()->addSoftBody(psb);
             mSoftbodies.push_back(psb);
         }
@@ -48,8 +51,6 @@ public:
         generateData();
         generateVertexArray();
     }
-
-    static const std::string getFilename(int id) { return "../../data/meshes/Cable" + std::to_string(id) + ".obj"; }
 
     void notifyActivateScreen(ActivateScreenMessage message)
     {
@@ -82,12 +83,12 @@ public:
         }
 
         mSecondCount += elapsedSeconds;
-        if (mSecondCount >= 3)
+        if (mSecondCount >= 4)
         {
             mSecondCount = 0;
             for (size_t i = 0; i < mSoftbodies.size(); ++i)
             {
-                mSoftbodies[i]->addForce({0, 0, -2});
+                mSoftbodies[i]->addForce({0, 0, -0.2});
             }
 
         }

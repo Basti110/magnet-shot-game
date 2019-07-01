@@ -27,7 +27,7 @@ uniform sampler2D ssao;
 
 uniform vec3 viewPos; 
 uniform Light light;
-uniform PointLight pointLights[25];
+uniform PointLight pointLights[35];
 uniform sampler2D shadowMap;
 uniform mat4 shadowTransform;
 uniform float shadowOffset;
