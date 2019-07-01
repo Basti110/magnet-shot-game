@@ -13,7 +13,7 @@ public:
     void lightOn(bool v) { mLight->setOn(v); }
 
 private:
-    bool mControlActivated;
+    bool mControlActivated = false;
     PointLight* mLight;
     glm::vec3 mNightColor;
 };
