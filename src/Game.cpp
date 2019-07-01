@@ -584,8 +584,8 @@ void Game::initLevel()
         std::make_pair(glm::vec3(- 4.35f, 0.27f, - 6.20f), -45.0f), // main island (left)
         std::make_pair(glm::vec3(- 4.35f, 0.27f, - 9.50f), -45.0f), // main island (left)
         std::make_pair(glm::vec3( 11.00f, 0.27f, -12.18f),   0.0f), // main island (right)
-        std::make_pair(glm::vec3(-44.35f, 0.27f, -11.20f), -45.0f), // left island
-        std::make_pair(glm::vec3(-44.35f, 0.27f, -14.50f), -45.0f)  // left island
+        std::make_pair(glm::vec3(-44.00f, 0.27f, -11.20f), -45.0f), // left island
+        std::make_pair(glm::vec3(-44.00f, 0.27f, -14.50f), -45.0f)  // left island
     };
     for (const auto& param : treeParams)
     {
@@ -671,10 +671,10 @@ void Game::initLevel()
     // add stack of cubes
     auto cubeParams = {
         // position, rotation y, light color
-        std::make_tuple(glm::vec3(-43.7046f, 0.5f, -22.3377f), -65.00f, Color{1, 1, 0}),
-        std::make_tuple(glm::vec3(-44.1246f, 0.5f, -21.1082f), - 6.83f, Color{0, 1, 0}),
-        std::make_tuple(glm::vec3(-45.0203f, 0.5f, -22.1135f), -26.60f, Color{0, 0, 1}),
-        std::make_tuple(glm::vec3(-44.3483f, 1.5f, -21.8468f),   0.00f, Color{0, 1, 1})
+        std::make_tuple(glm::vec3(-43.4046f, 0.5f, -22.3377f), -65.00f, Color{1, 1, 0}),
+        std::make_tuple(glm::vec3(-43.8246f, 0.5f, -21.1082f), - 6.83f, Color{0, 1, 0}),
+        std::make_tuple(glm::vec3(-44.7203f, 0.5f, -22.1135f), -26.60f, Color{0, 0, 1}),
+        std::make_tuple(glm::vec3(-44.0483f, 1.5f, -21.8468f),   0.00f, Color{0, 1, 1})
     };
     for (const auto& param : cubeParams)
     {
@@ -688,12 +688,12 @@ void Game::initLevel()
 
     // add clock tower
     root->addChild(new MeshNode(
-        glm::translate(glm::mat4(1), glm::vec3(-40.0f, 0.0f, -33.0f)),
+        glm::translate(glm::mat4(1), glm::vec3(-38.5f, 0.0f, -33.0f)),
         "../../data/meshes/ClockTower.ply",
         mPhysics, GROUP_STATIC_OBJECTS, GROUP_DYNAMIC_OBJECTS, 0.0f
     ));
     BoxNode* box = new BoxNode(
-        glm::translate(glm::mat4(1), glm::vec3(-40.0f, 2.5f, -33.0f)),
+        glm::translate(glm::mat4(1), glm::vec3(-38.5f, 2.5f, -33.0f)),
         glm::vec3(0.15f, 0.55f, 0.15f),
         mPhysics, GROUP_STATIC_OBJECTS, GROUP_DYNAMIC_OBJECTS, 0.0f
     );
