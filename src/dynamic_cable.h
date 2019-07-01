@@ -11,10 +11,10 @@
 #include "bullet_helper.hh"
 
 
-class Cable : public MeshNode
+class DynamicCable : public MeshNode
 {
 public:
-    Cable(int id, PhysicsManager* physics, MessageBus* messageBus)
+    DynamicCable(int id, PhysicsManager* physics, MessageBus* messageBus)
       : MeshNode(glm::mat4(), getFilename(id), physics, GROUP_NONE, GROUP_NONE, 0.0f), mId(id), mStartAnimation(false), mAnimationTimer(0)
     {
         messageBus->addActivateScreenReceiver([=](ActivateScreenMessage message) { this->notifyActivateScreen(message); });
