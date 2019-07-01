@@ -540,6 +540,12 @@ void Game::initLevel()
         root->addChild(new StaticCable(i, mPhysics, messageBus));
     }
     root->addChild(new DynamicCable(1, mPhysics, messageBus));
+    MeshNode* activatedCable = new MeshNode(
+        glm::mat4(), "../../data/meshes/ActivatedCable.obj",
+        mPhysics, GROUP_NONE, GROUP_NONE, 0.0f
+    );
+    activatedCable->setColor(red);
+    root->addChild(activatedCable);
 
     // add left bridge
     glm::mat4 bridgeTransform = glm::translate(glm::mat4(1), glm::vec3(-26.0f, -0.75f, -16.0f));
@@ -568,17 +574,28 @@ void Game::initLevel()
     root->addChild(obstacle);
 
     // add trees
-    auto treeParams = {// position, rotation z
-                       std::make_pair(glm::vec3(-4.35f, 0.27f, -6.2f), -45.0f), std::make_pair(glm::vec3(-4.35f, 0.27f, -9.5f), -45.0f),
-                       std::make_pair(glm::vec3(11.0f, 0.27f, -12.18f), 0.0f)};
+    auto treeParams = {
+        // position, rotation z
+        std::make_pair(glm::vec3(- 4.35f, 0.27f, - 6.20f), -45.0f), // main island (left)
+        std::make_pair(glm::vec3(- 4.35f, 0.27f, - 9.50f), -45.0f), // main island (left)
+        std::make_pair(glm::vec3( 11.00f, 0.27f, -12.18f),   0.0f), // main island (right)
+        std::make_pair(glm::vec3(-44.35f, 0.27f, -11.20f), -45.0f), // left island
+        std::make_pair(glm::vec3(-44.35f, 0.27f, -14.50f), -45.0f)  // left island
+    };
     for (const auto& param : treeParams)
     {
         glm::mat4 transform = glm::translate(glm::mat4(1), param.first);
         transform = glm::rotate(transform, glm::radians(param.second), glm::vec3(0, 1, 0));
-        MeshNode* base = new MeshNode(transform, "../../data/meshes/TreeBase.obj", mPhysics, GROUP_STATIC_OBJECTS, GROUP_DYNAMIC_OBJECTS, 0.0f);
+        MeshNode* base = new MeshNode(
+            transform, "../../data/meshes/TreeBase.obj",
+            mPhysics, GROUP_STATIC_OBJECTS, GROUP_DYNAMIC_OBJECTS, 0.0f
+        );
         base->setColor(brown);
         root->addChild(base);
-        MeshNode* top = new MeshNode(transform, "../../data/meshes/TreeTop.obj", mPhysics, GROUP_STATIC_OBJECTS, GROUP_DYNAMIC_OBJECTS, 0.0f);
+        MeshNode* top = new MeshNode(
+            transform, "../../data/meshes/TreeTop.obj",
+            mPhysics, GROUP_STATIC_OBJECTS, GROUP_DYNAMIC_OBJECTS, 0.0f
+        );
         top->setColor(green);
         root->addChild(top);
     }
@@ -589,8 +606,11 @@ void Game::initLevel()
     root->addChild(new SolarPanel(panelTransform, glm::pi<float>(), mPhysics, messageBus));
 
     // add wind turbines
-    auto turbineParams = {// position, rotation z, initial blade angle
-                          std::make_tuple(glm::vec3(-36.5f, 0.0f, 3.5f), 30.0f, 0.0f), std::make_tuple(glm::vec3(-44.0f, 0.0f, -4.0f), 30.0f, 22.5f)};
+    auto turbineParams = {
+        // position, rotation z, initial blade angle
+        std::make_tuple(glm::vec3(-36.5f, 0.0f, 6.5f), 30.0f, 0.0f),
+        std::make_tuple(glm::vec3(-44.0f, 0.0f, -1.0f), 30.0f, 22.5f)
+    };
     for (const auto& param : turbineParams)
     {
         glm::mat4 transform = glm::translate(glm::mat4(1), std::get<0>(param));
@@ -600,14 +620,21 @@ void Game::initLevel()
         root->addChild(turbine);
     }
 
+    // add electric box
+    root->addChild(new MeshNode(
+        glm::translate(glm::mat4(1), glm::vec3(-36.5f, 0.0f, 0.0f)),
+        "../../data/meshes/ElectricBox.obj",
+        mPhysics, GROUP_STATIC_OBJECTS, GROUP_DYNAMIC_OBJECTS, 0.0f
+    ));
+
     // add clock tower
     root->addChild(new MeshNode(
-        glm::translate(glm::mat4(1), glm::vec3(-35.0f, 0.0f, -31.0f)),
+        glm::translate(glm::mat4(1), glm::vec3(-40.0f, 0.0f, -33.0f)),
         "../../data/meshes/ClockTower.ply",
         mPhysics, GROUP_STATIC_OBJECTS, GROUP_DYNAMIC_OBJECTS, 0.0f
     ));
     BoxNode* box = new BoxNode(
-        glm::translate(glm::mat4(1), glm::vec3(-35.0f, 2.5f, -31.0f)),
+        glm::translate(glm::mat4(1), glm::vec3(-40.0f, 2.5f, -33.0f)),
         glm::vec3(0.15f, 0.55f, 0.15f),
         mPhysics, GROUP_STATIC_OBJECTS, GROUP_DYNAMIC_OBJECTS, 0.0f
     );
