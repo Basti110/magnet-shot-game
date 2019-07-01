@@ -664,7 +664,7 @@ void Game::initLevel()
     // add electric box
     root->addChild(new MeshNode(
         glm::translate(glm::mat4(1), glm::vec3(-36.5f, 0.0f, 0.0f)),
-        "../../data/meshes/ElectricBox.obj",
+        "../../data/meshes/ElectricBox.ply",
         mPhysics, GROUP_STATIC_OBJECTS, GROUP_DYNAMIC_OBJECTS, 0.0f
     ));
 
