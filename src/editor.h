@@ -1,7 +1,7 @@
 #pragma once
 #include "cube.h"
 #include "message_bus.h"
-#include "scnene_manager.h"
+#include "scene_manager.h"
 
 class Editor
 {

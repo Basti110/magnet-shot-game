@@ -7,7 +7,7 @@
 #include "io_manager.h"
 #include "location_event_manager.h"
 #include "physics_manager.h"
-#include "scnene_manager.h"
+#include "scene_manager.h"
 
 #include "dynamic_cable.h"
 #include "static_cable.h"
@@ -22,6 +22,7 @@
 #include "solar_panel.h"
 #include "stairs.h"
 #include "wind_turbine.h"
+#include "clock_tower.h"
 #include "light_cube.h"
 
 // glow OpenGL wrapper
@@ -701,18 +702,7 @@ void Game::initLevel()
     }
 
     // add clock tower
-    root->addChild(new MeshNode(
-        glm::translate(glm::mat4(1), glm::vec3(-38.5f, 0.0f, -33.0f)),
-        "../../data/meshes/ClockTower.ply",
-        mPhysics, GROUP_STATIC_OBJECTS, GROUP_DYNAMIC_OBJECTS, 0.0f
-    ));
-    BoxNode* box = new BoxNode(
-        glm::translate(glm::mat4(1), glm::vec3(-38.5f, 2.5f, -33.0f)),
-        glm::vec3(0.15f, 0.55f, 0.15f),
-        mPhysics, GROUP_STATIC_OBJECTS, GROUP_DYNAMIC_OBJECTS, 0.0f
-    );
-    box->setColor(red);
-    root->addChild(box);
+    root->addChild(new ClockTower(glm::vec3(-38.5f, 0.0f, -33.0f), mPhysics, messageBus, mScene));
 
     // add dispenser
     glm::mat4 dispenserTransform = glm::mat4(1);

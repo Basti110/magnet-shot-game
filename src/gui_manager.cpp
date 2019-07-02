@@ -2,7 +2,7 @@
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_glfw.h"
 #include "imgui/imgui_impl_opengl3.h"
-#include "scnene_manager.h"
+#include "scene_manager.h"
 
 //TODO: Templates for sending;
 GuiManager::GuiManager(MessageBus* messageBus, GLFWwindow* window, SceneManager* scene) : 

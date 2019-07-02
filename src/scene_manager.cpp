@@ -1,4 +1,4 @@
-#include "scnene_manager.h"
+#include "scene_manager.h"
 #include "point_light.h"
 #include <algorithm>
 #include <glm/gtc/matrix_transform.hpp>
