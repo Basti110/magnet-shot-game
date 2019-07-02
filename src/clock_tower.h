@@ -4,8 +4,10 @@
 #include "box_node.h"
 #include "scene_manager.h"
 #include "physics_manager.h"
+#include "bullet_helper.hh"
 
 #include <glm/ext/matrix_transform.hpp>
+#include <GLFW/glfw3.h>
 
 
 class ClockTower : public AbstractNode
@@ -38,13 +40,26 @@ public:
             mMinuteHands.push_back(minuteHand);
         }
 
-//        BoxNode* box = new BoxNode(
-//            glm::translate(glm::mat4(1), position + glm::vec3(0.0f, 2.5f, 0.0f)),
-//            glm::vec3(0.15f, 0.55f, 0.15f),
-//            physics, GROUP_STATIC_OBJECTS, GROUP_DYNAMIC_OBJECTS, 0.0f
-//        );
-//        box->setColor(red);
-//        addChild(box);
+        mRedBox = new BoxNode(
+            glm::translate(glm::mat4(1), position + glm::vec3(0.0f, 2.5f, 0.0f)),
+            glm::vec3(0.15f, 0.55f, 0.15f),
+            physics, GROUP_DYNAMIC_OBJECTS, GROUP_DYNAMIC_OBJECTS, 1.0f
+        );
+        mRedBox->setColor(red);
+
+        const auto& id = btTransform::getIdentity();
+        auto constraint = new btGeneric6DofConstraint(*(mRedBox->getRigidBody()), id, false);
+        constraint->setLinearLowerLimit(btVector3(0, -1, 0));
+        constraint->setLinearUpperLimit(btVector3(0, 0, 0));
+        mRedBox->addConstraint(constraint);
+        addChild(mRedBox);
+
+        mWhiteBox = new BoxNode(
+            glm::translate(glm::mat4(1), position + glm::vec3(0.0f, 3.8f, 0.0f)),
+            glm::vec3(0.05f, 0.75f, 0.05f),
+            physics, GROUP_DYNAMIC_OBJECTS, GROUP_DYNAMIC_OBJECTS, 1.0f
+        );
+        addChild(mWhiteBox);
     }
 
     void update(float elapsedSeconds) override
@@ -64,6 +79,19 @@ public:
             glm::mat4 minuteTransform = glm::rotate(baseTransform, angle * 24, glm::vec3(1,0,0));
             mMinuteHands[i]->setLocalTransformation(minuteTransform);
         }
+
+        // pull red box up box
+        mRedBox->getRigidBody()->applyCentralImpulse(btVector3(0,1,0));
+
+        // set position of white box
+        glm::mat4 transform = to_glm(mRedBox->getRigidBody()->getWorldTransform());
+        transform = glm::translate(transform, glm::vec3(0.0f, 1.3f, 0.0f));
+        mWhiteBox->getRigidBody()->setWorldTransform(to_bullet(transform));
+
+        // toggle day/night and clear magnets when pulled down
+        if (mRedBox->getRigidBody()->getCenterOfMassPosition().y() < mPosition.y + 1.5f) {
+            mMessageBus->sendMessage(new MouseClickMessage(0, 0, GLFW_MOUSE_BUTTON_MIDDLE, GLFW_PRESS));
+        }
     }
 
 private:
@@ -72,4 +100,6 @@ private:
     MessageBus* mMessageBus;
     std::vector<MeshNode*> mHourHands;
     std::vector<MeshNode*> mMinuteHands;
+    BoxNode* mRedBox;
+    BoxNode* mWhiteBox;
 };

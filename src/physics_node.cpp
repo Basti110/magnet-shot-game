@@ -18,7 +18,7 @@ PhysicsNode::PhysicsNode(PhysicsManager* physics) :
     mMessageBus->addPickBodyReceiver([=](PickBodyMessage message) { this->notifyPickBody(message); });
     mMessageBus->addGuiReceiver([=](Message* message) { this->notifyGuiInput(message); });
 
-	mProperty.nodeID = this->getNodeId();
+    mProperty.nodeID = this->getNodeId();
     mProperty.ambient = 0.2f * glm::vec3(1);
     mProperty.diffuse = glm::vec3(1);
     mProperty.specular = glm::vec3(1);
@@ -86,6 +86,12 @@ void PhysicsNode::render(glow::UsedProgram& shader, glm::mat4& projection, glm::
     {
         mCoordinateAxes->render(shader, projection, view, shadowPass);
     }
+}
+
+void PhysicsNode::addConstraint(btTypedConstraint* constraint)
+{
+    mWorld->addConstraint(constraint);
+    mConstraints.push_back(constraint);
 }
 
 void PhysicsNode::setColor(const glm::vec3& color) 
