@@ -13,7 +13,6 @@ public:
     void notifyKeyInput(KeyMessage message);
     void notifyGuiInput(Message* message);
     void save();
-
     void load();
 
 private:

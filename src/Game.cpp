@@ -177,6 +177,13 @@ void Game::render(float elapsedSeconds)
         glm::mat4 projection = mScene->getCamera()->getProjectionMatrix();
         GLOW_SCOPED(clearColor, glm::vec4(0.5, 0.5, 0.5, 1));
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        
+        //
+            
+        /*else
+            GLOW_SCOPED(polygonMode, GL_FILL);*/
+
         if (!mShowPhysicsDebug)
         {
 
@@ -223,23 +230,25 @@ void Game::render(float elapsedSeconds)
                     shaderSkybox.setUniform("sunAngle", angle);
                     shaderSkybox.setUniform("sunColor", mScene->getSunColor());
                     mSkybox->bind().draw();
-                }
-                
-
+                }              
                 
                 GLOW_SCOPED(enable, GL_CULL_FACE);
                 GLOW_SCOPED(cullFace, GL_BACK);
-
-                if (mDebugLine)
-                    GLOW_SCOPED(polygonMode, GL_LINE);
-                else
-                    GLOW_SCOPED(polygonMode, GL_FILL);
-
+                
                 auto shader = mShaderGeometry->use();
                 shader.setUniform("projection", projection);
                 shader.setUniform("view", view);
+
+                //Glow scoped does not work!? 
+                /*if (mDebugLine)
+                    GLOW_SCOPED(polygonMode, GL_LINE);*/
+
+                if (mDebugLine)                         
+                    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);                  
+
                 mScene->render(shader, projection, view, false);
                 
+                glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);           
                 //GLOW_SCOPED(polygonMode, GL_FILL);
             }
 
@@ -301,15 +310,6 @@ void Game::render(float elapsedSeconds)
             float updateRate = 0.0;
             mPhysics->renderDebug(projection, view, updateRate);
         }
-
-        // draw skybox
-        /*view = glm::mat4(glm::mat3(view));
-        GLOW_SCOPED(depthFunc, GL_LEQUAL);
-        auto shaderSkybox = mShaderSkybox->use();
-        shaderSkybox.setUniform("uTransform", projection * view);
-        shaderSkybox.setUniform("uColor1", mBackgroundColor1);
-        shaderSkybox.setUniform("uColor2", mBackgroundColor2);
-        mSkybox->bind().draw();*/
     }
     /*GLOW_SCOPED(enable, GL_BLEND);
     GLOW_SCOPED(blendFunc, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
