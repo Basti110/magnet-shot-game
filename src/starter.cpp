@@ -5,7 +5,7 @@
 #include "interaction_controller.h"
 #include "gameplay_controller.h"
 #include "message_bus.h"
-#include "scnene_manager.h"
+#include "scene_manager.h"
 #include "location_event_manager.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>

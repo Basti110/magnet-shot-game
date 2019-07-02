@@ -7,7 +7,7 @@
 #include "io_manager.h"
 #include "location_event_manager.h"
 #include "physics_manager.h"
-#include "scnene_manager.h"
+#include "scene_manager.h"
 
 #include "dynamic_cable.h"
 #include "static_cable.h"

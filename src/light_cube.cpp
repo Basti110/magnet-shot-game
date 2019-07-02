@@ -1,5 +1,5 @@
 #include "light_cube.h"
-#include "scnene_manager.h"
+#include "scene_manager.h"
 #include <glm/gtc/matrix_transform.hpp>
 
 LightCube::LightCube(const glm::mat4& transformation, Color color, PhysicsManager* physics, SceneManager* m) : 
