@@ -309,15 +309,6 @@ void Game::render(float elapsedSeconds)
             float updateRate = 0.0;
             mPhysics->renderDebug(projection, view, updateRate);
         }
-
-        // draw skybox
-        /*view = glm::mat4(glm::mat3(view));
-        GLOW_SCOPED(depthFunc, GL_LEQUAL);
-        auto shaderSkybox = mShaderSkybox->use();
-        shaderSkybox.setUniform("uTransform", projection * view);
-        shaderSkybox.setUniform("uColor1", mBackgroundColor1);
-        shaderSkybox.setUniform("uColor2", mBackgroundColor2);
-        mSkybox->bind().draw();*/
     }
     /*GLOW_SCOPED(enable, GL_BLEND);
     GLOW_SCOPED(blendFunc, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
