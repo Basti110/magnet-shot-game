@@ -48,7 +48,7 @@ int SCR_HEIGHT = 800;
 #define SAMPLES 32
 
 
-Game::Game() : GlfwApp(Gui::ImGui) {}
+Game::Game() : GlfwApp(Gui::ImGui), mWindowSize(1080, 800)  {}
 
 void Game::init()
 {
@@ -327,6 +327,8 @@ void Game::render(float elapsedSeconds)
     shaderOutput.setTexture("uTexColor", mTargetColor);
     shaderOutput.setTexture("uTexDepth", mTargetDepth);
     shaderOutput.setUniform("uShowPostProcess", mShowPostProcess);
+    shaderOutput.setUniform("uFXAA", mUseFXAA);
+    shaderOutput.setUniform("uBufferSize", mSuperSampling * mWindowSize);
     mMeshQuad->bind().draw();
 
     // draw crosshair
@@ -348,10 +350,11 @@ void Game::onGui()
 // Called when window is resized
 void Game::onResize(int w, int h)
 {
+    mWindowSize = glm::vec2(w, h);
     mScene->getCamera()->setViewportSize(w, h);
 
     for (auto const& t : mTargets)
-        t->bind().resize(2 * w, 2 * h);
+        t->bind().resize(mSuperSampling * w, mSuperSampling * h);
 }
 
 void Game::updateCamera(float elapsedSeconds) {}
@@ -442,6 +445,17 @@ void Game::notifyKeyInput(KeyMessage message)
         if (message.getInput() == GLFW_KEY_F8)
         {
             mDebugLine = mDebugLine ? false : true;
+        }
+
+        if (message.getInput() == GLFW_KEY_F9)
+        {
+            mUseFXAA = mUseFXAA ? false : true;
+        }
+
+        if (message.getInput() == GLFW_KEY_F10)
+        {
+            mSuperSampling = mSuperSampling == 2 ? 1 : 2;
+            onResize(mWindowSize.x, mWindowSize.y);
         }
     }
 }

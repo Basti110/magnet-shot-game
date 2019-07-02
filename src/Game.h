@@ -26,11 +26,14 @@ private:
     glm::vec3 mSunColor;
     glm::vec3 mSunsetBackground1;
     glm::vec3 mSunsetBackground2;
+    glm::vec2 mWindowSize;
     bool mShowWireframe = false;
     bool mShowPostProcess = false;
     bool mShowPhysicsDebug = false;
-    float mBounceF = 0;
     bool mDebugLine = false;
+    bool mUseFXAA = true;
+    float mBounceF = 0;
+    int mSuperSampling = 1;
     Starter* mStartManager;
     SceneManager* mScene;
     PhysicsManager* mPhysics;
