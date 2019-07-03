@@ -23,24 +23,28 @@ public:
         messageBus->addActivateScreenReceiver([=](ActivateScreenMessage message) { this->notifyActivateScreen(message); });
 
         std::vector<std::pair<btVector3, btVector3>> cablePositions;
-        cablePositions.push_back({btVector3(-9.6, 4, -20.5), btVector3(7.85, 4, -20.5)});
-        cablePositions.push_back({btVector3(-9.6, 4, -21), btVector3(7.85, 4, -21)});
-        cablePositions.push_back({btVector3(-9.6, 4, -19.5), btVector3(7.85, 4, -19.5)});
-        cablePositions.push_back({btVector3(-9.6, 4, -19), btVector3(7.85, 4, -19)});
+        cablePositions.push_back({btVector3(-9.55, 4.115, -20.49), btVector3(7.85, 4.115, -20.49)});
+        //cablePositions.push_back({btVector3(-9.6, 4, -21), btVector3(7.85, 4, -21)});
+        //cablePositions.push_back({btVector3(-9.6, 4, -19.5), btVector3(7.85, 4, -19.5)});
+        //cablePositions.push_back({btVector3(-9.6, 4, -19), btVector3(7.85, 4, -19)});
 
-        cablePositions.push_back({btVector3(7.85, 4, -20.5), btVector3(37.1, 4, -20.5)});
-        cablePositions.push_back({btVector3(7.85, 4, -21), btVector3(37.1, 4, -21)});
-        cablePositions.push_back({btVector3(7.85, 4, -19.5), btVector3(37.1, 4, -19.5)});
-        cablePositions.push_back({btVector3(7.85, 4, -19), btVector3(37.1, 4, -19)});
+        //cablePositions.push_back({btVector3(7.85, 4, -20.5), btVector3(37.1, 4, -20.5)});
+        //cablePositions.push_back({btVector3(7.85, 4, -21), btVector3(37.1, 4, -21)});
+        cablePositions.push_back({btVector3(7.95, 4.119, -19.76), btVector3(37.1, 4.119, -19.76)});
+        //cablePositions.push_back({btVector3(7.85, 4, -19), btVector3(37.1, 4, -19)});
 
-        cablePositions.push_back({btVector3(-33.1, 4, -20.5), btVector3(-9.6, 4, -20.5)});
-        cablePositions.push_back({btVector3(-33.1, 4, -21), btVector3(-9.6, 4, -21)});
-        cablePositions.push_back({btVector3(-33.1, 4, -19.5), btVector3(-9.6, 4, -19.5)});
-        cablePositions.push_back({btVector3(-33.1, 4, -19), btVector3(-9.6, 4, -19)});
+        cablePositions.push_back({btVector3(-33.0, 4.115, -20.49), btVector3(-9.54, 4.115, -20.49)});
+        //cablePositions.push_back({btVector3(-33.1, 4, -21), btVector3(-9.6, 4, -21)});
+        //cablePositions.push_back({btVector3(-33.1, 4, -19.5), btVector3(-9.6, 4, -19.5)});
+        //cablePositions.push_back({btVector3(-33.1, 4, -19), btVector3(-9.6, 4, -19)});
 
         for (size_t i = 0; i < cablePositions.size(); ++i)
         {
             btSoftBody* psb = createRope(*(physics->getSoftWorldInfo()), cablePositions[i].first, cablePositions[i].second, 16, 1 + 2);
+
+            if (psb == nullptr)
+                continue;
+
             psb->m_cfg.piterations = 4;
             psb->m_materials[0]->m_kLST = 0.99 + (1 / (btScalar)(15 - 1)) * 0.9;
             psb->setTotalMass(0.5);
@@ -118,7 +122,7 @@ public:
     {
         float e = 0.5;
         int p = 7;
-        float r = 0.03;
+        float r = 0.038;
         float stepSize = glm::radians(360.0f) / p;
         
         int nodeSize = psb->m_nodes.size();
@@ -248,6 +252,9 @@ public:
     btSoftBody* createRope(btSoftBodyWorldInfo& worldInfo, const btVector3& from, const btVector3& to, int res, int fixeds)
     {
         /* Create nodes	*/
+        if (res < 2)
+            return nullptr;
+     
         const int r = res + 2;
         btVector3* x = new btVector3[r];
         btScalar* m = new btScalar[r];
@@ -261,9 +268,17 @@ public:
         }
         btSoftBody* psb = new btSoftBody(&worldInfo, r, x, m);
         if (fixeds & 1)
+        {
             psb->setMass(0, 0);
+            //psb->setMass(1, 0);
+        }
+            
         if (fixeds & 2)
+        {
             psb->setMass(r - 1, 0);
+            //psb->setMass(r - 2, 0);
+        }
+            
         delete[] x;
         delete[] m;
         /* Create links	*/
