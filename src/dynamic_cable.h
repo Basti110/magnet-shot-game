@@ -14,29 +14,25 @@
 class DynamicCable : public PhysicsNode
 {
 public:
-    DynamicCable(int id, PhysicsManager* physics, MessageBus* messageBus)
-      : PhysicsNode(physics),
-        mId(id), 
-        mStartAnimation(false), 
-        mAnimationTimer(0)
+    DynamicCable(int id, PhysicsManager* physics, MessageBus* messageBus) : PhysicsNode(physics), mId(id), mStartAnimation(false), mAnimationTimer(0)
     {
         messageBus->addActivateScreenReceiver([=](ActivateScreenMessage message) { this->notifyActivateScreen(message); });
 
+
         std::vector<std::pair<btVector3, btVector3>> cablePositions;
-        cablePositions.push_back({btVector3(-9.55, 4.115, -20.49), btVector3(7.85, 4.115, -20.49)});
-        //cablePositions.push_back({btVector3(-9.6, 4, -21), btVector3(7.85, 4, -21)});
-        //cablePositions.push_back({btVector3(-9.6, 4, -19.5), btVector3(7.85, 4, -19.5)});
-        //cablePositions.push_back({btVector3(-9.6, 4, -19), btVector3(7.85, 4, -19)});
 
-        //cablePositions.push_back({btVector3(7.85, 4, -20.5), btVector3(37.1, 4, -20.5)});
-        //cablePositions.push_back({btVector3(7.85, 4, -21), btVector3(37.1, 4, -21)});
-        cablePositions.push_back({btVector3(7.95, 4.119, -19.76), btVector3(37.1, 4.119, -19.76)});
-        //cablePositions.push_back({btVector3(7.85, 4, -19), btVector3(37.1, 4, -19)});
+        if (id == 0)
+        {
+            cablePositions.push_back({btVector3(-33.0, 4.115, -20.49), btVector3(-9.54, 4.115, -20.49)});
+            cablePositions.push_back({btVector3(-9.55, 4.115, -20.49), btVector3(7.85, 4.115, -20.49)});
+        }
 
-        cablePositions.push_back({btVector3(-33.0, 4.115, -20.49), btVector3(-9.54, 4.115, -20.49)});
-        //cablePositions.push_back({btVector3(-33.1, 4, -21), btVector3(-9.6, 4, -21)});
-        //cablePositions.push_back({btVector3(-33.1, 4, -19.5), btVector3(-9.6, 4, -19.5)});
-        //cablePositions.push_back({btVector3(-33.1, 4, -19), btVector3(-9.6, 4, -19)});
+        if (id == 1)
+            cablePositions.push_back({btVector3(8.13, 4.05, -20.1), btVector3(6.78, 4.6, -35.0)});
+
+        if (id == 2)
+            cablePositions.push_back({btVector3(7.95, 4.119, -19.76), btVector3(37.1, 4.119, -19.76)});
+
 
         for (size_t i = 0; i < cablePositions.size(); ++i)
         {
@@ -51,7 +47,7 @@ public:
             physics->getSoftWorld()->addSoftBody(psb);
             mSoftbodies.push_back(psb);
         }
-   
+
         generateData();
         generateVertexArray();
     }
@@ -73,15 +69,15 @@ public:
             const float t = glm::clamp(mAnimationTimer, 0.0f, 1.0f);
             setColor((1 - t) * white + t * red);
         }
-        
+
         float updateTime = glfwGetTime();
         generateDataPosNormal();
         updateVertexArray();
         mUpdateTime += glfwGetTime() - updateTime;
-        
+
         if (++mUpdates >= 100)
         {
-            //glow::info() << "Cable Update Time: " << (mUpdateTime / 100) * 1000.f << " ms";
+            // glow::info() << "Cable Update Time: " << (mUpdateTime / 100) * 1000.f << " ms";
             mUpdateTime = 0;
             mUpdates = 0;
         }
@@ -94,7 +90,6 @@ public:
             {
                 mSoftbodies[i]->addForce({0, 0, -0.2});
             }
-
         }
     }
 
@@ -124,7 +119,7 @@ public:
         int p = 7;
         float r = 0.038;
         float stepSize = glm::radians(360.0f) / p;
-        
+
         int nodeSize = psb->m_nodes.size();
         int o = offset * ((nodeSize - 1) * (p * 6));
 
@@ -229,7 +224,7 @@ public:
         }
     }
 
-    void generateVertexArray() 
+    void generateVertexArray()
     {
         auto abPos = glow::ArrayBuffer::create("aPos", aPos);
         auto abNormal = glow::ArrayBuffer::create("aNormal", aNormal);
@@ -243,9 +238,9 @@ public:
 
     void updateVertexArray()
     {
-        auto abPos = mVertexArray->getAttributeBuffer("aPos"); 
+        auto abPos = mVertexArray->getAttributeBuffer("aPos");
         abPos->bind().setData(aPos);
-        auto abNormal = mVertexArray->getAttributeBuffer("aNormal"); 
+        auto abNormal = mVertexArray->getAttributeBuffer("aNormal");
         abNormal->bind().setData(aNormal);
     }
 
@@ -254,7 +249,7 @@ public:
         /* Create nodes	*/
         if (res < 2)
             return nullptr;
-     
+
         const int r = res + 2;
         btVector3* x = new btVector3[r];
         btScalar* m = new btScalar[r];
@@ -270,15 +265,15 @@ public:
         if (fixeds & 1)
         {
             psb->setMass(0, 0);
-            //psb->setMass(1, 0);
+            // psb->setMass(1, 0);
         }
-            
+
         if (fixeds & 2)
         {
             psb->setMass(r - 1, 0);
-            //psb->setMass(r - 2, 0);
+            // psb->setMass(r - 2, 0);
         }
-            
+
         delete[] x;
         delete[] m;
         /* Create links	*/

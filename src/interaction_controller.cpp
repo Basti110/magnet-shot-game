@@ -39,12 +39,12 @@ InteractionController::InteractionController(MessageBus* messageBus, SceneManage
     info.mass = 30.0;
     info.friction = 0.5;
     //auto controller = new btKinematik
-    glm::mat4 trans = glm::translate(glm::mat4(1.0), glm::vec3(4.75f, 2.0f, 4.0f));
+    mStartPosition = glm::translate(glm::mat4(1.0), glm::vec3(4.75f, 2.0f, 4.0f));
 
     mNode = new Node();
-    mNode->setLocalTransformation(trans);
+    mNode->setLocalTransformation(mStartPosition);
 
-    int bodyID = physics->addCapsule({0.25, 1.0}, trans, info);
+    int bodyID = physics->addCapsule({0.25, 1.0}, mStartPosition, info);
     mNode->setRigidBody(bodyID, physics);
     //mCube = new Cube(trans, Color{1.0f, 1.0f, 1.0f}, mPhysics);
 
@@ -64,7 +64,7 @@ InteractionController::InteractionController(MessageBus* messageBus, SceneManage
     mConstraint->setAngularUpperLimit(btVector3(0, 0, 0));
     mPhysics->getDynamicsWorld()->addConstraint(mConstraint);
 
-    trans = glm::translate(glm::mat4(1.0), glm::vec3(0.0f, 2.0f, 0.0f));
+    glm::mat4 trans = glm::translate(glm::mat4(1.0), glm::vec3(0.0f, 2.0f, 0.0f));
     mCubeX = new Cube(trans, Color{1.0f, 1.0f, 1.0f}, mPhysics);
 }
 
@@ -163,24 +163,17 @@ void InteractionController::notifyKeyInput(KeyMessage message)
             }
         }
 
-
         // Render Control
         if (message.getInput() == GLFW_KEY_R)
-            cam->resetPosition();
-
-        /*if (message.getInput() == GLFW_KEY_F8)
         {
-            if (this->lineOn)
+            //body->setCenterOfMassTransform(to_bullet(cam->getLocalTransformation());
+            if (mGameMode == GameMode::Gameplay)
             {
-                glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-                this->lineOn = false;
+                //body->getMotionState()->setWorldTransform(to_bullet(mStartPosition));
+                body->setCenterOfMassTransform(to_bullet(mStartPosition));
             }
-            else
-            {
-                glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-                this->lineOn = true;
-            }
-        }*/
+            cam->resetPosition();
+        }        
     }
 }
 

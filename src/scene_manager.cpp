@@ -63,15 +63,8 @@ void SceneManager::setSunAngle(float angle)
 { 
     float sunSetRatio = -0.8 * pow(angle - 1.5707963, 2) + 2;
     sunSetRatio = glm::max(glm::min(sunSetRatio, 1.0f), 0.0f);
-    if (angle > 3.141592653)
-    {
-        mSunColor = glm::vec3(1);
-    }
-    else
-    {
-        mSunColor = sunSetRatio * glm::vec3(1.0) + (1 - sunSetRatio) * mSunColor;
-    }
-    getSun()->setRenderColor(mSunColor);
+
+    mSunColor = sunSetRatio * glm::vec3(1.0) + (1 - sunSetRatio) * mSunSetColor;
 
     if (angle > 3.65 && !isNight)
     {
