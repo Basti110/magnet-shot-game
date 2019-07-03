@@ -23,6 +23,7 @@
 #include "stairs.h"
 #include "wind_turbine.h"
 #include "clock_tower.h"
+#include "puzzle_box.h"
 #include "light_cube.h"
 
 // glow OpenGL wrapper
@@ -702,6 +703,23 @@ void Game::initLevel()
 
     // add clock tower
     root->addChild(new ClockTower(glm::vec3(-38.5f, 0.0f, -33.0f), mPhysics, messageBus, mScene));
+
+    // add puzzle boxes
+    for (int y = 0; y < 8; y++) {
+        for (int x = 0; x < 6; x++) {
+            int x_ = x;
+            int y_ = y;
+            if (x == 5 && y == 3) continue;
+            if (x == 4 && y == 3) { x_ = 5; y_ = 3; }
+            if (x == 4 && y == 1) { x_ = 4; y_ = 2; }
+            if (x == 4 && y == 2) { x_ = 4; y_ = 3; }
+            PuzzleBox* box = new PuzzleBox(
+                glm::translate(glm::mat4(1), glm::vec3(-34.5f - x_, -0.5f, -4.0f - y_)),
+                mPhysics, x, y
+            );
+            root->addChild(box);
+        }
+    }
 
     // add dispenser
     glm::mat4 dispenserTransform = glm::mat4(1);
