@@ -27,7 +27,7 @@ GuiManager::GuiManager(MessageBus* messageBus, GLFWwindow* window, SceneManager*
     mLightDiffuse.first = glm::vec3(1.0);
     mLightSpecular.first = glm::vec3(1.0);
     mShadowOffset.first = 0.0005;
-    mSunAngle.first = 0.45;
+    mSunAngle.first = 0.7;
     mShadowSmoothness.first = 0.0006;
     mSunColor.first = glm::vec3(255 / 255.0, 120 / 255.0, 0 / 255.0);
     mSunsetColor1.first = glm::vec3(255 / 255.0, 121 / 255.0, 65 / 255.0);

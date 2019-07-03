@@ -568,6 +568,7 @@ void Game::initLevel()
 
     // add level
     MeshNode* level = new MeshNode(glm::mat4(1), "../../data/meshes/FirstRoom.obj", mPhysics, GROUP_STATIC_OBJECTS, GROUP_DYNAMIC_OBJECTS, 0.0f);
+    level->setSpecular({0, 0, 0});
     root->addChild(level);
 
     // add screens & cables
