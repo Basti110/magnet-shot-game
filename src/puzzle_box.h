@@ -34,7 +34,7 @@ public:
         mNightTexture = glow::Texture2D::createFromFile("../../data/textures/Circuit.png", glow::ColorSpace::sRGB);
         mActiveTexture = mDayTexture;
 
-        setAlpha(0.0);
+        setAlpha(1.0);
         setColorRatio(0.0);
         setColor(glm::vec3(0.5));
 
@@ -76,9 +76,11 @@ public:
     void notifySceneEvent(SceneEventMessage message) {
         if (message.eventId == SceneEventId::Day) {
             mActiveTexture = mDayTexture;
+            setAlpha(1.0);
         }
         if (message.eventId == SceneEventId::Night) {
             mActiveTexture = mNightTexture;
+            setAlpha(0.0);
         }
     }
 
