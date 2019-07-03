@@ -18,11 +18,12 @@ void main() {
 
     float r = sqrt(pow(vPosition.x, 2) + pow(vPosition.y, 2) + pow(vPosition.z, 2));
     float theta =  -sunAngle - 4.712388; //acos(vPosition.y / r);
-    float phi = 0; //atan(vPosition.x, vPosition.z);
+    float phi = -0.785398163397448; //atan(vPosition.x, vPosition.z);
 
-    float x = r * sin(theta) * cos(phi);
-    float z = r * sin(theta) * sin(phi);
+    
+    float x = r * sin(theta) * sin(phi);
     float y = r * cos(theta);
+    float z = r * sin(theta) * cos(phi);
      
     float ratio = 1 - abs(vPosition.y) / 100;
     ratio = ratio * ratio;

@@ -214,10 +214,20 @@ void IOManager::processInput()
         sendMessageKey(GLFW_KEY_F7, GLFW_PRESS, cameraSpeed);
     mPrevF7KeyState = glfwGetKey(window, GLFW_KEY_F7);
 
-        const int F8KeyState = glfwGetKey(window, GLFW_KEY_F8);
+    const int F8KeyState = glfwGetKey(window, GLFW_KEY_F8);
     if (F8KeyState == GLFW_RELEASE && mPrevF8KeyState == GLFW_PRESS)
         sendMessageKey(GLFW_KEY_F8, GLFW_PRESS, cameraSpeed);
     mPrevF8KeyState = glfwGetKey(window, GLFW_KEY_F8);
+
+    const int F9KeyState = glfwGetKey(window, GLFW_KEY_F9);
+    if (F9KeyState == GLFW_RELEASE && mPrevF9KeyState == GLFW_PRESS)
+        sendMessageKey(GLFW_KEY_F9, GLFW_PRESS, cameraSpeed);
+    mPrevF9KeyState = glfwGetKey(window, GLFW_KEY_F9);
+
+    const int F10KeyState = glfwGetKey(window, GLFW_KEY_F10);
+    if (F10KeyState == GLFW_RELEASE && mPrevF10KeyState == GLFW_PRESS)
+        sendMessageKey(GLFW_KEY_F10, GLFW_PRESS, cameraSpeed);
+    mPrevF10KeyState = glfwGetKey(window, GLFW_KEY_F10);
 
     // Toggle menu
     const int escKeyState = glfwGetKey(window, GLFW_KEY_ESCAPE);
