@@ -33,7 +33,7 @@ private:
     bool mDebugLine = false;
     bool mUseFXAA = true;
     float mBounceF = 0;
-    int mSuperSampling = 1;
+    int mSuperSampling = 2;
     Starter* mStartManager;
     SceneManager* mScene;
     PhysicsManager* mPhysics;

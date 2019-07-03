@@ -220,14 +220,31 @@ void Game::render(float elapsedSeconds)
                     }
 
                     float angle =  mScene->getSunAngle();
-                    if (angle > 3.141592653)
-                        angle -= 3.141592653;
+                    /*if (angle > 3.141592653)
+                        angle -= 3.141592653;*/
+
+                    float sunVisibility = 0;
+                    if (angle < 3.4)
+                    {
+                        sunVisibility = -0.6 * pow(angle - 1.5707963, 2) + 1.8;
+                        sunVisibility = glm::max(glm::min(sunVisibility, 1.f), 0.f);
+                    }
+
+                    float moonVisibility = 0;
+                    if (angle > 2.8)
+                    {
+                        moonVisibility = -0.6 * pow(angle - 4.712388, 2) + 1.8;
+                        moonVisibility = glm::max(glm::min(moonVisibility, 1.f), 0.f);
+                    }
 
                     shaderSkybox.setUniform("uTransform", projection * view); // * glm::mat4(glm::mat3(view)));
                     shaderSkybox.setUniform("uColor1", back1);
                     shaderSkybox.setUniform("uColor2", back2);
                     shaderSkybox.setUniform("sunAngle", angle);
+                    shaderSkybox.setUniform("moonAngle", (float)(angle + 3.141592653));
                     shaderSkybox.setUniform("sunColor", mScene->getSunColor());
+                    shaderSkybox.setUniform("moonVisibility", moonVisibility);
+                    shaderSkybox.setUniform("sunVisibility", sunVisibility);
                     mSkybox->bind().draw();
                 }              
                 
