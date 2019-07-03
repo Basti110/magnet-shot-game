@@ -21,7 +21,7 @@ void main() {
 
     float r = sqrt(pow(vPosition.x, 2) + pow(vPosition.y, 2) + pow(vPosition.z, 2));
     float thetaSun =  -sunAngle - 4.712388; //acos(vPosition.y / r);
-    float phi = -0.785398163397448; //atan(vPosition.x, vPosition.z);
+    float phi = 0.785398163397448; //atan(vPosition.x, vPosition.z);
     float thetaMoon =  -moonAngle - 4.712388;
 
     
