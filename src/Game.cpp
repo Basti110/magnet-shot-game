@@ -240,7 +240,7 @@ void Game::render(float elapsedSeconds)
                         moonVisibility = glm::max(glm::min(moonVisibility, 1.f), 0.f);
                     }
 
-                    shaderSkybox.setUniform("uTransform", projection * view); // * glm::mat4(glm::mat3(view)));
+                    shaderSkybox.setUniform("uTransform", projection * glm::mat4(glm::mat3(view)));
                     shaderSkybox.setUniform("uColor1", back1);
                     shaderSkybox.setUniform("uColor2", back2);
                     shaderSkybox.setUniform("sunAngle", angle);

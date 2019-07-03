@@ -4,7 +4,7 @@
 
 class PuzzleBoxWatcher {
 public:
-    PuzzleBoxWatcher() = default;
+    PuzzleBoxWatcher() : mIsActive(true) { }
 
     void addPuzzleBox(PuzzleBox* box, const glm::vec3& correctPosition)
     {
@@ -14,16 +14,20 @@ public:
 
     void update()
     {
-        for (size_t i = 0; i < mBodies.size(); i++) {
-            const glm::vec3 p = to_glm(mBodies[i]->getCenterOfMassPosition());
-            if (glm::length(p - mCorrectPositions[i]) > 0.025) {
-                return;
+        if (mIsActive) {
+            for (size_t i = 0; i < mBodies.size(); i++) {
+                const glm::vec3 p = to_glm(mBodies[i]->getCenterOfMassPosition());
+                if (glm::length(p - mCorrectPositions[i]) > 0.025) {
+                    return;
+                }
             }
+            MessageBus::getInstance()->sendMessage(new ActivateScreenMessage(0));
+            mIsActive = false;
         }
-        MessageBus::getInstance()->sendMessage(new ActivateScreenMessage(0));
     }
 
 private:
     std::vector<btRigidBody*> mBodies;
     std::vector<glm::vec3> mCorrectPositions;
+    bool mIsActive;
 };
