@@ -4,6 +4,8 @@
 #include "bullet_helper.hh"
 #include "load_mesh.h"
 
+#include <glow/objects/Texture2D.hh>
+
 
 class PuzzleBox : public PhysicsNode
 {

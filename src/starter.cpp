@@ -7,6 +7,7 @@
 #include "message_bus.h"
 #include "scene_manager.h"
 #include "location_event_manager.h"
+#include "puzzle_box_watcher.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -23,6 +24,7 @@ Starter::Starter(GLFWwindow* window)
     mIoManager = new IOManager(window, mBusManager);
     mGuiManager = new GuiManager(mBusManager, window, mScene);
     mLocationEventManager = new LocationEventManager(mBusManager, mScene->getCamera());
+    mPuzzleBoxWatcher = new PuzzleBoxWatcher();
     std::cout << "Startup finished\n";
 }
 
@@ -56,4 +58,9 @@ PhysicsManager* Starter::getPhysicsManager()
 LocationEventManager* Starter::getLocationEventManager()
 {
     return mLocationEventManager;
+}
+
+PuzzleBoxWatcher* Starter::getPuzzleBoxWatcher()
+{
+    return mPuzzleBoxWatcher;
 }

@@ -24,6 +24,7 @@
 #include "wind_turbine.h"
 #include "clock_tower.h"
 #include "puzzle_box.h"
+#include "puzzle_box_watcher.h"
 #include "light_cube.h"
 
 // glow OpenGL wrapper
@@ -134,6 +135,7 @@ void Game::update(float elapsedSeconds)
     mStartManager->getGuiManager()->update();
     mStartManager->getIOManager()->processInput();
     mStartManager->getLocationEventManager()->update();
+    mStartManager->getPuzzleBoxWatcher()->update();
     mStartManager->getMessageBus()->notify();
     updateCamera(elapsedSeconds);
     mScene->update(elapsedSeconds);
@@ -705,6 +707,9 @@ void Game::initLevel()
     root->addChild(new ClockTower(glm::vec3(-38.5f, 0.0f, -33.0f), mPhysics, messageBus, mScene));
 
     // add puzzle boxes
+    std::map<std::pair<int, int>, PuzzleBox*> puzzleBoxes;
+    const glm::vec3 puzzleOrigin = glm::vec3(-34.5f, -0.5f, -4.0f);
+
     for (int y = 0; y < 8; y++) {
         for (int x = 0; x < 6; x++) {
             int x_ = x;
@@ -714,12 +719,32 @@ void Game::initLevel()
             if (x == 4 && y == 1) { x_ = 4; y_ = 2; }
             if (x == 4 && y == 2) { x_ = 4; y_ = 3; }
             PuzzleBox* box = new PuzzleBox(
-                glm::translate(glm::mat4(1), glm::vec3(-34.5f - x_, -0.5f, -4.0f - y_)),
+                glm::translate(glm::mat4(1), puzzleOrigin - glm::vec3(x_, 0, y_)),
                 mPhysics, x, y
             );
             root->addChild(box);
+            puzzleBoxes[std::make_pair(x, y)] = box;
         }
     }
+
+    // add the relevant puzzle boxes to the watcher
+    auto watcher = mStartManager->getPuzzleBoxWatcher();
+    watcher->addPuzzleBox(puzzleBoxes[std::make_pair(2,0)], puzzleOrigin - glm::vec3(2,0,0));
+    watcher->addPuzzleBox(puzzleBoxes[std::make_pair(1,1)], puzzleOrigin - glm::vec3(2,0,1));
+    watcher->addPuzzleBox(puzzleBoxes[std::make_pair(2,1)], puzzleOrigin - glm::vec3(3,0,1));
+    watcher->addPuzzleBox(puzzleBoxes[std::make_pair(3,1)], puzzleOrigin - glm::vec3(4,0,1));
+    watcher->addPuzzleBox(puzzleBoxes[std::make_pair(0,2)], puzzleOrigin - glm::vec3(0,0,2));
+    watcher->addPuzzleBox(puzzleBoxes[std::make_pair(2,2)], puzzleOrigin - glm::vec3(2,0,2));
+    watcher->addPuzzleBox(puzzleBoxes[std::make_pair(3,2)], puzzleOrigin - glm::vec3(3,0,2));
+    watcher->addPuzzleBox(puzzleBoxes[std::make_pair(4,2)], puzzleOrigin - glm::vec3(4,0,2));
+    watcher->addPuzzleBox(puzzleBoxes[std::make_pair(0,3)], puzzleOrigin - glm::vec3(0,0,3));
+    watcher->addPuzzleBox(puzzleBoxes[std::make_pair(1,3)], puzzleOrigin - glm::vec3(1,0,2));
+    watcher->addPuzzleBox(puzzleBoxes[std::make_pair(0,4)], puzzleOrigin - glm::vec3(0,0,4));
+    watcher->addPuzzleBox(puzzleBoxes[std::make_pair(0,5)], puzzleOrigin - glm::vec3(0,0,5));
+    watcher->addPuzzleBox(puzzleBoxes[std::make_pair(1,5)], puzzleOrigin - glm::vec3(1,0,5));
+    watcher->addPuzzleBox(puzzleBoxes[std::make_pair(2,5)], puzzleOrigin - glm::vec3(2,0,5));
+    watcher->addPuzzleBox(puzzleBoxes[std::make_pair(2,6)], puzzleOrigin - glm::vec3(2,0,6));
+    watcher->addPuzzleBox(puzzleBoxes[std::make_pair(2,7)], puzzleOrigin - glm::vec3(2,0,7));
 
     // add dispenser
     glm::mat4 dispenserTransform = glm::mat4(1);
