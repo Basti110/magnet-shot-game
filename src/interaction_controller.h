@@ -23,6 +23,7 @@ private:
     PhysicsManager* mPhysics;
     Cube* mCube;
     Node* mNode;
+    glm::mat4 mStartPosition;
     int mCubeIndex;
     Cube* mCubeX;
     bool lineOn = false;

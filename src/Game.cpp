@@ -152,7 +152,7 @@ void Game::render(float elapsedSeconds)
     glm::mat4 view = mScene->getCamera()->getViewMatrix();
     glm::vec3 lightPos = mScene->getSunPos();
     glm::mat4 shadowView = glm::lookAt(lightPos, glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
-    glm::mat4 shadowProj = glm::ortho(-25.0f, 25.0f, -25.0f, 25.0f, 1.0f, 190.0f);
+    glm::mat4 shadowProj = glm::ortho(-50.0f, 50.0f, -50.0f, 50.0f, 1.0f, 190.0f);
     glm::mat4 shadowTransform = shadowProj * shadowView * glm::inverse(view);
 
     // shadow pass
@@ -574,8 +574,9 @@ void Game::initLevel()
         const glm::mat4 transform = glm::translate(glm::mat4(1), position);
         root->addChild(new Screen(i, transform, mPhysics, messageBus));
         root->addChild(new StaticCable(i, mPhysics, messageBus));
+        root->addChild(new DynamicCable(i, mPhysics, messageBus));
     }
-    root->addChild(new DynamicCable(1, mPhysics, messageBus));
+    
     MeshNode* activatedCable = new MeshNode(
         glm::mat4(), "../../data/meshes/ActivatedCable.obj",
         mPhysics, GROUP_NONE, GROUP_NONE, 0.0f
