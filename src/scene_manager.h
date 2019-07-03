@@ -31,7 +31,7 @@ public:
     void notifyLocationEvent(LocationEventMessage message);
     void setSceneRoot(Node* node);
     void setSun(Light* light);
-    void setSunColor(glm::vec3 v) { mSunColor = v; }
+    void setSunColor(glm::vec3 v) { mSunSetColor = v; }
 
     // Getter
     glm::vec3 getSunColor() { return mSunColor; }
@@ -48,6 +48,7 @@ private:
     Camera* mViewCamera;
     Light* mSun;
     glm::vec3 mSunColor;
+    glm::vec3 mSunSetColor;
     float mSunAngle;
     bool isNight = false;
     float mAdvanceSunAngle = 0;

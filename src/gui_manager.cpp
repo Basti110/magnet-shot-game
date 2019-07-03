@@ -29,8 +29,8 @@ GuiManager::GuiManager(MessageBus* messageBus, GLFWwindow* window, SceneManager*
     mShadowOffset.first = 0.0005;
     mSunAngle.first = 1;
     mShadowSmoothness.first = 0.0006;
-    mSunColor.first = glm::vec3(233 / 255.0, 154 / 255.0, 65 / 255.0);
-    mSunsetColor1.first = glm::vec3(210 / 255.0, 151 / 255.0, 76 / 255.0);
+    mSunColor.first = glm::vec3(255 / 255.0, 120 / 255.0, 0 / 255.0);
+    mSunsetColor1.first = glm::vec3(255 / 255.0, 121 / 255.0, 65 / 255.0);
     mSunsetColor2.first = glm::vec3(184 / 255.0, 1.0, 1.0);
 
     sendVec3Message(mBackgroundColor1, GuiSettings::BACKGROUND_COLOR1);
