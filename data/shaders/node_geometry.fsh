@@ -18,6 +18,7 @@ in vec3 Normal;
 in vec3 VertexColor;
 
 uniform sampler2D uTexture;
+uniform vec2 uTexOffset;
 uniform float uAlpha;
 uniform bool colorRatio;
 uniform bool useVertexColors;
@@ -29,7 +30,7 @@ void main()
     vec3 texColor = vec3(0);
 
     if (colorRatio)
-        texColor = texture(uTexture, TexCoord).rgb;
+        texColor = texture(uTexture, TexCoord + uTexOffset).rgb;
     else if (useVertexColors)
         texColor = VertexColor;
 
@@ -45,3 +46,4 @@ void main()
     gSpecular.rgb = material.specular;
     gSpecular.a = material.shininess / 255.0;
 }
+

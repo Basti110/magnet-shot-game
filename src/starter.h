@@ -6,6 +6,7 @@ class GuiManager;
 class IOManager;
 class SceneManager;
 class LocationEventManager;
+class PuzzleBoxWatcher;
 class MessageBus;
 class Editor;
 class PhysicsManager;
@@ -22,6 +23,7 @@ public:
     SceneManager* getScene();
     PhysicsManager* getPhysicsManager();
     LocationEventManager* getLocationEventManager();
+    PuzzleBoxWatcher* getPuzzleBoxWatcher();
 
 private:
     InteractionController* mInteractionController;
@@ -33,4 +35,5 @@ private:
     Editor* mEditor;
     PhysicsManager* mPhysics;
     LocationEventManager* mLocationEventManager;
+    PuzzleBoxWatcher* mPuzzleBoxWatcher;
 };

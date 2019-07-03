@@ -63,6 +63,8 @@ public:
 
     void render(glow::UsedProgram& shader, glm::mat4& projection, glm::mat4& view, bool shadowPass) override
     {
+        shader.setUniform("uTexOffset", glm::vec2(0));
+
         if (mIsOn) {
             shader.setTexture("uTexture", mTextureOn);
         }
