@@ -43,5 +43,5 @@ void main()
     gDiffuse.rgb = material.diffuse + texColor * 0.8;
 
     gSpecular.rgb = material.specular;
-    gSpecular.a = material.shininess;
+    gSpecular.a = material.shininess / 255.0;
 }

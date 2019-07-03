@@ -628,12 +628,14 @@ void Game::initLevel()
             mPhysics, GROUP_STATIC_OBJECTS, GROUP_DYNAMIC_OBJECTS, 0.0f
         );
         base->setColor(brown);
+        base->setSpecular({0, 0, 0});
         root->addChild(base);
         MeshNode* top = new MeshNode(
             transform, "../../data/meshes/TreeTop.obj",
             mPhysics, GROUP_STATIC_OBJECTS, GROUP_DYNAMIC_OBJECTS, 0.0f
         );
         top->setColor(green);
+        top->setSpecular({0, 0, 0});
         root->addChild(top);
     }
 
@@ -656,6 +658,7 @@ void Game::initLevel()
         glm::vec3(-46.677364349365234, 0, 8.966933250427246),
         glm::vec3(-30.180437088012695, 0, 8.966933250427246)
     };
+
     for (const auto& param : lampParams)
     {
         glm::mat4 transform = glm::translate(glm::mat4(1), param);
