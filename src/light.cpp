@@ -93,20 +93,6 @@ void Light::createBuffer()
 
 void Light::deleteBuffer() {}
 
-void Light::render(glow::UsedProgram& shader, glm::mat4& projection, glm::mat4& view, bool shadowPass)
-{
-    if (this->mIsInit)
-    {
-        auto shader = mShader->use();
-        shader.setUniform("model", mGlobalTransformation);
-        shader.setUniform("projection", projection);
-        shader.setUniform("view", view);
-        shader.setUniform("color", mRenderColor);
-        glBindVertexArray(this->VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-    }
-}
-
 void Light::setAmbient(const glm::vec3& color) 
 {
     mAmbient = color;

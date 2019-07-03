@@ -9,7 +9,6 @@ public:
     ~Light();
     virtual void createBuffer() override;
     virtual void deleteBuffer() override;
-    virtual void render(glow::UsedProgram& shader, glm::mat4& model, glm::mat4& view, bool shadowPass) override;
     void setAmbient(const glm::vec3& color);
     void setDiffuse(const glm::vec3& color);
     void setSpecular(const glm::vec3& color);
