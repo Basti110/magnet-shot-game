@@ -42,7 +42,7 @@ public:
 
         mRedBox = new BoxNode(
             glm::translate(glm::mat4(1), position + glm::vec3(0.0f, 2.5f, 0.0f)),
-            glm::vec3(0.15f, 0.55f, 0.15f),
+            glm::vec3(0.22f, 0.55f, 0.22f),
             physics, GROUP_DYNAMIC_OBJECTS, GROUP_DYNAMIC_OBJECTS, 1.0f
         );
         mRedBox->setColor(red);
@@ -55,8 +55,8 @@ public:
         addChild(mRedBox);
 
         mWhiteBox = new BoxNode(
-            glm::translate(glm::mat4(1), position + glm::vec3(0.0f, 3.8f, 0.0f)),
-            glm::vec3(0.05f, 0.75f, 0.05f),
+            glm::translate(glm::mat4(1), position + glm::vec3(0.0f, 4.05f, 0.0f)),
+            glm::vec3(0.1f, 1.0f, 0.1f),
             physics, GROUP_DYNAMIC_OBJECTS, GROUP_DYNAMIC_OBJECTS, 1.0f
         );
         addChild(mWhiteBox);
@@ -85,13 +85,16 @@ public:
 
         // set position of white box
         glm::mat4 transform = to_glm(mRedBox->getRigidBody()->getWorldTransform());
-        transform = glm::translate(transform, glm::vec3(0.0f, 1.3f, 0.0f));
+        transform = glm::translate(transform, glm::vec3(0.0f, 1.55f, 0.0f));
         mWhiteBox->getRigidBody()->setWorldTransform(to_bullet(transform));
 
         // toggle day/night and clear magnets when pulled down
         if (mRedBox->getRigidBody()->getCenterOfMassPosition().y() < mPosition.y + 1.5f) {
             mMessageBus->sendMessage(new MouseClickMessage(0, 0, GLFW_MOUSE_BUTTON_MIDDLE, GLFW_PRESS));
+            mScene->toggleDayNight();
         }
+
+        AbstractNode::update(elapsedSeconds);
     }
 
 private:

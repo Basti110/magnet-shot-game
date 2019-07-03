@@ -114,7 +114,6 @@ void Game::init()
         // register location events
         auto locationEventManager = mStartManager->getLocationEventManager();
         locationEventManager->registerEvent(glm::vec3(2, 0, 1), glm::vec3(3, 5, 2), LocationEventId::MagnetGunPickUp);
-        locationEventManager->registerEvent(glm::vec3(-23.6, 0, -17.8), glm::vec3(-18.6, 5, -14.8), LocationEventId::Island2);
         locationEventManager->registerEvent(glm::vec3(-6, 4, -39), glm::vec3(-1, 7, -35), LocationEventId::ActivateStairs);
         locationEventManager->registerEvent(glm::vec3(-6, 0, -38), glm::vec3(-1, 7, -23), LocationEventId::DeactivateStairs);
     }

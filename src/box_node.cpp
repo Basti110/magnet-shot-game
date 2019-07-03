@@ -21,7 +21,7 @@ BoxNode::BoxNode(const glm::mat4& transform, const glm::vec3& scale, PhysicsMana
 void BoxNode::update(float elapsedSeconds)
 {
     PhysicsNode::update(elapsedSeconds);
-    mGlobalTransformation = glm::scale(mGlobalTransformation, mScale);
+    setLocalTransformation(glm::scale(mLocalTransformation, mScale));
 }
 
 const glm::vec3& BoxNode::getScale()

@@ -46,7 +46,7 @@ void PhysicsNode::update(float elapsedSeconds)
     {
         btTransform transform;
         mRigidBody->getMotionState()->getWorldTransform(transform);
-        mGlobalTransformation = to_glm(transform);
+        setLocalTransformation(to_glm(transform));
     }
 
     if (mIsPicked && mCoordinateAxes && mRigidBody)

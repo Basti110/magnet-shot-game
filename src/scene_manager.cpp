@@ -6,14 +6,9 @@
 
 SceneManager::SceneManager()
 {
-	//this->root.createBuffer();
-	mRoot = new Node();
+    mRoot = new Node();
     mSun = nullptr;
     mViewCamera = new Camera();
-
-    MessageBus::getInstance()->addLocationEventReceiver([=](LocationEventMessage message) { 
-        this->notifyLocationEvent(message); 
-    });
 }
 
 
@@ -39,13 +34,11 @@ void SceneManager::addPointLight(PointLight* light)
 
 Node* SceneManager::getSceneRoot()
 {
-	//this->root = Node();
     return mRoot;
 }
 
 void SceneManager::setSceneRoot(Node* node)
 {
-	//this->root = Node();
     mRoot = node;
 }
 
@@ -139,20 +132,11 @@ void SceneManager::update(float elapsedSeconds)
     }
     mRoot->update(elapsedSeconds);
 
-    if (!mToNight)
-        return;
-
-    if (mSunAngle > 4) 
+    if (mAdvanceSunAngle > 0)
     {
-        setSunAngle(mSunAngle - 0.2 * elapsedSeconds);
-        if (mSunAngle <= 4)
-            mToNight = false;
-    }
-    else
-    {
-        setSunAngle(mSunAngle + 0.2 * elapsedSeconds);
-        if (mSunAngle >= 4)
-            mToNight = false;
+        const float delta = + 0.2 * elapsedSeconds;
+        setSunAngle(glm::mod(mSunAngle + delta, glm::two_pi<float>()));
+        mAdvanceSunAngle -= delta;
     }
 }
 
@@ -253,10 +237,9 @@ void SceneManager::setCamera(Camera * camera)
     mViewCamera = camera;
 }
 
-void SceneManager::notifyLocationEvent(LocationEventMessage message)
+void SceneManager::toggleDayNight()
 {
-    if (message.eventId == LocationEventId::Island2 && message.eventType == LocationEventType::Enter)
-    {
-        mToNight = true;
+    if (mAdvanceSunAngle <= 0) {
+        mAdvanceSunAngle = glm::pi<float>();
     }
 }
