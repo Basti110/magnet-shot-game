@@ -102,12 +102,12 @@ void SceneManager::setSunAngle(float angle)
     }
     
     float theta = -angle - 4.712388;
-    float phi = 0;
+    float phi = -0.785398163397448;
     float r = 98;
     
     float y = r * cos(theta);
-    float x = r * sin(theta) * cos(phi);
-    float z = r * sin(theta) * sin(phi);
+    float z = r * sin(theta) * cos(phi);
+    float x = r * sin(theta) * sin(phi);
 
     glm::mat4 transform = glm::translate(glm::mat4(1), glm::vec3(x, y, z));
     mSun->setLocalTransformation(transform);
