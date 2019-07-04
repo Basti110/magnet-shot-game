@@ -21,6 +21,7 @@ public:
     btRigidBody* getRigidBody() { return mRigidBody; }
     void addConstraint(btTypedConstraint* constraint);
     void setAmbient(const glm::vec3& color);
+    void setDiffuse(const glm::vec3& color) { mProperty.diffuse = color; }
     void setSpecular(const glm::vec3& color) { mProperty.specular = color; }
     void setColor(const glm::vec3& color);
     void setUseVertexColors(bool value) { mUseVertexColors = value; }

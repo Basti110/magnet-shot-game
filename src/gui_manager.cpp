@@ -87,7 +87,7 @@ void GuiManager::init()
 
 void GuiManager::render()
 {
-    if (mGameMode == GameMode::Editor)
+    /*if (mGameMode == GameMode::Editor)
         renderOverlay();
     
     if (mGameMode == GameMode::Menu)
@@ -98,7 +98,7 @@ void GuiManager::render()
         //ImGui::ShowDemoWindow(&show_demo_window);
     }
 
-	renderPropertyView();
+	renderPropertyView();*/
 }
 
 void GuiManager::update()

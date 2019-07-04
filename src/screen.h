@@ -22,6 +22,11 @@ public:
             0.0f
         );
 
+        mBase->setAmbient(glm::vec3(9 / 255.));
+        mBase->setDiffuse(glm::vec3(37 / 255.));
+        mBase->setSpecular(glm::vec3(1));
+        mBase->setShininess(90);
+
         mTop = new MeshNode(
             transform,
             "../../data/meshes/ScreenTop.obj",
@@ -34,6 +39,7 @@ public:
         mTop->setColorRatio(0.0);
         mTop->setColor(glm::vec3(0));
         mTop->setShininess(200);
+
 
         addChild(mBase);
         addChild(mTop);
