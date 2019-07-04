@@ -22,8 +22,8 @@ public:
             0.0f
         );
 
-        mBase->setAmbient(glm::vec3(9 / 255.));
-        mBase->setDiffuse(glm::vec3(37 / 255.));
+        mBase->setAmbient(glm::vec3(105 / 255.));
+        mBase->setDiffuse(glm::vec3(105 / 255.));
         mBase->setSpecular(glm::vec3(1));
         mBase->setShininess(90);
 
