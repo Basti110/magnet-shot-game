@@ -681,6 +681,10 @@ void Game::initLevel()
             transform, "../../data/meshes/Lamp.obj",
             mPhysics, GROUP_STATIC_OBJECTS, GROUP_DYNAMIC_OBJECTS, 0.0f
         );
+        base->setAmbient(glm::vec3(24 / 255.));
+        base->setDiffuse(glm::vec3(69 / 255.));
+        base->setSpecular(glm::vec3(1));
+        base->setShininess(90);
         root->addChild(base);
 
         transform = glm::translate(glm::mat4(1), param +  glm::vec3(0, 1.5f, 0));
