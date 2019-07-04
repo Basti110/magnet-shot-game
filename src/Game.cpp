@@ -571,6 +571,17 @@ void Game::initLevel()
     level->setSpecular({0, 0, 0});
     root->addChild(level);
 
+    // add fence
+    MeshNode* fence = new MeshNode(glm::mat4(1), "../../data/meshes/Fence.obj", mPhysics, GROUP_STATIC_OBJECTS, GROUP_DYNAMIC_OBJECTS, 0.0f);
+    fence->setSpecular({0, 0, 0});
+    root->addChild(fence);
+
+    // add power towers
+    MeshNode* powerTowers = new MeshNode(glm::mat4(1), "../../data/meshes/PowerTowers.obj", mPhysics, GROUP_STATIC_OBJECTS, GROUP_DYNAMIC_OBJECTS, 0.0f);
+    powerTowers->setColor(brown);
+    powerTowers->setSpecular({0, 0, 0});
+    root->addChild(powerTowers);
+
     // add screens & cables
     for (int i = 0; i < 3; i++)
     {
