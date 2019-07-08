@@ -77,10 +77,8 @@ void Game::init()
         // size is 1x1 for now and is changed onResize
         mTargets.push_back(mTargetColor = glow::Texture2D::create(1, 1, GL_RGB16F));
         mTargets.push_back(mTargetDepth = glow::Texture2D::create(1, 1, GL_DEPTH_COMPONENT32));
-        mTargetColor->bind().setFilter(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
-        mTargetDepth->bind().setFilter(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
-        mTargetColor->bind().generateMipmaps();
-        mTargetDepth->bind().generateMipmaps();
+        mTargetColor->bind().setFilter(GL_LINEAR, GL_LINEAR);
+        mTargetDepth->bind().setFilter(GL_LINEAR, GL_LINEAR);
         mFramebuffer = glow::Framebuffer::create("fColor", mTargetColor, mTargetDepth);
     }
     {

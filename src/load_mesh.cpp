@@ -48,7 +48,7 @@ glow::SharedVertexArray load_mesh_from_obj(const std::string& filename, bool int
 
     if (!mesh_has_texcoords)
     {
-        glow::warning() << "Mesh " << filename << " does not have texture coordinates. Cannot compute tangents.";
+        // glow::warning() << "Mesh " << filename << " does not have texture coordinates. Cannot compute tangents.";
         for (auto& t : tangents)
         {
             auto one_over_sqrt3 = 0.57735f;
