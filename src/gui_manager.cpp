@@ -22,7 +22,7 @@ GuiManager::GuiManager(MessageBus* messageBus, GLFWwindow* window, SceneManager*
     //Common Settings
 
     mBackgroundColor1.first = glm::vec3(  9/255.0,  65/255.0, 152/255.0);
-    mBackgroundColor2.first = glm::vec3(102/255.0, 169/255.0, 222/255.0);
+    mBackgroundColor2.first = glm::vec3(74/255.0, 178/255.0, 255/255.0);
     mLightAmbient.first = glm::vec3(1.0);
     mLightDiffuse.first = glm::vec3(1.0);
     mLightSpecular.first = glm::vec3(1.0);
@@ -32,8 +32,7 @@ GuiManager::GuiManager(MessageBus* messageBus, GLFWwindow* window, SceneManager*
     mSunColor.first = glm::vec3(255 / 255.0, 120 / 255.0, 0 / 255.0);
     mSunsetColor1.first = glm::vec3(255 / 255.0, 121 / 255.0, 65 / 255.0);
     mSunsetColor2.first = glm::vec3(184 / 255.0, 1.0, 1.0);
-    mSunIntensity.first = 1;
-    mSunIntensity.second = 1;
+    mSunIntensity.first = 1.5;
 
     sendVec3Message(mBackgroundColor1, GuiSettings::BACKGROUND_COLOR1);
     sendVec3Message(mBackgroundColor2, GuiSettings::BACKGROUND_COLOR2);

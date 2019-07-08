@@ -56,7 +56,7 @@ void main()
     vec3 norm = normalize(Normal);
     vec3 lightDir = normalize(light.position - FragPos);
     float diff = max(dot(norm, lightDir), 0.0);
-    vec3 diffuse = light.diffuse * (diff * materialDiffuse);// * occlusion;
+    vec3 diffuse = light.diffuse * (diff * materialDiffuse * occlusion);// * occlusion;
     
     // specular
     vec3 viewDir = normalize(-FragPos);
@@ -138,7 +138,7 @@ void main()
         result = materialAmbient * occlusion + (diff * materialDiffuse) + specular;
     }
     else {
-        result = (ambient + (0.5+0.5*shadowFactor) * diffuse + shadowFactor * specular);
+        result = (ambient + (0.1 + shadowFactor * 0.9) * diffuse + shadowFactor * specular);
     }
     //vec3 result = vec3(.95) * texture(ssao, TexCoords).r;
     //result = (ambient + (0.5+0.5*shadowFactor) * diffuse + shadowFactor * specular);
