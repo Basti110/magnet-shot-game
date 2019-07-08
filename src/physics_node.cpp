@@ -23,6 +23,7 @@ PhysicsNode::PhysicsNode(PhysicsManager* physics) :
     mProperty.diffuse = glm::vec3(1);
     mProperty.specular = glm::vec3(1);
     mProperty.shininess = 32;
+    mProperty.intensity = 2.0f;
 }
 
 PhysicsNode::~PhysicsNode()
@@ -71,9 +72,9 @@ void PhysicsNode::render(glow::UsedProgram& shader, glm::mat4& projection, glm::
     if (shadowPass && mDisableShadows) return;
 
     //glm::vec3 color = false ? glm::vec3(1, 0, 0) : mColor;
-    shader.setUniform("material.ambient", mProperty.ambient);
-    shader.setUniform("material.diffuse", mProperty.diffuse);
-    shader.setUniform("material.specular", mProperty.specular); // specular lighting doesn't have full effect on this object's material
+    shader.setUniform("material.ambient", mProperty.ambient * mProperty.intensity);
+    shader.setUniform("material.diffuse", mProperty.diffuse * mProperty.intensity);
+    shader.setUniform("material.specular", mProperty.specular * mProperty.intensity); // specular lighting doesn't have full effect on this object's material
     shader.setUniform("material.shininess", (int)mProperty.shininess);
     shader.setUniform("model", mGlobalTransformation);
     shader.setUniform("colorRatio", mColorRatio == 0.0f);

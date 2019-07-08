@@ -69,9 +69,9 @@ void Cube::render(glow::UsedProgram& shader, glm::mat4& projection, glm::mat4& v
 
     if (this->isInit)
     {
-        shader.setUniform("material.ambient", mProperty.ambient);
-        shader.setUniform("material.diffuse", mProperty.diffuse);
-        shader.setUniform("material.specular", mProperty.specular); // specular lighting doesn't have full effect on this object's material
+        shader.setUniform("material.ambient", mProperty.ambient * mProperty.intensity);
+        shader.setUniform("material.diffuse", mProperty.diffuse * mProperty.intensity);
+        shader.setUniform("material.specular", mProperty.specular * mProperty.intensity); // specular lighting doesn't have full effect on this object's material
         shader.setUniform("material.shininess", (int)mProperty.shininess);
         shader.setUniform("model", mGlobalTransformation);
         shader.setUniform("colorRatio", mColorRatio == 0.0f);

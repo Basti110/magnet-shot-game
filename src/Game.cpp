@@ -583,6 +583,7 @@ void Game::initLevel()
     MeshNode* powerTowers = new MeshNode(glm::mat4(1), "../../data/meshes/PowerTowers.obj", mPhysics, GROUP_STATIC_OBJECTS, GROUP_DYNAMIC_OBJECTS, 0.0f);
     powerTowers->setColor(brown);
     powerTowers->setSpecular({0, 0, 0});
+    powerTowers->setIntensity(1.5);
     root->addChild(powerTowers);
 
     // add screens & cables
@@ -646,14 +647,19 @@ void Game::initLevel()
             mPhysics, GROUP_STATIC_OBJECTS, GROUP_DYNAMIC_OBJECTS, 0.0f
         );
         base->setColor(brown);
+        base->setAmbient({30 / 255., 19 / 255., 7 / 255.});
+        base->setDiffuse({34 / 255., 24 / 255., 11 / 255.});
         base->setSpecular({0, 0, 0});
         root->addChild(base);
         MeshNode* top = new MeshNode(
             transform, "../../data/meshes/TreeTop.obj",
             mPhysics, GROUP_STATIC_OBJECTS, GROUP_DYNAMIC_OBJECTS, 0.0f
         );
-        top->setColor(green);
+        //top->setColor(green);
+        top->setAmbient({12 / 255., 28 / 255., 3 / 255.});
+        top->setDiffuse({57 / 255., 141 / 255., 11 / 255.});
         top->setSpecular({0, 0, 0});
+
         root->addChild(top);
     }
 

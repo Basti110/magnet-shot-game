@@ -85,11 +85,19 @@ public:
     glm::vec3 ambient;
     glm::vec3 diffuse;
     glm::vec3 specular;
+    float intensity;
     float shininess;
 
 	bool compare(const BodyProperties& v) 
 	{
-        return (ambient == v.ambient) && diffuse == v.diffuse && specular == v.specular && shininess == v.shininess && nodeID == v.nodeID;
+        bool compare = (ambient == v.ambient);
+        compare = compare && diffuse == v.diffuse;
+        compare = compare && specular == v.specular;
+        compare = compare && shininess == v.shininess;
+        compare = compare && nodeID == v.nodeID;
+        compare = compare && intensity == v.intensity;
+
+        return compare;
 	}
 };
 

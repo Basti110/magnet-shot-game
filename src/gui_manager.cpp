@@ -366,6 +366,7 @@ void GuiManager::renderPropertyView()
         ImGui::Text("Object:");
         {
             ImGui::SliderInt("ID", &mBodyProperty.first.nodeID, 0, 10);
+            ImGui::SliderFloat("Itensity", &mBodyProperty.first.intensity, 1, 10);
             ImGui::SliderFloat("shininess", &mBodyProperty.first.shininess, 0.0f, 1024.0f);
             ImGui::ColorEdit3("ambient", &mBodyProperty.first.ambient.r);
             ImGui::ColorEdit3("diffiuse", &mBodyProperty.first.diffuse.r);
