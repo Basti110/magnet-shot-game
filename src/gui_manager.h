@@ -45,6 +45,7 @@ private:
     //std::pair<bool, bool> mSSOA;
     std::pair<float, float> mShadowOffset;
     std::pair<float, float> mSunAngle;
+    std::pair<float, float> mSunIntensity;
     std::pair<float, float> mShadowSmoothness;
 
     //------------------------------------------------

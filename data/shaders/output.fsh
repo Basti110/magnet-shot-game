@@ -60,6 +60,9 @@ void main()
     vec3 color = uFXAA ? fxaa() : texture(uTexColor, vPosition.xy).rgb;
     float depth = texture(uTexDepth, vPosition).x;
 
+    //HDR
+    color = color / (color + vec3(1.0));
+
     // conversion to sRGB
     color = pow(color, vec3(1 / 2.224));
 

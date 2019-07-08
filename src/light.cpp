@@ -113,6 +113,16 @@ void Light::setRenderColor(const glm::vec3& color)
     mRenderColor = color;
 }
 
+void Light::setIntensity(float intensity) 
+{
+    mIntensity = intensity;
+}
+
+float Light::getIntensity()
+{
+    return mIntensity;
+}
+
 glm::vec3 Light::getAmbient()
 {
     return mAmbient;

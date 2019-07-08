@@ -156,17 +156,23 @@ void SceneManager::setLightInShader(glow::UsedProgram& shader)
     glm::vec3 backSpecular;
     float sunSetRatio;
 
-    sunAmbient = glm::vec3(1.0, 220 / 255., 199 / 255.);
-    sunDiffuse = glm::vec3(251 / 255., 155 / 255., 79 / 255.);
-    sunSpecular = glm::vec3(248 / 255., 125 / 255., 18 / 255.);
+    //sunAmbient = mSun->glm::vec3(1.0, 220 / 255., 199 / 255.) * mSun->getIntensity();
+    //sunDiffuse = glm::vec3(251 / 255., 155 / 255., 79 / 255.) * mSun->getIntensity();
+    //sunSpecular = glm::vec3(248 / 255., 125 / 255., 18 / 255.) * mSun->getIntensity();
+
+    /*sunAmbient = mSun->getAmbient() * mSun->getIntensity();
+    sunAmbient = mSun->getAmbient();
+    sunAmbient *= mSun->getIntensity();
+    sunDiffuse = mSun->getDiffuse() * mSun->getIntensity();
+    sunSpecular = mSun->getSpecular() * mSun->getIntensity();*/
 
     if (mSunAngle < 3.141592653)
     {
         sunSetRatio = -0.8 * pow(mSunAngle - 1.5707963, 2) + 2;
         sunSetRatio = glm::max(glm::min(sunSetRatio, 1.0f), 0.0f);
-        backAmbient = mSun->getAmbient();
-        backDiffuse = mSun->getDiffuse();
-        backSpecular = mSun->getSpecular();
+        backAmbient = mSun->getAmbient() * mSun->getIntensity();
+        backDiffuse = mSun->getDiffuse() * mSun->getIntensity();
+        backSpecular = mSun->getSpecular() * mSun->getIntensity();
         shader.setUniform("sunShadowOn", true);
     }
     else
@@ -207,7 +213,7 @@ void SceneManager::setLightInShader(glow::UsedProgram& shader)
         
         glm::vec3 lightPos = glm::vec3(mViewCamera->getViewMatrix() * glm::vec4(mPointLights[i]->getPos(), 1));
         glUniform3fv(glGetUniformLocation(id, ("pointLights[" + std::to_string(lightCounter) + "].Position").c_str()), 1, &lightPos[0]);
-        glUniform3fv(glGetUniformLocation(id, ("pointLights[" + std::to_string(lightCounter) + "].Color").c_str()), 1, &(mPointLights[i]->getAmbient())[0]);
+        glUniform3fv(glGetUniformLocation(id, ("pointLights[" + std::to_string(lightCounter) + "].Color").c_str()), 1, &(mPointLights[i]->getAmbient() * 2.0f)[0]);
         glUniform1f(glGetUniformLocation(id, ("pointLights[" + std::to_string(lightCounter) + "].Linear").c_str()), mPointLights[i]->getLinear());
         glUniform1f(glGetUniformLocation(id, ("pointLights[" + std::to_string(lightCounter) + "].Quadratic").c_str()), mPointLights[i]->getQuadratic());
         glUniform1f(glGetUniformLocation(id, ("pointLights[" + std::to_string(lightCounter) + "].Radius").c_str()), mPointLights[i]->getRadius());

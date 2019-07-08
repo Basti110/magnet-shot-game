@@ -32,6 +32,8 @@ GuiManager::GuiManager(MessageBus* messageBus, GLFWwindow* window, SceneManager*
     mSunColor.first = glm::vec3(255 / 255.0, 120 / 255.0, 0 / 255.0);
     mSunsetColor1.first = glm::vec3(255 / 255.0, 121 / 255.0, 65 / 255.0);
     mSunsetColor2.first = glm::vec3(184 / 255.0, 1.0, 1.0);
+    mSunIntensity.first = 1;
+    mSunIntensity.second = 1;
 
     sendVec3Message(mBackgroundColor1, GuiSettings::BACKGROUND_COLOR1);
     sendVec3Message(mBackgroundColor2, GuiSettings::BACKGROUND_COLOR2);
@@ -44,6 +46,7 @@ GuiManager::GuiManager(MessageBus* messageBus, GLFWwindow* window, SceneManager*
     sendVec3Message(mSunsetColor1, GuiSettings::SUNSET_BACKGROUND1);
     sendVec3Message(mSunsetColor2, GuiSettings::SUNSET_BACKGROUND2);
     sendFloatMessage(mSunAngle, GuiSettings::SUN_ANGLE);
+    sendFloatMessage(mSunIntensity, GuiSettings::SUN_INTENSITY);
     
     //Cube Settings
 
@@ -124,6 +127,9 @@ void GuiManager::update()
 
     if (mSunAngle.first != mSunAngle.second)
         sendFloatMessage(mSunAngle, GuiSettings::SUN_ANGLE);
+
+    if (mSunIntensity.first != mSunIntensity.second)
+        sendFloatMessage(mSunIntensity, GuiSettings::SUN_INTENSITY);
 
     if (mShadowOffset.first != mShadowOffset.second)
         sendFloatMessage(mShadowOffset, GuiSettings::SHADOW_OFFSET);
@@ -270,6 +276,7 @@ void GuiManager::renderWorldSettings()
             ImGui::ColorEdit3("Light Ambient", &mLightAmbient.first.r);
             ImGui::ColorEdit3("Light Diffuse", &mLightDiffuse.first.r);
             ImGui::ColorEdit3("Light Specular", &mLightSpecular.first.r);
+            ImGui::SliderFloat("Sun intensity", &mSunIntensity.first, 1.0f, 200.0f);
             ImGui::SliderFloat("Shadow Offset", &mShadowOffset.first, 0.0f, 0.0025f, "%.5f");
             ImGui::SliderFloat("Shadow Smoothness", &mShadowSmoothness.first, 0.0f, 0.0025f, "%.5f");
             ImGui::SliderFloat("Sun Angle", &mSunAngle.first, 0.0f, 6.28318530f);

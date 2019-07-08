@@ -443,6 +443,10 @@ void Game::notifyGuiInput(Message* message)
             //float sunAngle = m->getValue();
 
         }
+        else if (m->getSetting() == GuiSettings::SUN_INTENSITY)
+        {
+            mScene->getSun()->setIntensity(m->getValue());
+        }
     }
 }
 
@@ -492,10 +496,10 @@ void Game::initSSOA()
     mTargets.push_back(mGAmbient = glow::Texture2D::create(1, 1, GL_RGBA16F));
     mGAmbient->bind().setFilter(GL_NEAREST, GL_NEAREST);
 
-    mTargets.push_back(mGDiffuse = glow::Texture2D::create(1, 1, GL_RGB));
+    mTargets.push_back(mGDiffuse = glow::Texture2D::create(1, 1, GL_RGB16F));
     mGDiffuse->bind().setFilter(GL_NEAREST, GL_NEAREST);
 
-    mTargets.push_back(mGSpecular = glow::Texture2D::create(1, 1, GL_RGBA));
+    mTargets.push_back(mGSpecular = glow::Texture2D::create(1, 1, GL_RGBA16F));
     mGSpecular->bind().setFilter(GL_NEAREST, GL_NEAREST);
 
     mGBuffer = glow::Framebuffer::createDepthOnly(mGDepth);
