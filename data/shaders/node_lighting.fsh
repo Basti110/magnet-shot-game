@@ -1,4 +1,5 @@
 out vec4 FragColor;
+out vec4 gBloom;
 
 in vec2 TexCoords;
 
@@ -140,6 +141,12 @@ void main()
     else {
         result = (ambient + (0.1 + shadowFactor * 0.9) * diffuse + shadowFactor * specular);
     }
+
+    float brightness = dot(result, vec3(0.2126, 0.7152, 0.0722));
+    if(brightness > 1.0) 
+        gBloom = vec4(result, 1.0);
+    else
+        gBloom = vec4(0.0, 0.0, 0.0, 1.0);
     //vec3 result = vec3(.95) * texture(ssao, TexCoords).r;
     //result = (ambient + (0.5+0.5*shadowFactor) * diffuse + shadowFactor * specular);
     FragColor = vec4(result, 1);

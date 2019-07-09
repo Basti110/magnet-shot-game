@@ -53,6 +53,7 @@ private:
     glow::SharedProgram mShaderLighting;
     glow::SharedProgram mShaderSkybox;
     glow::SharedProgram mShaderCrosshair;
+    glow::SharedProgram mShaderBloomFilter;
 
     // meshes
     glow::SharedVertexArray mMeshQuad;
@@ -88,6 +89,13 @@ private:
 	std::vector<glm::vec3> ssaoKernel;
     std::vector<glm::vec3> ssaoNoise;
 
+    //Bloom
+    glow::SharedFramebuffer mBloomGausBuffer1;
+    glow::SharedFramebuffer mBloomGausBuffer2;
+
+    glow::SharedTexture2D mBloomTexture;
+    glow::SharedTexture2D mBloomGausTexture1;
+    glow::SharedTexture2D mBloomGausTexture2;
 
     // shadow map
     glow::SharedFramebuffer mShadowFramebuffer;

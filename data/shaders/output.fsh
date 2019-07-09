@@ -1,5 +1,6 @@
 uniform sampler2D uTexColor;
 uniform sampler2D uTexDepth;
+uniform sampler2D uBloomBlur;
 uniform bool uShowPostProcess;
 uniform bool uFXAA;
 uniform vec2 uBufferSize;
@@ -61,6 +62,7 @@ void main()
     float depth = texture(uTexDepth, vPosition).x;
 
     //HDR
+    color += texture(uBloomBlur, vPosition.xy).rgb;
     color = color / (color + vec3(1.0));
 
     // conversion to sRGB

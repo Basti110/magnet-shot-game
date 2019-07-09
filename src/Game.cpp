@@ -109,6 +109,7 @@ void Game::init()
         mShaderOutput = glow::Program::createFromFile("../../data/shaders/output");
         mShaderSkybox = glow::Program::createFromFile("../../data/shaders/skybox");
         mShaderCrosshair = glow::Program::createFromFile("../../data/shaders/crosshair");
+        mShaderBloomFilter = glow::Program::createFromFile("../../data/shaders/bloomFilter");
 
 
         // register location events
@@ -117,6 +118,18 @@ void Game::init()
         locationEventManager->registerEvent(glm::vec3(-6, 4, -39), glm::vec3(-1, 7, -35), LocationEventId::ActivateStairs);
         locationEventManager->registerEvent(glm::vec3(-6, 0, -38), glm::vec3(-1, 7, -23), LocationEventId::DeactivateStairs);
     }
+
+    //Bloom
+    mTargets.push_back(mBloomTexture = glow::Texture2D::create(1, 1, GL_RGB16F));
+    mBloomTexture->bind().setFilter(GL_NEAREST, GL_NEAREST);
+    mFramebuffer->bind().attachColor("gBloom", mBloomTexture);
+
+    mBloomGausTexture1 = glow::Texture2D::create(1, 1, GL_RGB16F);
+    mBloomGausTexture2 = glow::Texture2D::create(1, 1, GL_RGB16F);
+    mBloomGausTexture1->bind().setFilter(GL_NEAREST, GL_NEAREST);
+    mBloomGausTexture2->bind().setFilter(GL_NEAREST, GL_NEAREST);
+    mBloomGausBuffer1 = glow::Framebuffer::create("fColor", mBloomGausTexture1);
+    mBloomGausBuffer2 = glow::Framebuffer::create("fColor", mBloomGausTexture2);
 
     initSSOA();
     initLevel();
@@ -321,6 +334,31 @@ void Game::render(float elapsedSeconds)
                 mScene->setLightInShader(shader);
                 mMeshQuad->bind().draw();
             }
+
+            //Blur Bloom Texture
+            {
+                bool horizontal = true;
+                bool first_iteration = true;
+                int amount = 10;
+                auto shader = mShaderBloomFilter->use();
+                for (unsigned int i = 0; i < amount; i++)
+                {
+                    auto buffer = horizontal ? mBloomGausBuffer1->bind() : mBloomGausBuffer2->bind();
+                    shader.setUniform("horizontal", horizontal);
+                    
+                    glow::SharedTexture2D texture;
+                    if (first_iteration)
+                        texture = mBloomTexture;
+                    else
+                        texture = horizontal ? mBloomGausTexture2 : mBloomGausTexture1;
+                    shader.setTexture("gSpecular", texture);
+                    
+                    mMeshQuad->bind().draw();
+                    horizontal = !horizontal;
+                    if (first_iteration)
+                        first_iteration = false;
+                } 
+            }
         }
         else
         {
@@ -344,6 +382,7 @@ void Game::render(float elapsedSeconds)
     auto shaderOutput = mShaderOutput->use();
     shaderOutput.setTexture("uTexColor", mTargetColor);
     shaderOutput.setTexture("uTexDepth", mTargetDepth);
+    shaderOutput.setTexture("uBloomBlur", mBloomGausTexture2);
     shaderOutput.setUniform("uShowPostProcess", mShowPostProcess);
     shaderOutput.setUniform("uFXAA", mUseFXAA);
     shaderOutput.setUniform("uBufferSize", mSuperSampling * mWindowSize);
@@ -373,6 +412,9 @@ void Game::onResize(int w, int h)
 
     for (auto const& t : mTargets)
         t->bind().resize(mSuperSampling * w, mSuperSampling * h);
+
+    mBloomGausTexture1->bind().resize(w, h);
+    mBloomGausTexture2->bind().resize(w, h);
 }
 
 void Game::updateCamera(float elapsedSeconds) {}
