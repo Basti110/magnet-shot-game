@@ -191,7 +191,6 @@ void IOManager::processInput()
             mPrevGameMode = mCurrGameMode;
             mCurrGameMode = GameMode::Editor;
         }
-
     }
     if (glfwGetKey(window, GLFW_KEY_F3) == GLFW_PRESS)
     {
@@ -201,7 +200,15 @@ void IOManager::processInput()
             mPrevGameMode = mCurrGameMode;
             mCurrGameMode = GameMode::Editor2;
         }
-
+    }
+    if (glfwGetKey(window, GLFW_KEY_F4) == GLFW_PRESS)
+    {
+        if (mCurrGameMode != GameMode::Cinematic)
+        {
+            sendMessageGameMode(GameMode::Cinematic);
+            mPrevGameMode = mCurrGameMode;
+            mCurrGameMode = GameMode::Cinematic;
+        }
     }
 
 	const int F6KeyState = glfwGetKey(window, GLFW_KEY_F6);

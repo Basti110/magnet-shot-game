@@ -8,6 +8,7 @@
 #include "location_event_manager.h"
 #include "physics_manager.h"
 #include "scene_manager.h"
+#include "cinematic_controller.h"
 
 #include "dynamic_cable.h"
 #include "static_cable.h"
@@ -136,6 +137,7 @@ void Game::update(float elapsedSeconds)
     mStartManager->getIOManager()->processInput();
     mStartManager->getLocationEventManager()->update();
     mStartManager->getPuzzleBoxWatcher()->update();
+    mStartManager->getCinematicController()->update(elapsedSeconds);
     mStartManager->getMessageBus()->notify();
     updateCamera(elapsedSeconds);
     mScene->update(elapsedSeconds);
@@ -614,6 +616,17 @@ void Game::initLevel()
     bridge = new FloatingBridge(bridgeTransform, mPhysics);
     bridge->setColor(red);
     root->addChild(bridge);
+
+    // add bird
+    glm::mat4 birdTransform = glm::translate(glm::mat4(1), glm::vec3(9.09171, 2.35247, -7.21369));
+    birdTransform = glm::rotate(birdTransform, glm::radians(30.0f), glm::vec3(0,1,0));
+
+    MeshNode* bird = new MeshNode(
+        birdTransform, "../../data/meshes/Bird.ply",
+        mPhysics, GROUP_NONE, GROUP_NONE, 0.0f
+    );
+    bird->setAlpha(0);
+    root->addChild(bird);
 
     // add gun
     mMagnetGun = new MagnetGun(glm::vec3(2.5, 1.5, 1.5), mPhysics, messageBus, mScene->getCamera());

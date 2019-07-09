@@ -56,7 +56,8 @@ enum class GameMode
     Menu,
     Gameplay,
     Editor,
-    Editor2
+    Editor2,
+    Cinematic
 };
 
 enum class LocationEventId
