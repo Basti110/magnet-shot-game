@@ -109,14 +109,24 @@ void main()
             Z += kernel[j];
         }
 
+        // vec3 centerColor = texture(uTexColor, vPosition).rgb;
+
         //read out the texels
         for (int i=-kSize; i <= kSize; ++i) {
             for (int j=-kSize; j <= kSize; ++j) {
-                vec2 offset = vec2(i, j) / kSize / size * coc;
-                color += kernel[kSize+j]*kernel[kSize+i]*texture(uTexColor, vPosition + offset).rgb;
+                vec2 offset = vec2(i, j) / (kSize * size) * coc;
+                float weight = kernel[kSize+j] * kernel[kSize+i];
+                color += weight * texture(uTexColor, vPosition + offset).rgb;
+                // float sampleDepth = texture(uTexDepth, vPosition + offset).x;
+                // if (abs(sampleDepth - depth) < 0.01) {
+                //     color += weight * texture(uTexColor, vPosition + offset).rgb;
+                // }
+                // else {
+                //     color += weight * centerColor;
+                // }
             }
         }
-        color /= Z * Z;
+        color /= (Z * Z);
     }
     else {
         color = texture(uTexColor, vPosition).rgb;
