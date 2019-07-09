@@ -52,6 +52,7 @@ private:
     glow::SharedProgram mShaderGeometry;
     glow::SharedProgram mShaderLighting;
     glow::SharedProgram mShaderSkybox;
+    glow::SharedProgram mShaderDepthOfField;
     glow::SharedProgram mShaderCrosshair;
 
     // meshes
@@ -59,14 +60,18 @@ private:
     glow::SharedVertexArray mSkybox;
     glow::SharedVertexArray mCrosshair;
 
+    std::vector<glow::SharedTexture2D> mTargets;
+
     // intermediate framebuffer with color and depth texture
     glow::SharedFramebuffer mFramebuffer;
     glow::SharedTexture2D mTargetColor;
     glow::SharedTexture2D mTargetDepth;
 
-    std::vector<glow::SharedTexture2D> mTargets;
-	
-	//SSAO
+    // Anti-Aliased Buffer
+    glow::SharedFramebuffer mAABuffer;
+    glow::SharedTexture2D mAAColor;
+
+    //SSAO
     bool mSSOA_On = true;
     glow::SharedFramebuffer mGBuffer;
     glow::SharedTexture2D mGDepth;

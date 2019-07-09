@@ -84,6 +84,14 @@ void Game::init()
         mTargetDepth->bind().setWrap(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
         mFramebuffer = glow::Framebuffer::create("fColor", mTargetColor, mTargetDepth);
     }
+
+    {
+        mTargets.push_back(mAAColor = glow::Texture2D::create(1, 1, GL_RGB16F));
+        mAAColor->bind().setFilter(GL_LINEAR, GL_LINEAR);
+        mAAColor->bind().setWrap(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
+        mAABuffer = glow::Framebuffer::create("fColor", mAAColor);
+    }
+
     {
         mShadowMap = glow::Texture2D::create(8192, 8192, GL_DEPTH_COMPONENT32);
         mShadowMap->bind().generateMipmaps();
@@ -111,8 +119,8 @@ void Game::init()
         mShaderLighting = glow::Program::createFromFile("../../data/shaders/node_lighting");
         mShaderOutput = glow::Program::createFromFile("../../data/shaders/output");
         mShaderSkybox = glow::Program::createFromFile("../../data/shaders/skybox");
+        mShaderDepthOfField = glow::Program::createFromFile("../../data/shaders/depth_of_field");
         mShaderCrosshair = glow::Program::createFromFile("../../data/shaders/crosshair");
-
 
         // register location events
         auto locationEventManager = mStartManager->getLocationEventManager();
@@ -342,17 +350,29 @@ void Game::render(float elapsedSeconds)
 
 
     GLOW_SCOPED(disable, GL_CULL_FACE);
-
     GLOW_SCOPED(polygonMode, GL_FILL);
-    auto shaderOutput = mShaderOutput->use();
-    shaderOutput.setTexture("uTexColor", mTargetColor);
-    shaderOutput.setTexture("uTexDepth", mGDepth);
-    shaderOutput.setUniform("uFocus", mScene->getCamera()->getFocus());
-    shaderOutput.setUniform("uAperture", mScene->getCamera()->getAperture());
-    shaderOutput.setUniform("uShowPostProcess", mShowPostProcess);
-    shaderOutput.setUniform("uFXAA", mUseFXAA);
-    shaderOutput.setUniform("uBufferSize", mSuperSampling * mWindowSize);
-    mMeshQuad->bind().draw();
+
+    // fxaa
+    {
+        auto fb = mAABuffer->bind();
+        auto shader = mShaderOutput->use();
+        shader.setTexture("uTexColor", mTargetColor);
+        shader.setTexture("uTexDepth", mTargetDepth);
+        shader.setUniform("uShowPostProcess", mShowPostProcess);
+        shader.setUniform("uFXAA", mUseFXAA);
+        shader.setUniform("uBufferSize", mSuperSampling * mWindowSize);
+        mMeshQuad->bind().draw();
+    }
+
+    // depth of field
+    {
+        auto shader = mShaderDepthOfField->use();
+        shader.setTexture("uTexColor", mAAColor);
+        shader.setTexture("uTexDepth", mGDepth);
+        shader.setUniform("uFocus", mScene->getCamera()->getFocus());
+        shader.setUniform("uAperture", mScene->getCamera()->getAperture());
+        mMeshQuad->bind().draw();
+    }
 
     // draw crosshair
     int w, h;
