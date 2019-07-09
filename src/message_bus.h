@@ -35,6 +35,8 @@ enum GuiSettings
     SUN_ANGLE, 
     SHADOW_OFFSET,
     SHADOW_SMOOTHNESS,
+    FOCUS,
+    APERTURE,
     CUBE_COLOR,
     CUBE_SIZE,
     CUBE_SHAPE,

@@ -79,6 +79,8 @@ void Game::init()
         mTargets.push_back(mTargetDepth = glow::Texture2D::create(1, 1, GL_DEPTH_COMPONENT32));
         mTargetColor->bind().setFilter(GL_LINEAR, GL_LINEAR);
         mTargetDepth->bind().setFilter(GL_LINEAR, GL_LINEAR);
+        mTargetColor->bind().setWrap(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
+        mTargetDepth->bind().setWrap(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
         mFramebuffer = glow::Framebuffer::create("fColor", mTargetColor, mTargetDepth);
     }
     {
@@ -172,8 +174,6 @@ void Game::render(float elapsedSeconds)
 
     // Render World in 4 Phases
     {
-        auto fb = mFramebuffer->bind();
-
         glm::mat4 projection = mScene->getCamera()->getProjectionMatrix();
         GLOW_SCOPED(clearColor, glm::vec4(0.5, 0.5, 0.5, 1));
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -247,7 +247,7 @@ void Game::render(float elapsedSeconds)
                     shaderSkybox.setUniform("moonVisibility", moonVisibility);
                     shaderSkybox.setUniform("sunVisibility", sunVisibility);
                     mSkybox->bind().draw();
-                }              
+                }
                 
                 GLOW_SCOPED(enable, GL_CULL_FACE);
                 GLOW_SCOPED(cullFace, GL_BACK);
@@ -260,12 +260,12 @@ void Game::render(float elapsedSeconds)
                 /*if (mDebugLine)
                     GLOW_SCOPED(polygonMode, GL_LINE);*/
 
-                if (mDebugLine)                         
-                    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);                  
+                if (mDebugLine)
+                    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
                 mScene->render(shader, projection, view, false);
                 
-                glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);           
+                glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
                 //GLOW_SCOPED(polygonMode, GL_FILL);
             }
 
@@ -304,6 +304,7 @@ void Game::render(float elapsedSeconds)
 
             // Phase 4: Traditional lighting with SSOA. Uses the texture Information from the phases before.
             {
+                auto fb = mFramebuffer->bind();
                 GLOW_SCOPED(disable, GL_DEPTH_TEST);
 
                 GLOW_SCOPED(enable, GL_BLEND);
@@ -343,7 +344,9 @@ void Game::render(float elapsedSeconds)
     GLOW_SCOPED(polygonMode, GL_FILL);
     auto shaderOutput = mShaderOutput->use();
     shaderOutput.setTexture("uTexColor", mTargetColor);
-    shaderOutput.setTexture("uTexDepth", mTargetDepth);
+    shaderOutput.setTexture("uTexDepth", mGDepth);
+    shaderOutput.setUniform("uFocus", mScene->getCamera()->getFocus());
+    shaderOutput.setUniform("uAperture", mScene->getCamera()->getAperture());
     shaderOutput.setUniform("uShowPostProcess", mShowPostProcess);
     shaderOutput.setUniform("uFXAA", mUseFXAA);
     shaderOutput.setUniform("uBufferSize", mSuperSampling * mWindowSize);
@@ -439,9 +442,7 @@ void Game::notifyGuiInput(Message* message)
         }
         else if (m->getSetting() == GuiSettings::SUN_ANGLE)
         {
-            mScene->setSunAngle(m->getValue());        
-            //float sunAngle = m->getValue();
-
+            mScene->setSunAngle(m->getValue());
         }
     }
 }
@@ -482,6 +483,10 @@ void Game::initSSOA()
 {
     // GBuffer Textures and Framebuffer
     mTargets.push_back(mGDepth = glow::Texture2D::create(1, 1, GL_DEPTH_COMPONENT32));
+    mGDepth->bind().setWrap(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
+    mGDepth->bind().setFilter(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+    mGDepth->bind().generateMipmaps();
+
     mTargets.push_back(mGPosition = glow::Texture2D::create(1, 1, GL_RGB16F));
     mGPosition->bind().setWrap(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
     mGPosition->bind().setFilter(GL_NEAREST, GL_NEAREST);

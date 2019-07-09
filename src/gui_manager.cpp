@@ -27,8 +27,10 @@ GuiManager::GuiManager(MessageBus* messageBus, GLFWwindow* window, SceneManager*
     mLightDiffuse.first = glm::vec3(1.0);
     mLightSpecular.first = glm::vec3(1.0);
     mShadowOffset.first = 0.0005;
-    mSunAngle.first = 0.7;
     mShadowSmoothness.first = 0.0006;
+    mFocus.first = 0;
+    mAperture.first = 0;
+    mSunAngle.first = 0.7;
     mSunColor.first = glm::vec3(255 / 255.0, 120 / 255.0, 0 / 255.0);
     mSunsetColor1.first = glm::vec3(255 / 255.0, 121 / 255.0, 65 / 255.0);
     mSunsetColor2.first = glm::vec3(184 / 255.0, 1.0, 1.0);
@@ -40,6 +42,8 @@ GuiManager::GuiManager(MessageBus* messageBus, GLFWwindow* window, SceneManager*
     sendVec3Message(mLightSpecular, GuiSettings::LIGHT_SPECULAR);
     sendFloatMessage(mShadowOffset, GuiSettings::SHADOW_OFFSET);
     sendFloatMessage(mShadowSmoothness, GuiSettings::SHADOW_SMOOTHNESS);
+    sendFloatMessage(mFocus, GuiSettings::FOCUS);
+    sendFloatMessage(mAperture, GuiSettings::APERTURE);
     sendVec3Message(mSunColor, GuiSettings::SUN_COLOR);
     sendVec3Message(mSunsetColor1, GuiSettings::SUNSET_BACKGROUND1);
     sendVec3Message(mSunsetColor2, GuiSettings::SUNSET_BACKGROUND2);
@@ -130,6 +134,12 @@ void GuiManager::update()
 
     if (mShadowSmoothness.first != mShadowSmoothness.second)
         sendFloatMessage(mShadowSmoothness, GuiSettings::SHADOW_SMOOTHNESS);
+
+    if (mFocus.first != mFocus.second)
+        sendFloatMessage(mFocus, GuiSettings::FOCUS);
+
+    if (mAperture.first != mAperture.second)
+        sendFloatMessage(mAperture, GuiSettings::APERTURE);
 
     if (mCubeSize.first != mCubeSize.second)
         sendFloatMessage(mCubeSize, GuiSettings::CUBE_SIZE);
@@ -272,6 +282,8 @@ void GuiManager::renderWorldSettings()
             ImGui::ColorEdit3("Light Specular", &mLightSpecular.first.r);
             ImGui::SliderFloat("Shadow Offset", &mShadowOffset.first, 0.0f, 0.0025f, "%.5f");
             ImGui::SliderFloat("Shadow Smoothness", &mShadowSmoothness.first, 0.0f, 0.0025f, "%.5f");
+            ImGui::SliderFloat("Focus", &mFocus.first, 0.0f, 50.0f, "%.5f");
+            ImGui::SliderFloat("Aperture", &mAperture.first, 0.0f, 50.0f, "%.5f");
             ImGui::SliderFloat("Sun Angle", &mSunAngle.first, 0.0f, 6.28318530f);
             ImGui::ColorEdit3("Sun Color", &mSunColor.first.r);
             ImGui::ColorEdit3("Sunset Color 1", &mSunsetColor1.first.r);

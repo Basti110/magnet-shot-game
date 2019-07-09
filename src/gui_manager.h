@@ -44,8 +44,10 @@ private:
     std::pair<glm::vec3, glm::vec3> mSunsetColor2;
     //std::pair<bool, bool> mSSOA;
     std::pair<float, float> mShadowOffset;
-    std::pair<float, float> mSunAngle;
     std::pair<float, float> mShadowSmoothness;
+    std::pair<float, float> mFocus;
+    std::pair<float, float> mAperture;
+    std::pair<float, float> mSunAngle;
 
     //------------------------------------------------
     // ------------- Object Selection ----------------
