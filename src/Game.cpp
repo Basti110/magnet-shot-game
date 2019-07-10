@@ -200,6 +200,7 @@ void Game::render(float elapsedSeconds)
 
     // Render World in 4 Phases
     {
+        auto fb = mFramebuffer->bind();
         glm::mat4 projection = mScene->getCamera()->getProjectionMatrix();
         GLOW_SCOPED(clearColor, glm::vec4(0.5, 0.5, 0.5, 1));
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -322,7 +323,6 @@ void Game::render(float elapsedSeconds)
 
             // Phase 4: Traditional lighting with SSOA. Uses the texture Information from the phases before.
             {
-                auto fb = mFramebuffer->bind();
                 GLOW_SCOPED(disable, GL_DEPTH_TEST);
 
                 GLOW_SCOPED(enable, GL_BLEND);
