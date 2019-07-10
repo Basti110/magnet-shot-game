@@ -122,7 +122,7 @@ Editor::Editor(MessageBus* mB, SceneManager* scene, PhysicsManager* physics) :
     });
 
     mCubeDistance = 2.0;
-    // load();
+    load();
 }
 
 void Editor::refreshCube()
@@ -392,8 +392,9 @@ void Editor::load() {
 
         glm::mat4 trans = glm::mat4(1.0f);
         trans = glm::translate(trans, glm::vec3(t[0], t[1], t[2]));
-        trans = glm::scale(trans, scale);
+        trans = glm::scale(trans, glm::vec3(1));
         Cube* newCube = new Cube(trans, Color{c[0], c[1], c[2]}, mPhysics);
+        newCube->addPhysics(scale, info);
         newCube->setScale(scale);
         mScene->appendNode(newCube);
         //newCube->addPhysics(mCubeScale, mCubeInfo);
