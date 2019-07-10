@@ -4,9 +4,9 @@
 #include "physics_manager.h"
 
 
-PhysicsNode::PhysicsNode(PhysicsManager* physics) : 
+PhysicsNode::PhysicsNode(PhysicsManager* physics, bool receiveMessages) :
     mPhysics(physics),
-    mWorld(physics->getDynamicsWorld()), 
+    mWorld(physics->getDynamicsWorld()),
     mRigidBody(nullptr),
     mUseVertexColors(false),
     mIsVisible(true),
@@ -14,9 +14,11 @@ PhysicsNode::PhysicsNode(PhysicsManager* physics) :
     mAlpha(1.0f),
     mColorRatio(1.0f)
 {
-    mMessageBus = MessageBus::getInstance();
-    mMessageBus->addPickBodyReceiver([=](PickBodyMessage message) { this->notifyPickBody(message); });
-    mMessageBus->addGuiReceiver([=](Message* message) { this->notifyGuiInput(message); });
+    if (receiveMessages) {
+        mMessageBus = MessageBus::getInstance();
+        mMessageBus->addPickBodyReceiver([=](PickBodyMessage message) { this->notifyPickBody(message); });
+        mMessageBus->addGuiReceiver([=](Message* message) { this->notifyGuiInput(message); });
+    }
 
     mProperty.nodeID = this->getNodeId();
     mProperty.ambient = 0.2f * glm::vec3(1);
@@ -62,7 +64,7 @@ void PhysicsNode::update(float elapsedSeconds)
         mRigidBody->setWorldTransform(to_bullet(trans));
         mRigidBody->getMotionState()->setWorldTransform(to_bullet(trans));
      }
-        
+
     AbstractNode::update(elapsedSeconds);
 }
 
@@ -95,7 +97,7 @@ void PhysicsNode::addConstraint(btTypedConstraint* constraint)
     mConstraints.push_back(constraint);
 }
 
-void PhysicsNode::setColor(const glm::vec3& color) 
+void PhysicsNode::setColor(const glm::vec3& color)
 {
     mProperty.nodeID = this->getNodeId();
     mProperty.ambient = 0.3f * color;
@@ -135,7 +137,7 @@ void PhysicsNode::notifyPickBody(PickBodyMessage message)
     }
 }
 
-void PhysicsNode::notifyGuiInput(Message* message) 
+void PhysicsNode::notifyGuiInput(Message* message)
 {
     if (message->getType() == MType::BODY_PROPERTIES_IN)
     {

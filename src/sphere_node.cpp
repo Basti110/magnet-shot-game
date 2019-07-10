@@ -5,8 +5,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 
-SphereNode::SphereNode(const glm::vec3& position, float radius, PhysicsManager* physics, short collisionGroup, short collisionMask, float mass) :
-    PhysicsNode(physics),
+SphereNode::SphereNode(const glm::vec3& position, float radius, PhysicsManager* physics, short collisionGroup, short collisionMask, float mass, bool receiveMessages) :
+    PhysicsNode(physics, receiveMessages),
     mRadius(radius)
 {
     glm::mat4 translation = glm::translate(glm::mat4(1), position);
