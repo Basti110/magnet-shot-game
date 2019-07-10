@@ -1,6 +1,7 @@
 #pragma once
 #include <utility>
 #include "mesh_node.h"
+#include "physics_manager.h"
 //#include <btSoftBodyInternals.h>
 //#include <btSoftBodyHelpers.h>
 #include <BulletSoftBody/btSoftBody.h>
@@ -44,7 +45,7 @@ public:
             psb->m_cfg.piterations = 4;
             psb->m_materials[0]->m_kLST = 0.99 + (1 / (btScalar)(15 - 1)) * 0.9;
             psb->setTotalMass(0.5);
-            physics->getSoftWorld()->addSoftBody(psb);
+            physics->getSoftWorld()->addSoftBody(psb, GROUP_NONE, GROUP_NONE);
             mSoftbodies.push_back(psb);
         }
 
