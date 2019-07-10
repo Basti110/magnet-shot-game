@@ -36,6 +36,8 @@ enum GuiSettings
     SUN_ANGLE, 
     SHADOW_OFFSET,
     SHADOW_SMOOTHNESS,
+    FOCUS,
+    APERTURE,
     CUBE_COLOR,
     CUBE_SIZE,
     CUBE_SHAPE,
@@ -56,7 +58,8 @@ enum class GameMode
     Menu,
     Gameplay,
     Editor,
-    Editor2
+    Editor2,
+    Cinematic
 };
 
 enum class LocationEventId

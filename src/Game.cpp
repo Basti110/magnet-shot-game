@@ -8,6 +8,7 @@
 #include "location_event_manager.h"
 #include "physics_manager.h"
 #include "scene_manager.h"
+#include "cinematic_controller.h"
 
 #include "dynamic_cable.h"
 #include "static_cable.h"
@@ -79,8 +80,18 @@ void Game::init()
         mTargets.push_back(mTargetDepth = glow::Texture2D::create(1, 1, GL_DEPTH_COMPONENT32));
         mTargetColor->bind().setFilter(GL_LINEAR, GL_LINEAR);
         mTargetDepth->bind().setFilter(GL_LINEAR, GL_LINEAR);
+        mTargetColor->bind().setWrap(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
+        mTargetDepth->bind().setWrap(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
         mFramebuffer = glow::Framebuffer::create("fColor", mTargetColor, mTargetDepth);
     }
+
+    {
+        mTargets.push_back(mAAColor = glow::Texture2D::create(1, 1, GL_RGB16F));
+        mAAColor->bind().setFilter(GL_LINEAR, GL_LINEAR);
+        mAAColor->bind().setWrap(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
+        mAABuffer = glow::Framebuffer::create("fColor", mAAColor);
+    }
+
     {
         mShadowMap = glow::Texture2D::create(8192, 8192, GL_DEPTH_COMPONENT32);
         mShadowMap->bind().generateMipmaps();
@@ -108,9 +119,9 @@ void Game::init()
         mShaderLighting = glow::Program::createFromFile("../../data/shaders/node_lighting");
         mShaderOutput = glow::Program::createFromFile("../../data/shaders/output");
         mShaderSkybox = glow::Program::createFromFile("../../data/shaders/skybox");
+        mShaderDepthOfField = glow::Program::createFromFile("../../data/shaders/depth_of_field");
         mShaderCrosshair = glow::Program::createFromFile("../../data/shaders/crosshair");
         mShaderBloomFilter = glow::Program::createFromFile("../../data/shaders/bloomFilter");
-
 
         // register location events
         auto locationEventManager = mStartManager->getLocationEventManager();
@@ -150,6 +161,7 @@ void Game::update(float elapsedSeconds)
     mStartManager->getIOManager()->processInput();
     mStartManager->getLocationEventManager()->update();
     mStartManager->getPuzzleBoxWatcher()->update();
+    mStartManager->getCinematicController()->update(elapsedSeconds);
     mStartManager->getMessageBus()->notify();
     updateCamera(elapsedSeconds);
     mScene->update(elapsedSeconds);
@@ -188,8 +200,6 @@ void Game::render(float elapsedSeconds)
 
     // Render World in 4 Phases
     {
-        auto fb = mFramebuffer->bind();
-
         glm::mat4 projection = mScene->getCamera()->getProjectionMatrix();
         GLOW_SCOPED(clearColor, glm::vec4(0.5, 0.5, 0.5, 1));
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -206,7 +216,7 @@ void Game::render(float elapsedSeconds)
                 glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
                 GLOW_SCOPED(enable, GL_DEPTH_TEST);
-                {           
+                {
                     auto shaderSkybox = mShaderSkybox->use();
                     float sunAngle = mScene->getSunAngle();
                     glm::vec3 back1;
@@ -256,15 +266,15 @@ void Game::render(float elapsedSeconds)
                     shaderSkybox.setUniform("sunVisibility", sunVisibility);
                     mSkybox->bind().draw();
                 }
-                
+
                 GLOW_SCOPED(enable, GL_CULL_FACE);
                 GLOW_SCOPED(cullFace, GL_BACK);
-                
+
                 auto shader = mShaderGeometry->use();
                 shader.setUniform("projection", projection);
                 shader.setUniform("view", view);
 
-                //Glow scoped does not work!? 
+                //Glow scoped does not work!?
                 /*if (mDebugLine)
                     GLOW_SCOPED(polygonMode, GL_LINE);*/
 
@@ -272,7 +282,7 @@ void Game::render(float elapsedSeconds)
                     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
                 mScene->render(shader, projection, view, false);
-                
+
                 glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
                 //GLOW_SCOPED(polygonMode, GL_FILL);
             }
@@ -312,6 +322,7 @@ void Game::render(float elapsedSeconds)
 
             // Phase 4: Traditional lighting with SSOA. Uses the texture Information from the phases before.
             {
+                auto fb = mFramebuffer->bind();
                 GLOW_SCOPED(disable, GL_DEPTH_TEST);
 
                 GLOW_SCOPED(enable, GL_BLEND);
@@ -340,19 +351,19 @@ void Game::render(float elapsedSeconds)
                 {
                     auto buffer = horizontal ? mBloomGausBuffer1->bind() : mBloomGausBuffer2->bind();
                     shader.setUniform("horizontal", horizontal);
-                    
+
                     glow::SharedTexture2D texture;
                     if (first_iteration)
                         texture = mBloomTexture;
                     else
                         texture = horizontal ? mBloomGausTexture2 : mBloomGausTexture1;
                     shader.setTexture("gSpecular", texture);
-                    
+
                     mMeshQuad->bind().draw();
                     horizontal = !horizontal;
                     if (first_iteration)
                         first_iteration = false;
-                } 
+                }
             }
         }
         else
@@ -372,18 +383,32 @@ void Game::render(float elapsedSeconds)
 
 
     GLOW_SCOPED(disable, GL_CULL_FACE);
-
     GLOW_SCOPED(polygonMode, GL_FILL);
-    auto shaderOutput = mShaderOutput->use();
-    shaderOutput.setTexture("uTexColor", mTargetColor);
-    shaderOutput.setTexture("uTexDepth", mTargetDepth);
-    shaderOutput.setTexture("uBloomBlur", mBloomGausTexture2);
-    shaderOutput.setUniform("uBloomOn", mBloomOn);
-    shaderOutput.setUniform("uExposure", mScene->getHdrExploration());
-    shaderOutput.setUniform("uShowPostProcess", mShowPostProcess);
-    shaderOutput.setUniform("uFXAA", mUseFXAA);
-    shaderOutput.setUniform("uBufferSize", mSuperSampling * mWindowSize);
-    mMeshQuad->bind().draw();
+
+    // fxaa
+    {
+        auto fb = mAABuffer->bind();
+        auto shader = mShaderOutput->use();
+        shader.setTexture("uTexColor", mTargetColor);
+        shader.setTexture("uTexDepth", mTargetDepth);
+        shader.setTexture("uBloomBlur", mBloomGausTexture2);
+        shader.setUniform("uBloomOn", mBloomOn);
+        shader.setUniform("uExposure", mScene->getHdrExploration());
+        shader.setUniform("uShowPostProcess", mShowPostProcess);
+        shader.setUniform("uFXAA", mUseFXAA);
+        shader.setUniform("uBufferSize", mSuperSampling * mWindowSize);
+        mMeshQuad->bind().draw();
+    }
+
+    // depth of field
+    {
+        auto shader = mShaderDepthOfField->use();
+        shader.setTexture("uTexColor", mAAColor);
+        shader.setTexture("uTexDepth", mGDepth);
+        shader.setUniform("uFocus", mScene->getCamera()->getFocus());
+        shader.setUniform("uAperture", mScene->getCamera()->getAperture());
+        mMeshQuad->bind().draw();
+    }
 
     // draw crosshair
     int w, h;
@@ -450,7 +475,7 @@ void Game::notifyGuiInput(Message* message)
         else if (m->getSetting() == GuiSettings::SUN_COLOR)
         {
             auto shader = mShaderSkybox->use();
-            mScene->getSun()->setRenderColor(m->getValue());       
+            mScene->getSun()->setRenderColor(m->getValue());
             mScene->setSunColor(m->getValue());
         }
         else if (m->getSetting() == GuiSettings::SUNSET_BACKGROUND1)
@@ -478,9 +503,7 @@ void Game::notifyGuiInput(Message* message)
         }
         else if (m->getSetting() == GuiSettings::SUN_ANGLE)
         {
-            mScene->setSunAngle(m->getValue());        
-            //float sunAngle = m->getValue();
-
+            mScene->setSunAngle(m->getValue());
         }
         else if (m->getSetting() == GuiSettings::SUN_INTENSITY)
         {
@@ -534,6 +557,10 @@ void Game::initSSOA()
 {
     // GBuffer Textures and Framebuffer
     mTargets.push_back(mGDepth = glow::Texture2D::create(1, 1, GL_DEPTH_COMPONENT32));
+    mGDepth->bind().setWrap(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
+    mGDepth->bind().setFilter(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+    mGDepth->bind().generateMipmaps();
+
     mTargets.push_back(mGPosition = glow::Texture2D::create(1, 1, GL_RGB16F));
     mGPosition->bind().setWrap(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
     mGPosition->bind().setFilter(GL_NEAREST, GL_NEAREST);
@@ -648,7 +675,7 @@ void Game::initLevel()
         root->addChild(new StaticCable(i, mPhysics, messageBus));
         root->addChild(new DynamicCable(i, mPhysics, messageBus));
     }
-    
+
     MeshNode* activatedCable = new MeshNode(
         glm::mat4(), "../../data/meshes/ActivatedCable.obj",
         mPhysics, GROUP_NONE, GROUP_NONE, 0.0f
@@ -667,6 +694,17 @@ void Game::initLevel()
     bridge = new FloatingBridge(bridgeTransform, mPhysics);
     bridge->setColor(red);
     root->addChild(bridge);
+
+    // add bird
+    glm::mat4 birdTransform = glm::translate(glm::mat4(1), glm::vec3(9.09171, 2.35247, -7.21369));
+    birdTransform = glm::rotate(birdTransform, glm::radians(30.0f), glm::vec3(0,1,0));
+
+    MeshNode* bird = new MeshNode(
+        birdTransform, "../../data/meshes/Bird.ply",
+        mPhysics, GROUP_NONE, GROUP_NONE, 0.0f
+    );
+    bird->setAlpha(0);
+    root->addChild(bird);
 
     // add gun
     mMagnetGun = new MagnetGun(glm::vec3(2.5, 1.5, 1.5), mPhysics, messageBus, mScene->getCamera());

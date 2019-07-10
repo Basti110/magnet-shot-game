@@ -4,6 +4,7 @@
 #include "editor.h"
 #include "interaction_controller.h"
 #include "gameplay_controller.h"
+#include "cinematic_controller.h"
 #include "message_bus.h"
 #include "scene_manager.h"
 #include "location_event_manager.h"
@@ -20,6 +21,7 @@ Starter::Starter(GLFWwindow* window)
     mPhysics = new PhysicsManager();
     mInteractionController = new InteractionController(mBusManager, mScene, window, mPhysics);
     mGameplayController = new GameplayController(mBusManager, mScene, mPhysics);
+    mCinematicController = new CinematicController(mBusManager, mScene);
     mEditor = new Editor(mBusManager, mScene, mPhysics);
     mIoManager = new IOManager(window, mBusManager);
     mGuiManager = new GuiManager(mBusManager, window, mScene);
@@ -63,4 +65,9 @@ LocationEventManager* Starter::getLocationEventManager()
 PuzzleBoxWatcher* Starter::getPuzzleBoxWatcher()
 {
     return mPuzzleBoxWatcher;
+}
+
+CinematicController* Starter::getCinematicController()
+{
+    return mCinematicController;
 }

@@ -1,6 +1,7 @@
 #pragma once
 class InteractionController;
 class GameplayController;
+class CinematicController;
 class GuiManager;
 // class RenderSystem;
 class IOManager;
@@ -24,10 +25,12 @@ public:
     PhysicsManager* getPhysicsManager();
     LocationEventManager* getLocationEventManager();
     PuzzleBoxWatcher* getPuzzleBoxWatcher();
+    CinematicController* getCinematicController();
 
 private:
     InteractionController* mInteractionController;
     GameplayController* mGameplayController;
+    CinematicController* mCinematicController;
     GuiManager* mGuiManager;
     SceneManager* mScene;
     IOManager* mIoManager;

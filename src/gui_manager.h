@@ -43,19 +43,21 @@ private:
     std::pair<glm::vec3, glm::vec3> mSunsetColor1;
     std::pair<glm::vec3, glm::vec3> mSunsetColor2;
     //std::pair<bool, bool> mSSOA;
-    std::pair<float, float> mShadowOffset;
     std::pair<float, float> mSunAngle;
     std::pair<float, float> mSunIntensity;
+    std::pair<float, float> mShadowOffset;
     std::pair<float, float> mShadowSmoothness;
     std::pair<float, float> mHdrExposure;
+    std::pair<float, float> mFocus;
+    std::pair<float, float> mAperture;
 
     //------------------------------------------------
     // ------------- Object Selection ----------------
     //------------------------------------------------
 
     std::vector<std::string> mObjects = {
-        "Simple Cube", 
-        "Simple Sphere", 
+        "Simple Cube",
+        "Simple Sphere",
         "TestObject"};
 
     int mSelectedObject = 0;
@@ -74,4 +76,3 @@ private:
     bool mPropertyViewIsActive = false;
     std::pair<BodyProperties, BodyProperties> mBodyProperty;
 };
-

@@ -1,6 +1,11 @@
 #ifndef CAMERA_H
 #define CAMERA_H
+
 #include "abstract_node.h"
+
+
+class Message;
+
 
 class Camera : public AbstractNode
 {
@@ -27,6 +32,17 @@ public:
     void setLocalTransformation(glm::mat4 transformation) override;
     void render(glow::UsedProgram& shader, glm::mat4& projection, glm::mat4& view, bool shadowPass) override;
 
+    void detatchFromParent(bool value);
+    void lookAt(const glm::vec3& eye, const glm::vec3& center, const glm::vec3& up);
+
+    void setAperture(float value);
+    void setFocus(float value);
+
+    float getAperture();
+    float getFocus();
+
+    void notifyGuiInput(Message* message);
+
 
 private:
     void buildTransform();
@@ -37,6 +53,10 @@ private:
     glm::vec3 mCameraPos;
     glm::vec3 mCameraFront;
     glm::vec3 mCameraUp;
+
+    bool mDetatchFromParent;
+    float mAperture;
+    float mFocus;
 };
 
 #endif // CAMERA_H

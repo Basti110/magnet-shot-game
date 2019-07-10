@@ -1,10 +1,21 @@
 #include "camera.h"
+#include "message_bus.h"
+
 #include <glm/gtc/matrix_transform.hpp>
-#include <iostream>
 #include <glm/gtc/matrix_inverse.hpp>
-Camera::Camera()
+
+#include <iostream>
+
+
+Camera::Camera() :
+    mDetatchFromParent(false),
+    mAperture(0),
+    mFocus(0)
 {
     resetPosition();
+    MessageBus::getInstance()->addGuiReceiver([=](Message* message) {
+        this->notifyGuiInput(message);
+    });
 }
 
 void Camera::resetPosition()
@@ -89,7 +100,12 @@ void Camera::buildTransform()
 
 glm::mat4 Camera::getViewMatrix()
 {
-    return glm::inverse(mGlobalTransformation);
+    if (mDetatchFromParent) {
+        return glm::inverse(mLocalTransformation);
+    }
+    else {
+        return glm::inverse(mGlobalTransformation);
+    }
 }
 
 int Camera::getWidth()
@@ -147,4 +163,50 @@ void Camera::setLocalTransformation(glm::mat4 transformation)
 void Camera::render(glow::UsedProgram &shader, glm::mat4& projection, glm::mat4& view, bool shadowPass)
 {
     AbstractNode::render(shader, projection, view, shadowPass);
+}
+
+void Camera::detatchFromParent(bool value)
+{
+    mDetatchFromParent = value;
+}
+
+void Camera::lookAt(const glm::vec3& eye, const glm::vec3& center, const glm::vec3& up)
+{
+    glm::mat4 t = glm::lookAt(eye, center, up);
+    AbstractNode::setLocalTransformation(glm::inverse(t));
+}
+
+void Camera::setAperture(float value)
+{
+    mAperture = value;
+}
+
+void Camera::setFocus(float value)
+{
+    mFocus = value;
+}
+
+float Camera::getAperture()
+{
+    return mAperture;
+}
+
+float Camera::getFocus()
+{
+    return mFocus;
+}
+
+void Camera::notifyGuiInput(Message* message)
+{
+    if (auto m = dynamic_cast<GuiFloatMessage*>(message))
+    {
+        if (m->getSetting() == GuiSettings::FOCUS)
+        {
+            setFocus(m->getValue());
+        }
+        else if (m->getSetting() == GuiSettings::APERTURE)
+        {
+            setAperture(m->getValue());
+        }
+    }
 }
