@@ -20,9 +20,8 @@ GuiManager::GuiManager(MessageBus* messageBus, GLFWwindow* window, SceneManager*
 
 
     //Common Settings
-
-    mBackgroundColor1.first = glm::vec3(  9/255.0,  65/255.0, 152/255.0);
-    mBackgroundColor2.first = glm::vec3(74/255.0, 178/255.0, 255/255.0);
+    mBackgroundColor1.first = glm::vec3(41/255.0, 87/255.0, 184/255.0);
+    mBackgroundColor2.first = glm::vec3( 3/255.0, 22/255.0, 133/255.0);
     mLightAmbient.first = glm::vec3(1.0);
     mLightDiffuse.first = glm::vec3(1.0);
     mLightSpecular.first = glm::vec3(1.0);
