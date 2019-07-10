@@ -339,7 +339,7 @@ void Game::render(float elapsedSeconds)
             {
                 bool horizontal = true;
                 bool first_iteration = true;
-                int amount = 10;
+                int amount = 5;
                 auto shader = mShaderBloomFilter->use();
                 for (unsigned int i = 0; i < amount; i++)
                 {
