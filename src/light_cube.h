@@ -17,7 +17,7 @@ public:
 private:
     bool mControlActivated = true;
     PointLight* mLight;
-    glm::vec3 mNightColor;
+    glm::vec3 mColor;
     float mDayIntensity;
     float mNightIntensity;
 };
