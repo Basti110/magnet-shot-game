@@ -828,7 +828,13 @@ void Game::initLevel()
         std::make_tuple(glm::vec3(-43.4046f, 0.5f, -22.3377f), -65.00f, Color{139/255., 220/255.,  36/255.}, 1.0), //green
         std::make_tuple(glm::vec3(-43.8246f, 0.5f, -21.1082f), - 6.83f, Color{222/255.,  66/255.,  26/255.}, 1.9), //red
         std::make_tuple(glm::vec3(-44.7203f, 0.5f, -22.1135f), -26.60f, Color{  0/255.,  65/255., 165/255.}, 3.2), //blue
-        std::make_tuple(glm::vec3(-44.0483f, 1.5f, -21.8468f),   0.00f, Color{255/255., 152/255.,  23/255.}, 1.3)  //yellow
+        std::make_tuple(glm::vec3(-44.0483f, 1.5f, -21.8468f),   0.00f, Color{255/255., 152/255.,  23/255.}, 1.3), //yellow
+
+        // decorate right island
+        std::make_tuple(glm::vec3(42.4046f, 0.5f, -24.3377f), -65.00f, Color{139/255., 220/255.,  36/255.}, 1.0), //green
+        std::make_tuple(glm::vec3(42.8246f, 0.5f, -23.1082f), - 6.83f, Color{222/255.,  66/255.,  26/255.}, 1.9), //red
+        std::make_tuple(glm::vec3(43.7203f, 0.5f, -24.1135f), -26.60f, Color{  0/255.,  65/255., 165/255.}, 3.2), //blue
+        std::make_tuple(glm::vec3(43.0483f, 1.5f, -23.8468f),   0.00f, Color{255/255., 152/255.,  23/255.}, 1.3)  //yellow
     };
 
     for (const auto& param : cubeParams)
@@ -843,6 +849,13 @@ void Game::initLevel()
         cubeLight->createBuffer();
         cubeLight->addPhysics(glm::vec3(1.0f), info);
     }
+
+    // add mystery box
+    root->addChild(new MeshNode(
+        glm::translate(glm::mat4(1), glm::vec3(39.91f, 0.0f, -7.5f)),
+        "../../data/meshes/MysteryBox.ply",
+        mPhysics, GROUP_STATIC_OBJECTS, GROUP_DYNAMIC_OBJECTS, 0.0f
+    ));
 
     // add clock tower
     root->addChild(new ClockTower(glm::vec3(-38.5f, 0.0f, -33.0f), mPhysics, messageBus, mScene));
