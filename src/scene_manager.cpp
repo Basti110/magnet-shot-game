@@ -61,7 +61,8 @@ void SceneManager::setSun(Light * light)
 
 void SceneManager::setSunAngle(float angle) 
 { 
-    float sunSetRatio = -0.8 * pow(angle - 1.5707963, 2) + 2;
+    float pi = glm::pi<float>();
+    float sunSetRatio = -0.8 * pow(angle - pi / 2, 2) + 2;
     sunSetRatio = glm::max(glm::min(sunSetRatio, 1.0f), 0.0f);
 
     mSunColor = sunSetRatio * glm::vec3(3.0) + (1 - sunSetRatio) * mSunSetColor * 5.0f;
@@ -81,15 +82,15 @@ void SceneManager::setSunAngle(float angle)
     }
 
     mSunAngle = angle;
-    if (angle > 3.141592653)
+    if (angle > pi)
     {
-        float ratio = -0.8 * pow(mSunAngle - 4.712388, 2) + 2;
+        float ratio = -0.8 * pow(mSunAngle - 3 * pi / 2, 2) + 2;
         if (ratio >= 1)
-            angle = angle - 3.141592653;
+            angle = angle - pi;
     }
     
-    float theta = -angle - 4.712388;
-    float phi = 0.785398163397448;
+    float theta = -angle - 3 * pi / 2;
+    float phi = pi / 4;
     float r = 98;
     
     float y = r * cos(theta);
@@ -98,6 +99,30 @@ void SceneManager::setSunAngle(float angle)
 
     glm::mat4 transform = glm::translate(glm::mat4(1), glm::vec3(x, y, z));
     mSun->setLocalTransformation(transform);
+}
+
+float SceneManager::getMoonVisibility()
+{
+    float pi = glm::pi<float>();
+    float moonVisibility = 0;
+    if (mSunAngle > 2.8) // define in common
+    {
+        moonVisibility = -0.6 * pow(mSunAngle - 3 * pi / 2, 2) + 1.8;
+        moonVisibility = glm::max(glm::min(moonVisibility, 1.f), 0.f);
+    }
+    return moonVisibility;
+}
+
+float SceneManager::getSunVisibility()
+{
+    float pi = glm::pi<float>();
+    float sunVisibility = 0;
+    if (mSunAngle < 3.4) // definde in common
+    {
+        sunVisibility = -0.6 * pow(mSunAngle - pi / 2, 2) + 1.8;
+        sunVisibility = glm::max(glm::min(sunVisibility, 1.f), 0.f);
+    }
+    return sunVisibility;
 }
 
 glm::vec3 SceneManager::getSunPos()
@@ -156,8 +181,9 @@ void SceneManager::setLightInShader(glow::UsedProgram& shader)
     glm::vec3 backDiffuse;
     glm::vec3 backSpecular;
     float sunSetRatio;
+    float pi = glm::pi<float>();
 
-    sunAmbient = glm::vec3(1.0, 220 / 255., 199 / 255.) * mSun->getIntensity();
+    sunAmbient = glm::vec3(1.0, 220 / 255., 199 / 255.) * mSun->getIntensity(); //Define in common
     sunDiffuse = glm::vec3(251 / 255., 155 / 255., 79 / 255.) * mSun->getIntensity();
     sunSpecular = glm::vec3(248 / 255., 125 / 255., 18 / 255.) * mSun->getIntensity();
 
@@ -167,9 +193,9 @@ void SceneManager::setLightInShader(glow::UsedProgram& shader)
     sunDiffuse = mSun->getDiffuse() * mSun->getIntensity();
     sunSpecular = mSun->getSpecular() * mSun->getIntensity();*/
 
-    if (mSunAngle < 3.141592653)
+    if (mSunAngle < pi)
     {
-        sunSetRatio = -0.8 * pow(mSunAngle - 1.5707963, 2) + 2;
+        sunSetRatio = -0.8 * pow(mSunAngle - pi / 2, 2) + 2;
         sunSetRatio = glm::max(glm::min(sunSetRatio, 1.0f), 0.0f);
         backAmbient = mSun->getAmbient() * mSun->getIntensity();
         backDiffuse = mSun->getDiffuse() * mSun->getIntensity();
@@ -178,9 +204,9 @@ void SceneManager::setLightInShader(glow::UsedProgram& shader)
     }
     else
     {
-        sunSetRatio = -0.8 * pow(mSunAngle - 4.712388, 2) + 2;
+        sunSetRatio = -0.8 * pow(mSunAngle - 3 * pi / 2, 2) + 2;
         sunSetRatio = glm::max(glm::min(sunSetRatio, 1.f), 0.f);
-        backAmbient = glm::vec3(3 / 255., 3 / 255., 3 / 255.);
+        backAmbient = glm::vec3(3 / 255., 3 / 255., 3 / 255.); //Define in common
         backDiffuse = glm::vec3(0 / 255., 0 / 255., 0 / 255.);
         backSpecular = glm::vec3(0., 0., 0.);
         shader.setUniform("sunShadowOn", false);
@@ -219,15 +245,6 @@ void SceneManager::setLightInShader(glow::UsedProgram& shader)
         glUniform1f(glGetUniformLocation(id, ("pointLights[" + std::to_string(lightCounter) + "].Quadratic").c_str()), mPointLights[i]->getQuadratic());
         glUniform1f(glGetUniformLocation(id, ("pointLights[" + std::to_string(lightCounter) + "].Radius").c_str()), mPointLights[i]->getRadius());
         lightCounter++;
-
-        /*shaderLightingPass.setVec3("lights[" + std::to_string(i) + "].Position", lightPositions[i]);
-        shaderLightingPass.setVec3("lights[" + std::to_string(i) + "].Color", lightColors[i]);
-        // update attenuation parameters and calculate radius
-        const float constant = 1.0; // note that we don't send this to the shader, we assume it is always 1.0 (in our case)
-        const float linear = 0.7;
-        const float quadratic = 1.8;
-        shaderLightingPass.setFloat("lights[" + std::to_string(i) + "].Linear", linear);
-        shaderLightingPass.setFloat("lights[" + std::to_string(i) + "].Quadratic", quadratic);*/
     }
     shader.setUniform("sizePointLight", lightCounter);
 }

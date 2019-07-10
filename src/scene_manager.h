@@ -22,6 +22,9 @@ public:
     void removeNode(std::function<bool(AbstractNode*)> predicate);
     void update(float elapsedSeconds);
     void setSunAngle(float angle);
+    float getMoonVisibility();
+    float getSunVisibility();
+    
     //void setSunColor(glm::vec3 sunColor);
     glm::vec3 getSunPos();
     void toggleDayNight();

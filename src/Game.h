@@ -125,6 +125,7 @@ public:
     void notifyGameModeChange(GameModeMessage message);
     void notifyGuiInput(Message* message);
     void notifyKeyInput(KeyMessage message);
+    void getBackgrounds(glm::vec3& back1, glm::vec3& back2);
 
     float mLastFrame = 0;
 };

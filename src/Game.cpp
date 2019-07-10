@@ -214,54 +214,24 @@ void Game::render(float elapsedSeconds)
                 // GLOW_SCOPED(depthFunc, GL_LEQUAL);
                 auto gBuffer = mGBuffer->bind();
                 GLOW_SCOPED(clearColor, glm::vec4(0.5,0.5,0.5, 1));
-                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+                glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);      
                 GLOW_SCOPED(enable, GL_DEPTH_TEST);
+
+                //First Skybox
                 {
-                    auto shaderSkybox = mShaderSkybox->use();
-                    float sunAngle = mScene->getSunAngle();
+                    auto shaderSkybox = mShaderSkybox->use();                  
                     glm::vec3 back1;
                     glm::vec3 back2;
-                    if (sunAngle < 3.141592653)
-                    {
-                        float sunSetRatio = -0.8 * pow(sunAngle - 1.5707963, 2) + 2;
-                        sunSetRatio = glm::max(glm::min(sunSetRatio, 1.f), 0.f);
-                        back1 = sunSetRatio * glm::vec3(mBackgroundColor1) + (1 - sunSetRatio) * mSunsetBackground1;
-                        back2 = sunSetRatio * glm::vec3(mBackgroundColor2) + (1 - sunSetRatio) * mSunsetBackground2;
-                    }
-                    else
-                    {
-                        glm::vec3 dark1 = glm::vec3(0, 3 / 255., 8 / 255.) * glm::vec3(9 / 255. , 9 / 255., 9 / 255.);
-                        glm::vec3 dark2 = glm::vec3(2 / 255., 7 / 255., 48 / 255.) * glm::vec3(9 / 255. , 9 / 255., 9 / 255.);
-                        float sunSetRatio = -0.8 * pow(sunAngle - 4.712388, 2) + 2;
-                        sunSetRatio = glm::max(glm::min(sunSetRatio, 1.f), 0.f);
-                        back1 = sunSetRatio * glm::vec3(dark1) + (1 - sunSetRatio) * mSunsetBackground1;
-                        back2 = sunSetRatio * glm::vec3(dark2) + (1 - sunSetRatio) * mSunsetBackground2;
-                    }
-
+                    getBackgrounds(back1, back2);
                     float angle =  mScene->getSunAngle();
-                    /*if (angle > 3.141592653)
-                        angle -= 3.141592653;*/
-
-                    float sunVisibility = 0;
-                    if (angle < 3.4)
-                    {
-                        sunVisibility = -0.6 * pow(angle - 1.5707963, 2) + 1.8;
-                        sunVisibility = glm::max(glm::min(sunVisibility, 1.f), 0.f);
-                    }
-
-                    float moonVisibility = 0;
-                    if (angle > 2.8)
-                    {
-                        moonVisibility = -0.6 * pow(angle - 4.712388, 2) + 1.8;
-                        moonVisibility = glm::max(glm::min(moonVisibility, 1.f), 0.f);
-                    }
+                    float sunVisibility = mScene->getSunVisibility();
+                    float moonVisibility = mScene->getMoonVisibility();
 
                     shaderSkybox.setUniform("uTransform", projection * glm::mat4(glm::mat3(view)));
                     shaderSkybox.setUniform("uColor1", back1 * 1.0f);
                     shaderSkybox.setUniform("uColor2", back2 * 1.0f);
                     shaderSkybox.setUniform("sunAngle", angle);
-                    shaderSkybox.setUniform("moonAngle", (float)(angle + 3.141592653));
+                    shaderSkybox.setUniform("moonAngle", (float)(angle + glm::pi<float>()));
                     shaderSkybox.setUniform("sunColor", mScene->getSunColor());
                     shaderSkybox.setUniform("moonVisibility", moonVisibility);
                     shaderSkybox.setUniform("sunVisibility", sunVisibility);
@@ -275,9 +245,6 @@ void Game::render(float elapsedSeconds)
                 shader.setUniform("projection", projection);
                 shader.setUniform("view", view);
 
-                //Glow scoped does not work!?
-                /*if (mDebugLine)
-                    GLOW_SCOPED(polygonMode, GL_LINE);*/
 
                 if (mDebugLine)
                     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -285,7 +252,6 @@ void Game::render(float elapsedSeconds)
                 mScene->render(shader, projection, view, false);
 
                 glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-                //GLOW_SCOPED(polygonMode, GL_FILL);
             }
 
             // Phase 2 : Generate SSAO texture from gPosition
@@ -372,15 +338,6 @@ void Game::render(float elapsedSeconds)
             mPhysics->renderDebug(projection, view, updateRate);
         }
     }
-    /*GLOW_SCOPED(enable, GL_BLEND);
-    GLOW_SCOPED(blendFunc, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    GLOW_SCOPED(enable, GL_CULL_FACE);
-    GLOW_SCOPED(cullFace, GL_BACK);
-
-    GLOW_SCOPED(clearColor, mBackgroundColor1);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);*/
-
 
     GLOW_SCOPED(disable, GL_CULL_FACE);
     GLOW_SCOPED(polygonMode, GL_FILL);
@@ -550,6 +507,28 @@ void Game::notifyKeyInput(KeyMessage message)
         {
             mBloomOn = !mBloomOn;
         }
+    }
+}
+
+void Game::getBackgrounds(glm::vec3& back1, glm::vec3& back2) 
+{
+    float sunAngle = mScene->getSunAngle();
+    float pi = glm::pi<float>();
+    if (sunAngle < pi)
+    {
+        float sunSetRatio = -0.8 * pow(sunAngle - pi / 2, 2) + 2;
+        sunSetRatio = glm::max(glm::min(sunSetRatio, 1.f), 0.f);
+        back1 = sunSetRatio * glm::vec3(mBackgroundColor1) + (1 - sunSetRatio) * mSunsetBackground1;
+        back2 = sunSetRatio * glm::vec3(mBackgroundColor2) + (1 - sunSetRatio) * mSunsetBackground2;
+    }
+    else
+    {
+        glm::vec3 dark1 = glm::vec3(0, 3 / 255., 8 / 255.) * glm::vec3(9 / 255., 9 / 255., 9 / 255.);
+        glm::vec3 dark2 = glm::vec3(2 / 255., 7 / 255., 48 / 255.) * glm::vec3(9 / 255., 9 / 255., 9 / 255.);
+        float sunSetRatio = -0.8 * pow(sunAngle - (3 * pi) / 2, 2) + 2;
+        sunSetRatio = glm::max(glm::min(sunSetRatio, 1.f), 0.f);
+        back1 = sunSetRatio * glm::vec3(dark1) + (1 - sunSetRatio) * mSunsetBackground1;
+        back2 = sunSetRatio * glm::vec3(dark2) + (1 - sunSetRatio) * mSunsetBackground2;
     }
 }
 
