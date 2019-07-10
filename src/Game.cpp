@@ -625,6 +625,8 @@ void Game::initLevel()
     MeshNode* level = new MeshNode(glm::mat4(1), "../../data/meshes/FirstRoom.obj", mPhysics, GROUP_STATIC_OBJECTS, GROUP_DYNAMIC_OBJECTS, 0.0f);
     //level->setAmbient({27 / 255., 27 / 255., 27 / 255.});
     //level->setIntensity(2.5);
+    level->setDiffuse({235 / 255., 235 / 255., 235 / 255.});
+    level->setAmbient({20 / 255., 20 / 255., 20 / 255.});
     level->setSpecular({0, 0, 0});
     root->addChild(level);
 

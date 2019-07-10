@@ -125,7 +125,7 @@ void main()
     float shadowFactor = 1;
     if(sunShadowOn) {
         shadowFactor = 0;
-        for (int i = 0; i < 16; i++){
+        for (int i = 0; i < 16; i++) {
             vec2 noise = poisson[i] * shadowSmoothness;
             float shadowDepth = texture(shadowMap, shadowPos.xy + noise).x;
             if (shadowPos.z <= shadowDepth + shadowOffset) {

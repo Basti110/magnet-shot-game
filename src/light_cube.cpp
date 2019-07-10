@@ -17,7 +17,7 @@ LightCube::LightCube(const glm::mat4& transformation, Color color, PhysicsManage
 
     mAlpha = 1.0;
     mDayIntensity = mProperty.intensity;
-    mNightIntensity = mProperty.intensity;
+    mNightIntensity = mProperty.intensity * 3;
 
     //mProperty.ambient = 0.9f * glm::vec3(color.red, color.green, color.blue);
     mNightColor = glm::vec3(color.red, color.green, color.blue);

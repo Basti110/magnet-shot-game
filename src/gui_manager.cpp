@@ -32,7 +32,7 @@ GuiManager::GuiManager(MessageBus* messageBus, GLFWwindow* window, SceneManager*
     mSunColor.first = glm::vec3(255 / 255.0, 120 / 255.0, 0 / 255.0);
     mSunsetColor1.first = glm::vec3(255 / 255.0, 121 / 255.0, 30 / 255.0);
     mSunsetColor2.first = glm::vec3(168 / 255.0, 0.8, 0.8);
-    mHdrExposure.first = 2.0;
+    mHdrExposure.first = 2.5;
     mSunIntensity.first = 1.0;
 
     sendVec3Message(mBackgroundColor1, GuiSettings::BACKGROUND_COLOR1);
