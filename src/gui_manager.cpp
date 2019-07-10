@@ -30,8 +30,8 @@ GuiManager::GuiManager(MessageBus* messageBus, GLFWwindow* window, SceneManager*
     mSunAngle.first = 0.7;
     mShadowSmoothness.first = 0.0006;
     mSunColor.first = glm::vec3(255 / 255.0, 120 / 255.0, 0 / 255.0);
-    mSunsetColor1.first = glm::vec3(255 / 255.0, 121 / 255.0, 65 / 255.0);
-    mSunsetColor2.first = glm::vec3(184 / 255.0, 1.0, 1.0);
+    mSunsetColor1.first = glm::vec3(255 / 255.0, 121 / 255.0, 30 / 255.0);
+    mSunsetColor2.first = glm::vec3(168 / 255.0, 0.8, 0.8);
     mHdrExposure.first = 2.0;
     mSunIntensity.first = 1.0;
 

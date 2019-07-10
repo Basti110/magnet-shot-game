@@ -383,6 +383,7 @@ void Game::render(float elapsedSeconds)
     shaderOutput.setTexture("uTexColor", mTargetColor);
     shaderOutput.setTexture("uTexDepth", mTargetDepth);
     shaderOutput.setTexture("uBloomBlur", mBloomGausTexture2);
+    shaderOutput.setUniform("uBloomOn", mBloomOn);
     shaderOutput.setUniform("uExposure", mScene->getHdrExploration());
     shaderOutput.setUniform("uShowPostProcess", mShowPostProcess);
     shaderOutput.setUniform("uFXAA", mUseFXAA);
@@ -503,28 +504,33 @@ void Game::notifyKeyInput(KeyMessage message)
     {
         if (message.getInput() == GLFW_KEY_F7)
         {
-            mShowPhysicsDebug = mShowPhysicsDebug ? false : true;
+            mShowPhysicsDebug = !mShowPhysicsDebug;
         }
 
         if (message.getInput() == GLFW_KEY_F6)
         {
-            mSSOA_On = mSSOA_On ? false : true;
+            mSSOA_On = !mSSOA_On;
         }
 
         if (message.getInput() == GLFW_KEY_F8)
         {
-            mDebugLine = mDebugLine ? false : true;
+            mDebugLine = !mDebugLine;
         }
 
         if (message.getInput() == GLFW_KEY_F9)
         {
-            mUseFXAA = mUseFXAA ? false : true;
+            mUseFXAA = !mUseFXAA;
         }
 
         if (message.getInput() == GLFW_KEY_F10)
         {
             mSuperSampling = mSuperSampling == 2 ? 1 : 2;
             onResize(mWindowSize.x, mWindowSize.y);
+        }
+
+        if (message.getInput() == GLFW_KEY_F11)
+        {
+            mBloomOn = !mBloomOn;
         }
     }
 }

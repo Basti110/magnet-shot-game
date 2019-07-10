@@ -32,6 +32,7 @@ private:
     bool mShowPhysicsDebug = false;
     bool mDebugLine = false;
     bool mUseFXAA = true;
+    bool mBloomOn = true;
     float mBounceF = 0;
     int mSuperSampling = 2;
     Starter* mStartManager;

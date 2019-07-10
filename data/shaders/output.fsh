@@ -4,6 +4,7 @@ uniform sampler2D uBloomBlur;
 uniform float uExposure;
 uniform bool uShowPostProcess;
 uniform bool uFXAA;
+uniform bool uBloomOn;
 uniform vec2 uBufferSize;
 
 in vec2 vPosition;
@@ -63,8 +64,8 @@ void main()
     float depth = texture(uTexDepth, vPosition).x;
 
     //HDR
-    
-    color += texture(uBloomBlur, vPosition.xy).rgb;
+    if (uBloomOn)
+        color += texture(uBloomBlur, vPosition.xy).rgb;
     //color = color / (color + vec3(1.0));
     color = vec3(1.0) - exp(-color * uExposure);
 

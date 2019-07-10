@@ -229,6 +229,11 @@ void IOManager::processInput()
         sendMessageKey(GLFW_KEY_F10, GLFW_PRESS, cameraSpeed);
     mPrevF10KeyState = glfwGetKey(window, GLFW_KEY_F10);
 
+    const int F11KeyState = glfwGetKey(window, GLFW_KEY_F11);
+    if (F11KeyState == GLFW_RELEASE && mPrevF11KeyState == GLFW_PRESS)
+        sendMessageKey(GLFW_KEY_F11, GLFW_PRESS, cameraSpeed);
+    mPrevF11KeyState = glfwGetKey(window, GLFW_KEY_F11);
+
     // Toggle menu
     const int escKeyState = glfwGetKey(window, GLFW_KEY_ESCAPE);
     if (escKeyState == GLFW_RELEASE && mPrevEscKeyState == GLFW_PRESS) {

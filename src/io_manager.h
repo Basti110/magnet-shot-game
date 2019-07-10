@@ -34,6 +34,7 @@ private:
     int mPrevF8KeyState;
     int mPrevF9KeyState;
     int mPrevF10KeyState;
+    int mPrevF11KeyState;
     int mPrevSpaceKeyState;
     int mPrevEscKeyState;
     int mPrevLeftButtonState;

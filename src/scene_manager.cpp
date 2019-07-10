@@ -157,9 +157,9 @@ void SceneManager::setLightInShader(glow::UsedProgram& shader)
     glm::vec3 backSpecular;
     float sunSetRatio;
 
-    //sunAmbient = mSun->glm::vec3(1.0, 220 / 255., 199 / 255.) * mSun->getIntensity();
-    //sunDiffuse = glm::vec3(251 / 255., 155 / 255., 79 / 255.) * mSun->getIntensity();
-    //sunSpecular = glm::vec3(248 / 255., 125 / 255., 18 / 255.) * mSun->getIntensity();
+    sunAmbient = glm::vec3(1.0, 220 / 255., 199 / 255.) * mSun->getIntensity();
+    sunDiffuse = glm::vec3(251 / 255., 155 / 255., 79 / 255.) * mSun->getIntensity();
+    sunSpecular = glm::vec3(248 / 255., 125 / 255., 18 / 255.) * mSun->getIntensity();
 
     /*sunAmbient = mSun->getAmbient() * mSun->getIntensity();
     sunAmbient = mSun->getAmbient();
