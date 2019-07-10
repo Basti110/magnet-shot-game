@@ -25,12 +25,12 @@ public:
 
         base->setColor({150 / 255., 150 / 255., 150 / 255.});
 
-        const glm::vec3 bladesOffset(0.72530f, 8.73904f, 0.0f);
+        const glm::vec3 bladesOffset(0.694645f, 8.73904f, 0.0f);
         mBladesTransform = glm::translate(transform, bladesOffset);
 
         mBlades = new MeshNode(
             mBladesTransform,
-            "../../data/meshes/WindTurbineBlades.obj",
+            "../../data/meshes/WindTurbineBlades.ply",
             physics,
             GROUP_STATIC_OBJECTS,
             GROUP_DYNAMIC_OBJECTS,
