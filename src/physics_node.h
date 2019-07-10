@@ -12,7 +12,7 @@ class PhysicsManager;
 class PhysicsNode : public AbstractNode
 {
 public:
-    PhysicsNode(PhysicsManager* physics);
+    PhysicsNode(PhysicsManager* physics, bool receiveMessages = true);
     ~PhysicsNode() override;
 
     void update(float elapsedSeconds) override;
