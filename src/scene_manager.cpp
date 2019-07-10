@@ -64,7 +64,8 @@ void SceneManager::setSunAngle(float angle)
     float sunSetRatio = -0.8 * pow(angle - 1.5707963, 2) + 2;
     sunSetRatio = glm::max(glm::min(sunSetRatio, 1.0f), 0.0f);
 
-    mSunColor = sunSetRatio * glm::vec3(1.0) + (1 - sunSetRatio) * mSunSetColor;
+    mSunColor = sunSetRatio * glm::vec3(3.0) + (1 - sunSetRatio) * mSunSetColor * 5.0f;
+    mHdrExploration = sunSetRatio * 2.0 + (1 - sunSetRatio) * 0.5;
 
     if (angle > 3.65 && !isNight)
     {
@@ -179,7 +180,7 @@ void SceneManager::setLightInShader(glow::UsedProgram& shader)
     {
         sunSetRatio = -0.8 * pow(mSunAngle - 4.712388, 2) + 2;
         sunSetRatio = glm::max(glm::min(sunSetRatio, 1.f), 0.f);
-        backAmbient = glm::vec3(1 / 255., 1 / 255., 1 / 255.);
+        backAmbient = glm::vec3(3 / 255., 3 / 255., 3 / 255.);
         backDiffuse = glm::vec3(0 / 255., 0 / 255., 0 / 255.);
         backSpecular = glm::vec3(0., 0., 0.);
         shader.setUniform("sunShadowOn", false);

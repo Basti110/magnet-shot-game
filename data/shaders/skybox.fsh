@@ -39,7 +39,7 @@ void main() {
     if(distance(vec3(xSun, ySun, zSun), vPosition) < 10)
         color = sunVisibility * sunColor + (1 - sunVisibility) * color;
     else if(distance(vec3(xMoon, yMoon, zMoon), vPosition) < 10)
-        color = moonVisibility * vec3(1) + (1 - moonVisibility) * color;
+        color = moonVisibility * vec3(5) + (1 - moonVisibility) * color;
         
     gPosition = vPosition;
 

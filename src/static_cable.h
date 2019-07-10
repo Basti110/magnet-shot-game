@@ -5,25 +5,20 @@
 class StaticCable : public MeshNode
 {
 public:
-    StaticCable(int id, PhysicsManager* physics, MessageBus* messageBus) :
-        MeshNode(glm::mat4(), getFilename(id), physics, GROUP_NONE, GROUP_NONE, 0.0f),
-        mId(id),
-        mStartAnimation(false),
-        mAnimationTimer(0)
+    StaticCable(int id, PhysicsManager* physics, MessageBus* messageBus)
+      : MeshNode(glm::mat4(), getFilename(id), physics, GROUP_NONE, GROUP_NONE, 0.0f), mId(id), mStartAnimation(false), mAnimationTimer(0)
     {
-        messageBus->addActivateScreenReceiver([=](ActivateScreenMessage message) {
-            this->notifyActivateScreen(message);
-        });
+        messageBus->addActivateScreenReceiver([=](ActivateScreenMessage message) { this->notifyActivateScreen(message); });
+
+        this->setColor({200 / 255., 200 / 255., 200 / 255.});
     }
 
-    static const std::string getFilename(int id)
-    {
-        return "../../data/meshes/Cable" + std::to_string(id) + ".obj";
-    }
+    static const std::string getFilename(int id) { return "../../data/meshes/Cable" + std::to_string(id) + ".obj"; }
 
     void notifyActivateScreen(ActivateScreenMessage message)
     {
-        if (message.screenId == mId) {
+        if (message.screenId == mId)
+        {
             mStartAnimation = true;
             mAnimationTimer = -0.5f;
         }
@@ -31,7 +26,8 @@ public:
 
     void update(float elapsedSeconds) override
     {
-        if (mStartAnimation) {
+        if (mStartAnimation)
+        {
             mAnimationTimer += elapsedSeconds;
             const float t = glm::clamp(mAnimationTimer, 0.0f, 1.0f);
             setColor((1 - t) * white + t * red);

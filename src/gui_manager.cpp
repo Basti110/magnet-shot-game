@@ -32,8 +32,8 @@ GuiManager::GuiManager(MessageBus* messageBus, GLFWwindow* window, SceneManager*
     mSunColor.first = glm::vec3(255 / 255.0, 120 / 255.0, 0 / 255.0);
     mSunsetColor1.first = glm::vec3(255 / 255.0, 121 / 255.0, 65 / 255.0);
     mSunsetColor2.first = glm::vec3(184 / 255.0, 1.0, 1.0);
-    mHdrExposure.first = 0.5;
-    mSunIntensity.first = 1.5;
+    mHdrExposure.first = 2.0;
+    mSunIntensity.first = 1.0;
 
     sendVec3Message(mBackgroundColor1, GuiSettings::BACKGROUND_COLOR1);
     sendVec3Message(mBackgroundColor2, GuiSettings::BACKGROUND_COLOR2);
@@ -281,13 +281,13 @@ void GuiManager::renderWorldSettings()
             ImGui::ColorEdit3("Light Diffuse", &mLightDiffuse.first.r);
             ImGui::ColorEdit3("Light Specular", &mLightSpecular.first.r);
             ImGui::SliderFloat("Sun intensity", &mSunIntensity.first, 1.0f, 200.0f);
-            //ImGui::SliderFloat("Shadow Offset", &mShadowOffset.first, 0.0f, 0.0025f, "%.5f");
-            //ImGui::SliderFloat("Shadow Smoothness", &mShadowSmoothness.first, 0.0f, 0.0025f, "%.5f");
+            ImGui::SliderFloat("Shadow Offset", &mShadowOffset.first, 0.0f, 0.0025f, "%.5f");
+            ImGui::SliderFloat("Shadow Smoothness", &mShadowSmoothness.first, 0.0f, 0.0025f, "%.5f");
             ImGui::SliderFloat("Sun Angle", &mSunAngle.first, 0.0f, 6.28318530f);
-            ImGui::SliderFloat("bloom exposure", &mHdrExposure.first, 0.1f, 5.0f);
-            //ImGui::ColorEdit3("Sun Color", &mSunColor.first.r);
-            //ImGui::ColorEdit3("Sunset Color 1", &mSunsetColor1.first.r);
-            //ImGui::ColorEdit3("Sunset Color 2", &mSunsetColor2.first.r);
+            ImGui::SliderFloat("HDR exposure", &mHdrExposure.first, 0.1f, 5.0f);
+            ImGui::ColorEdit3("Sun Color", &mSunColor.first.r);
+            ImGui::ColorEdit3("Sunset Color 1", &mSunsetColor1.first.r);
+            ImGui::ColorEdit3("Sunset Color 2", &mSunsetColor2.first.r);
         }
     }
     ImGui::End();

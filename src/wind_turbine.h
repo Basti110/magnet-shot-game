@@ -23,6 +23,8 @@ public:
             0.0f
         );
 
+        base->setColor({150 / 255., 150 / 255., 150 / 255.});
+
         const glm::vec3 bladesOffset(0.72530f, 8.73904f, 0.0f);
         mBladesTransform = glm::translate(transform, bladesOffset);
 

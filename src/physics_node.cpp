@@ -23,7 +23,7 @@ PhysicsNode::PhysicsNode(PhysicsManager* physics) :
     mProperty.diffuse = glm::vec3(1);
     mProperty.specular = glm::vec3(1);
     mProperty.shininess = 32;
-    mProperty.intensity = 2.0f;
+    mProperty.intensity = 1.0f;
 }
 
 PhysicsNode::~PhysicsNode()

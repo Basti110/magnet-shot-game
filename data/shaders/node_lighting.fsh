@@ -136,7 +136,7 @@ void main()
     
     vec3 result;
     if (alpha < 1) {
-        result = materialAmbient * occlusion + (diff * materialDiffuse) + specular;
+        result = materialAmbient * occlusion + ((0.5 * diff + 0.5) * materialDiffuse) + specular;
     }
     else {
         result = (ambient + (0.1 + shadowFactor * 0.9) * diffuse + shadowFactor * specular);

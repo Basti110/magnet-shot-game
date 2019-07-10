@@ -617,8 +617,8 @@ void Game::initLevel()
 
     // add level
     MeshNode* level = new MeshNode(glm::mat4(1), "../../data/meshes/FirstRoom.obj", mPhysics, GROUP_STATIC_OBJECTS, GROUP_DYNAMIC_OBJECTS, 0.0f);
-    level->setAmbient({27 / 255., 27 / 255., 27 / 255.});
-    level->setIntensity(2.5);
+    //level->setAmbient({27 / 255., 27 / 255., 27 / 255.});
+    //level->setIntensity(2.5);
     level->setSpecular({0, 0, 0});
     root->addChild(level);
 
@@ -704,9 +704,9 @@ void Game::initLevel()
             transform, "../../data/meshes/TreeTop.obj",
             mPhysics, GROUP_STATIC_OBJECTS, GROUP_DYNAMIC_OBJECTS, 0.0f
         );
-        //top->setColor(green);
-        top->setAmbient({12 / 255., 28 / 255., 3 / 255.});
-        top->setDiffuse({57 / 255., 141 / 255., 11 / 255.});
+        top->setColor(green);
+        //top->setAmbient({12 / 255., 28 / 255., 3 / 255.});
+        //->setDiffuse({57 / 255., 141 / 255., 11 / 255.});
         top->setSpecular({0, 0, 0});
 
         root->addChild(top);
@@ -783,17 +783,18 @@ void Game::initLevel()
     // add stack of cubes
     auto cubeParams = {
         // position, rotation y, light color
-        std::make_tuple(glm::vec3(-43.4046f, 0.5f, -22.3377f), -65.00f, Color{139/255., 220/255.,  36/255.}, 1.0),
-        std::make_tuple(glm::vec3(-43.8246f, 0.5f, -21.1082f), - 6.83f, Color{222/255.,  66/255.,  26/255.}, 1.0),
-        std::make_tuple(glm::vec3(-44.7203f, 0.5f, -22.1135f), -26.60f, Color{  0/255.,  65/255., 165/255.}, 1.5),
-        std::make_tuple(glm::vec3(-44.0483f, 1.5f, -21.8468f),   0.00f, Color{255/255., 152/255.,  23/255.}, 1.0)
+        std::make_tuple(glm::vec3(-43.4046f, 0.5f, -22.3377f), -65.00f, Color{139/255., 220/255.,  36/255.}, 1.0), //green
+        std::make_tuple(glm::vec3(-43.8246f, 0.5f, -21.1082f), - 6.83f, Color{222/255.,  66/255.,  26/255.}, 1.9), //red
+        std::make_tuple(glm::vec3(-44.7203f, 0.5f, -22.1135f), -26.60f, Color{  0/255.,  65/255., 165/255.}, 3.2), //blue
+        std::make_tuple(glm::vec3(-44.0483f, 1.5f, -21.8468f),   0.00f, Color{255/255., 152/255.,  23/255.}, 1.3) //yellow
     };
+
     for (const auto& param : cubeParams)
     {
         glm::mat4 transform = glm::translate(glm::mat4(1), std::get<0>(param));
         transform = glm::rotate(transform, glm::radians(std::get<1>(param)), glm::vec3(0, 1, 0));
         LightCube* cubeLight = new LightCube(transform, std::get<2>(param), mPhysics, mScene);
-        cubeLight->setIntensity(std::get<3>(param));
+        cubeLight->setNightIntensity(std::get<3>(param));
         mScene->appendNode(cubeLight);
         const auto& c = std::get<2>(param);
         cubeLight->setColor(glm::vec3(c.red, c.green, c.blue));
@@ -854,20 +855,23 @@ void Game::initLevel()
     mScene->setSceneRoot(root);
 
     // add a bunch of cubes for testing
-    std::vector<Color> colors;
+    /*std::vector<Color> colors;
     colors.push_back({139/255., 220/255.,  36/255.});
     colors.push_back({222/255.,  66/255.,  26/255.});
     colors.push_back({  0/255.,  65/255., 165/255.});
-    colors.push_back({255/255., 152/255.,  23/255.});
+    colors.push_back({255/255., 152/255.,  23/255.});*/
 
     for (int i = 0; i < 4; i++)
     {
+        Color color = std::get<2>(*(cubeParams.begin() + i));
+        float nightIntensity = std::get<3>(*(cubeParams.begin() + i));
         glm::mat4 trans = glm::translate(glm::mat4(1.0), glm::vec3(1, i * 5 + 5, -7));
-        LightCube* cubeLight = new LightCube(trans, colors[i], mStartManager->getPhysicsManager(), mScene);
+        LightCube* cubeLight = new LightCube(trans, color, mStartManager->getPhysicsManager(), mScene);
         mScene->appendNode(cubeLight);
-        cubeLight->setColor(glm::vec3(colors[i].red, colors[i].green, colors[i].blue));
+        cubeLight->setColor(glm::vec3(color.red, color.green, color.blue));
         cubeLight->createBuffer();
         cubeLight->addPhysics(glm::vec3(1.0f), info);
+        cubeLight->setNightIntensity(nightIntensity);
     }
 
     // add stairs

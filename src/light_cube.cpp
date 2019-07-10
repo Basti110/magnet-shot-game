@@ -16,6 +16,8 @@ LightCube::LightCube(const glm::mat4& transformation, Color color, PhysicsManage
     mLight = light;
 
     mAlpha = 1.0;
+    mDayIntensity = mProperty.intensity;
+    mNightIntensity = mProperty.intensity;
 
     //mProperty.ambient = 0.9f * glm::vec3(color.red, color.green, color.blue);
     mNightColor = glm::vec3(color.red, color.green, color.blue);
@@ -40,11 +42,13 @@ void LightCube::notifySceneEvent(SceneEventMessage message)
         mProperty.ambient = 0.9f * mNightColor;
         mAlpha = 0.0;
         mLight->setOn(true);
+        mProperty.intensity = mNightIntensity;
     }
     else if (message.eventId == SceneEventId::Day)
     {
         setColor({0.9, 0.9, 0.9});
         mAlpha = 1.0;
         mLight->setOn(false);
+        mProperty.intensity = mDayIntensity;
     }
 }

@@ -50,6 +50,7 @@ public:
 
         generateData();
         generateVertexArray();
+        this->setColor({200 / 255., 200 / 255., 200 / 255.});
     }
 
     void notifyActivateScreen(ActivateScreenMessage message)

@@ -12,8 +12,12 @@ public:
     void activateControl(bool v) { mControlActivated = v; }
     void lightOn(bool v) { mLight->setOn(v); }
 
+    void setNightIntensity(float value) { mNightIntensity = value; };
+
 private:
     bool mControlActivated = true;
     PointLight* mLight;
     glm::vec3 mNightColor;
+    float mDayIntensity;
+    float mNightIntensity;
 };
