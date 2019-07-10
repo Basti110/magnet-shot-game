@@ -21,6 +21,7 @@ public:
         for (int i = 0; i < 15; i++) {
             glm::mat4 boxTransform = glm::translate(transform, glm::vec3(0, -(i * stepHeight), i * stepWidth));
             BoxNode* box = new BoxNode(boxTransform, scale, physics,GROUP_STATIC_OBJECTS, GROUP_DYNAMIC_OBJECTS, 0.0f);
+            box->setSpecular(glm::vec3(0));
             box->setDisableShadows(true);
             mBoxes.push_back(box);
             mTargetTransforms.push_back(boxTransform);

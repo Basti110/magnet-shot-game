@@ -627,15 +627,16 @@ void Game::initLevel()
 
     // add fence
     MeshNode* fence = new MeshNode(glm::mat4(1), "../../data/meshes/Fence.obj", mPhysics, GROUP_STATIC_OBJECTS, GROUP_DYNAMIC_OBJECTS, 0.0f);
-    fence->setColor(glm::vec3(0.4));
+    fence->setColor(glm::vec3(0.25));
     fence->setSpecular({0, 0, 0});
     root->addChild(fence);
 
     // add power towers
     MeshNode* powerTowers = new MeshNode(glm::mat4(1), "../../data/meshes/PowerTowers.obj", mPhysics, GROUP_STATIC_OBJECTS, GROUP_DYNAMIC_OBJECTS, 0.0f);
     powerTowers->setColor(brown);
+    powerTowers->setAmbient({30 / 255., 19 / 255., 7 / 255.});
+    powerTowers->setDiffuse({34 / 255., 24 / 255., 11 / 255.});
     powerTowers->setSpecular({0, 0, 0});
-    powerTowers->setIntensity(1.5);
     root->addChild(powerTowers);
 
     // add screens & cables
@@ -785,11 +786,11 @@ void Game::initLevel()
 
     // add stack of cubes
     auto cubeParams = {
-        // position, rotation y, light color
+        // position, rotation y, light color, night intensity
         std::make_tuple(glm::vec3(-43.4046f, 0.5f, -22.3377f), -65.00f, Color{139/255., 220/255.,  36/255.}, 1.0), //green
         std::make_tuple(glm::vec3(-43.8246f, 0.5f, -21.1082f), - 6.83f, Color{222/255.,  66/255.,  26/255.}, 1.9), //red
         std::make_tuple(glm::vec3(-44.7203f, 0.5f, -22.1135f), -26.60f, Color{  0/255.,  65/255., 165/255.}, 3.2), //blue
-        std::make_tuple(glm::vec3(-44.0483f, 1.5f, -21.8468f),   0.00f, Color{255/255., 152/255.,  23/255.}, 1.3) //yellow
+        std::make_tuple(glm::vec3(-44.0483f, 1.5f, -21.8468f),   0.00f, Color{255/255., 152/255.,  23/255.}, 1.3)  //yellow
     };
 
     for (const auto& param : cubeParams)
