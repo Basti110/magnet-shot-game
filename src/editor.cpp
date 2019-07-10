@@ -122,7 +122,7 @@ Editor::Editor(MessageBus* mB, SceneManager* scene, PhysicsManager* physics) :
     });
 
     mCubeDistance = 2.0;
-    load();
+    // load();
 }
 
 void Editor::refreshCube()
