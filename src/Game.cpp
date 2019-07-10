@@ -122,12 +122,15 @@ void Game::init()
     //Bloom
     mTargets.push_back(mBloomTexture = glow::Texture2D::create(1, 1, GL_RGB16F));
     mBloomTexture->bind().setFilter(GL_NEAREST, GL_NEAREST);
+    mBloomTexture->bind().setWrap(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
     mFramebuffer->bind().attachColor("gBloom", mBloomTexture);
 
     mBloomGausTexture1 = glow::Texture2D::create(1, 1, GL_RGB16F);
     mBloomGausTexture2 = glow::Texture2D::create(1, 1, GL_RGB16F);
     mBloomGausTexture1->bind().setFilter(GL_NEAREST, GL_NEAREST);
     mBloomGausTexture2->bind().setFilter(GL_NEAREST, GL_NEAREST);
+    mBloomGausTexture1->bind().setWrap(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
+    mBloomGausTexture2->bind().setWrap(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
     mBloomGausBuffer1 = glow::Framebuffer::create("fColor", mBloomGausTexture1);
     mBloomGausBuffer2 = glow::Framebuffer::create("fColor", mBloomGausTexture2);
 
@@ -191,16 +194,8 @@ void Game::render(float elapsedSeconds)
         GLOW_SCOPED(clearColor, glm::vec4(0.5, 0.5, 0.5, 1));
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        
-        //
-            
-        /*else
-            GLOW_SCOPED(polygonMode, GL_FILL);*/
-
         if (!mShowPhysicsDebug)
         {
-
-
             // Phase 1 : render scene's geometry data into Gbuffer
             // 5 Texture Buffer for each pixel: gPosition, gNormal, gAmbient, gDiffuse, gSpecular
             {
@@ -260,7 +255,7 @@ void Game::render(float elapsedSeconds)
                     shaderSkybox.setUniform("moonVisibility", moonVisibility);
                     shaderSkybox.setUniform("sunVisibility", sunVisibility);
                     mSkybox->bind().draw();
-                }              
+                }
                 
                 GLOW_SCOPED(enable, GL_CULL_FACE);
                 GLOW_SCOPED(cullFace, GL_BACK);
@@ -273,12 +268,12 @@ void Game::render(float elapsedSeconds)
                 /*if (mDebugLine)
                     GLOW_SCOPED(polygonMode, GL_LINE);*/
 
-                if (mDebugLine)                         
-                    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);                  
+                if (mDebugLine)
+                    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
                 mScene->render(shader, projection, view, false);
                 
-                glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);           
+                glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
                 //GLOW_SCOPED(polygonMode, GL_FILL);
             }
 
