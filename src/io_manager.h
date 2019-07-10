@@ -48,5 +48,7 @@ private:
     bool mPress1 = false;
     bool mPress2 = false;
     bool mPress3 = false;
+
+    bool mFirstCall = true;
 };
 

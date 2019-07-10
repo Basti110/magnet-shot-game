@@ -125,7 +125,7 @@ void Game::init()
 
         // register location events
         auto locationEventManager = mStartManager->getLocationEventManager();
-        locationEventManager->registerEvent(glm::vec3(2, 0, 1), glm::vec3(3, 5, 2), LocationEventId::MagnetGunPickUp);
+        locationEventManager->registerEvent(glm::vec3(3, 0, 1.5), glm::vec3(4, 5, 2.5), LocationEventId::MagnetGunPickUp);
         locationEventManager->registerEvent(glm::vec3(-6, 4, -39), glm::vec3(-1, 7, -35), LocationEventId::ActivateStairs);
         locationEventManager->registerEvent(glm::vec3(-6, 0, -38), glm::vec3(-1, 7, -23), LocationEventId::DeactivateStairs);
     }
@@ -707,7 +707,7 @@ void Game::initLevel()
     root->addChild(bird);
 
     // add gun
-    mMagnetGun = new MagnetGun(glm::vec3(2.5, 1.5, 1.5), mPhysics, messageBus, mScene->getCamera());
+    mMagnetGun = new MagnetGun(glm::vec3(3.5, 1.5, 2.0), mPhysics, messageBus, mScene->getCamera());
     root->addChild(mMagnetGun);
 
     // add obstacle
