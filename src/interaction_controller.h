@@ -23,9 +23,11 @@ private:
     PhysicsManager* mPhysics;
     Cube* mCube;
     Node* mNode;
-    glm::mat4 mStartPosition;
-    int mCubeIndex;
     Cube* mCubeX;
+    glm::mat4 mStartPosition;
+    glm::vec3 mFronMove;
+    glm::vec3 mRightMove;
+    int mCubeIndex;
     bool lineOn = false;
     bool mMovement = false;
     float mJumpTime = 0;

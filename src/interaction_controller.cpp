@@ -34,11 +34,12 @@ InteractionController::InteractionController(MessageBus* messageBus, SceneManage
             this->notifyMouseMoveInput(message);
     });
 
+    mFronMove = {0, 0, 0};
+    mRightMove = {0, 0, 0};
 
     RigidBodyInfo info;
     info.mass = 30.0;
     info.friction = 0.5;
-    //auto controller = new btKinematik
     mStartPosition = glm::translate(glm::mat4(1.0), glm::vec3(4.75f, 2.0f, 4.0f));
 
     mNode = new Node();
@@ -46,13 +47,12 @@ InteractionController::InteractionController(MessageBus* messageBus, SceneManage
 
     int bodyID = physics->addCapsule({0.25, 1.0}, mStartPosition, info);
     mNode->setRigidBody(bodyID, physics);
-    //mCube = new Cube(trans, Color{1.0f, 1.0f, 1.0f}, mPhysics);
 
     mScene->appendNode(mNode);
-    //mCube->addPhysics(glm::vec3(1.0f), info);
     mNode->addChild(mScene->getCamera());
 
     btRigidBody* body = mPhysics->getRigidBody(mNode->getPhysicsID());
+    physics->addExludeBody(body);
     bool useLinearReferenceFrameA = true;
     btTransform frameInB;
     frameInB = btTransform::getIdentity();
@@ -96,11 +96,16 @@ void InteractionController::notifyKeyInput(KeyMessage message)
         if (mGameMode == GameMode::Gameplay)
         {
             if (onGround && (message.getInput() == GLFW_KEY_W ||
-                message.getInput() == GLFW_KEY_S ||
-                message.getInput() == GLFW_KEY_A ||
+                message.getInput() == GLFW_KEY_S))
+            {
+                mFronMove = {0, 0, 0};
+                body->setLinearVelocity(to_bullet(mFronMove + mRightMove));
+            }
+            else if (onGround && (message.getInput() == GLFW_KEY_A || 
                 message.getInput() == GLFW_KEY_D))
             {
-                body->setLinearVelocity(to_bullet(glm::vec3(0, 0, 0)));
+                mRightMove = {0, 0, 0};
+                body->setLinearVelocity(to_bullet(mFronMove + mRightMove));
             }
         }
     }
@@ -147,19 +152,25 @@ void InteractionController::notifyKeyInput(KeyMessage message)
             {
                 glm::vec3 right = cam->getCameraRight();
                 glm::vec3 front = glm::normalize(glm::cross(right, {0, 1, 0}));
-                if (message.getInput() == GLFW_KEY_W)
-                    body->setLinearVelocity(to_bullet(front * glm::vec3(-5)));
-                if (message.getInput() == GLFW_KEY_S)
-                    body->setLinearVelocity(to_bullet(front * glm::vec3(5)));
-                if (message.getInput() == GLFW_KEY_A)
-                    body->setLinearVelocity(to_bullet(right * glm::vec3(-5)));
-                if (message.getInput() == GLFW_KEY_D)
-                    body->setLinearVelocity(to_bullet(right * glm::vec3(5)));
+                if (message.getInput() == GLFW_KEY_W || message.getInput() == GLFW_KEY_S || message.getInput() == GLFW_KEY_A || message.getInput() == GLFW_KEY_D)
+                {
+                    if (message.getInput() == GLFW_KEY_W)
+                        mFronMove = front * glm::vec3(-1);
+                    if (message.getInput() == GLFW_KEY_S)
+                        mFronMove = front * glm::vec3(1);
+                    if (message.getInput() == GLFW_KEY_A)
+                        mRightMove = right * glm::vec3(-1);
+                    if (message.getInput() == GLFW_KEY_D)
+                        mRightMove = right * glm::vec3(1);
+
+                    body->setLinearVelocity(to_bullet(glm::normalize(mFronMove + mRightMove) * 5.0f));
+                }
                 if (message.getInput() == GLFW_KEY_SPACE)
                 {
                     body->applyCentralImpulse({0, 200, 0});
                     mJumpTime = glfwGetTime();
                 }
+
             }
         }
 

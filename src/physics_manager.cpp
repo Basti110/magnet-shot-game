@@ -249,11 +249,18 @@ btRigidBody* PhysicsManager::pickBody(const glm::vec3& rayFromWorld, const glm::
         btVector3 pickPos = rayCallback.m_hitPointWorld;
         btRigidBody* body = (btRigidBody*)btRigidBody::upcast(rayCallback.m_collisionObject);
 
+        for (auto& excludeObject : mSkipBodies)
+        {
+            if (body == excludeObject)
+                return nullptr;
+        }
+
         if (body && !body->isKinematicObject())
         {
             isect = to_glm(pickPos);
             return body;
         }
+
     }
     return nullptr;
 }

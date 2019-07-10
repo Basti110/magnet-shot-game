@@ -64,6 +64,7 @@ public:
     btRigidBody* getRigidBody(int id);
     btSoftBodyWorldInfo* getSoftWorldInfo() { return mSoftBodyWorldInfo; }
     btSoftRigidDynamicsWorld* getSoftWorld() { return mBulletSoftworld; }
+    void addExludeBody(btRigidBody* body) { mSkipBodies.push_back(body); }
 
 private:
     //void drawSoftBody(btSoftBody* psb);
@@ -81,6 +82,8 @@ private:
     std::vector<btRigidBody*> mRigidBodies;
     std::vector<btRigidBody*> mRedMagnets;
     std::vector<btRigidBody*> mBlueMagnets;
+
+    std::vector<btRigidBody*> mSkipBodies;
 
     float mLastPhysicsUpdate = 0;
 };
