@@ -703,7 +703,7 @@ void Game::initLevel()
         birdTransform, "../../data/meshes/Bird.ply",
         mPhysics, GROUP_NONE, GROUP_NONE, 0.0f
     );
-    bird->setAlpha(0);
+    bird->setAlpha(1);
     root->addChild(bird);
 
     // add gun
