@@ -47,6 +47,7 @@ private:
     std::pair<float, float> mSunAngle;
     std::pair<float, float> mSunIntensity;
     std::pair<float, float> mShadowSmoothness;
+    std::pair<float, float> mHdrExposure;
 
     //------------------------------------------------
     // ------------- Object Selection ----------------

@@ -27,6 +27,7 @@ enum MType
 
 enum GuiSettings
 {
+    HDR_EXPLORATION,
     BACKGROUND_COLOR1,
     BACKGROUND_COLOR2,
     LIGHT_AMBIENT,

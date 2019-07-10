@@ -32,8 +32,10 @@ public:
     void setSceneRoot(Node* node);
     void setSun(Light* light);
     void setSunColor(glm::vec3 v) { mSunSetColor = v; }
+    void setHdrExploration(float value) { mHdrExploration = value; }
 
     // Getter
+    float getHdrExploration() { return mHdrExploration; }
     glm::vec3 getSunColor() { return mSunColor; }
     float getSunAngle() {return mSunAngle;}
     Node* getSceneRoot();
@@ -50,6 +52,7 @@ private:
     glm::vec3 mSunColor;
     glm::vec3 mSunSetColor;
     float mSunAngle;
+    float mHdrExploration;
     bool isNight = false;
     float mAdvanceSunAngle = 0;
 };

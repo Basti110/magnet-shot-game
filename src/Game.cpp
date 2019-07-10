@@ -252,8 +252,8 @@ void Game::render(float elapsedSeconds)
                     }
 
                     shaderSkybox.setUniform("uTransform", projection * glm::mat4(glm::mat3(view)));
-                    shaderSkybox.setUniform("uColor1", back1 * 3.0f);
-                    shaderSkybox.setUniform("uColor2", back2 * 3.0f);
+                    shaderSkybox.setUniform("uColor1", back1 * 1.0f);
+                    shaderSkybox.setUniform("uColor2", back2 * 1.0f);
                     shaderSkybox.setUniform("sunAngle", angle);
                     shaderSkybox.setUniform("moonAngle", (float)(angle + 3.141592653));
                     shaderSkybox.setUniform("sunColor", mScene->getSunColor());
@@ -383,6 +383,7 @@ void Game::render(float elapsedSeconds)
     shaderOutput.setTexture("uTexColor", mTargetColor);
     shaderOutput.setTexture("uTexDepth", mTargetDepth);
     shaderOutput.setTexture("uBloomBlur", mBloomGausTexture2);
+    shaderOutput.setUniform("uExposure", mScene->getHdrExploration());
     shaderOutput.setUniform("uShowPostProcess", mShowPostProcess);
     shaderOutput.setUniform("uFXAA", mUseFXAA);
     shaderOutput.setUniform("uBufferSize", mSuperSampling * mWindowSize);
@@ -488,6 +489,10 @@ void Game::notifyGuiInput(Message* message)
         else if (m->getSetting() == GuiSettings::SUN_INTENSITY)
         {
             mScene->getSun()->setIntensity(m->getValue());
+        }
+        else if (m->getSetting() == GuiSettings::HDR_EXPLORATION)
+        {
+            mScene->setHdrExploration(m->getValue());
         }
     }
 }
