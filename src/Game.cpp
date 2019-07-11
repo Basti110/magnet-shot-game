@@ -123,9 +123,13 @@ void Game::init()
         mShaderCrosshair = glow::Program::createFromFile("../../data/shaders/crosshair");
         mShaderBloomFilter = glow::Program::createFromFile("../../data/shaders/bloomFilter");
 
+        mShaderGeometry->setWarnOnUnchangedUniforms(false);
+        mShaderLighting->setWarnOnUnchangedUniforms(false);
+        mShaderBloomFilter->setWarnOnUnchangedUniforms(false);
+
         // register location events
         auto locationEventManager = mStartManager->getLocationEventManager();
-        locationEventManager->registerEvent(glm::vec3(2, 0, 1), glm::vec3(3, 5, 2), LocationEventId::MagnetGunPickUp);
+        locationEventManager->registerEvent(glm::vec3(3, 0, 1.5), glm::vec3(4, 5, 2.5), LocationEventId::MagnetGunPickUp);
         locationEventManager->registerEvent(glm::vec3(-6, 4, -39), glm::vec3(-1, 7, -35), LocationEventId::ActivateStairs);
         locationEventManager->registerEvent(glm::vec3(-6, 0, -38), glm::vec3(-1, 7, -23), LocationEventId::DeactivateStairs);
     }
@@ -313,7 +317,7 @@ void Game::render(float elapsedSeconds)
                 bool first_iteration = true;
                 int amount = 5;
                 auto shader = mShaderBloomFilter->use();
-                for (unsigned int i = 0; i < amount; i++)
+                for (int i = 0; i < amount; i++)
                 {
                     auto buffer = horizontal ? mBloomGausBuffer1->bind() : mBloomGausBuffer2->bind();
                     shader.setUniform("horizontal", horizontal);
@@ -537,7 +541,7 @@ void Game::initSSOA()
     // GBuffer Textures and Framebuffer
     mTargets.push_back(mGDepth = glow::Texture2D::create(1, 1, GL_DEPTH_COMPONENT32));
     mGDepth->bind().setWrap(GL_CLAMP_TO_EDGE, GL_CLAMP_TO_EDGE);
-    mGDepth->bind().setFilter(GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+    mGDepth->bind().setFilter(GL_LINEAR, GL_LINEAR);
     mGDepth->bind().generateMipmaps();
 
     mTargets.push_back(mGPosition = glow::Texture2D::create(1, 1, GL_RGB16F));
@@ -603,6 +607,8 @@ void Game::initSSOA()
     // SSAO Shader
     mShaderSSAO = glow::Program::createFromFile("../../data/shaders/ssao");
     mShaderBlurSSAO = glow::Program::createFromFile("../../data/shaders/ssao_blur");
+
+    mShaderSSAO->setWarnOnUnchangedUniforms(false);
 }
 
 void Game::initLevel()
@@ -686,7 +692,7 @@ void Game::initLevel()
     root->addChild(bird);
 
     // add gun
-    mMagnetGun = new MagnetGun(glm::vec3(2.5, 1.5, 1.5), mPhysics, messageBus, mScene->getCamera());
+    mMagnetGun = new MagnetGun(glm::vec3(3.5, 1.5, 2.0), mPhysics, messageBus, mScene->getCamera());
     root->addChild(mMagnetGun);
 
     // add obstacle

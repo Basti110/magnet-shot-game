@@ -42,9 +42,15 @@ IOManager::~IOManager()
 
 void IOManager::processInput()
 {
+    if (mFirstCall) {
+        glfwGetCursorPos(window, &mMousePositionX, &mMousePositionY);
+        mFirstCall = false;
+    }
+
     float currentFrame = glfwGetTime();
     mDeltaTime = currentFrame - mLastFrame;
     mLastFrame = currentFrame;
+
     //TODO: sendMessageKey with deltaTime not speed
     float cameraSpeed = 5.0f * mDeltaTime;
 

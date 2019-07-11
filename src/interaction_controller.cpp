@@ -40,7 +40,7 @@ InteractionController::InteractionController(MessageBus* messageBus, SceneManage
     RigidBodyInfo info;
     info.mass = 30.0;
     info.friction = 0.5;
-    mStartPosition = glm::translate(glm::mat4(1.0), glm::vec3(4.75f, 2.0f, 4.0f));
+    mStartPosition = glm::translate(glm::mat4(1.0), glm::vec3(3.5f, 2.0f, 5.5f));
 
     mNode = new Node();
     mNode->setLocalTransformation(mStartPosition);

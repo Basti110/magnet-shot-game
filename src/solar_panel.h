@@ -11,7 +11,7 @@ class SolarPanel : public AbstractNode
 {
 public:
     SolarPanel(const glm::mat4& transform, float panelAngle, PhysicsManager* physics, MessageBus* messageBus)
-      : mMessageBus(messageBus), mMessageSent(false)
+      : mMessageBus(messageBus), mTransform(transform), mLocked(false), mMessageSent(false)
     {
         mBase = new MeshNode(transform, "../../data/meshes/SolarPanelBase.obj", physics, GROUP_STATIC_OBJECTS, GROUP_DYNAMIC_OBJECTS, 0.0f);
 
@@ -39,10 +39,11 @@ public:
         mTop->getRigidBody()->setAngularFactor(btVector3(0, 1, 0));
         mTop->setColor(glm::vec3(0));
 
-            addChild(mBase);
+        addChild(mBase);
         addChild(mTop);
 
-        mOrientation = to_bullet(glm::quat_cast(transform));
+        mLockOrientation = to_bullet(glm::quat_cast(transform));
+        mLastOrientation = mTop->getRigidBody()->getOrientation();
         mLockedInHeight = mTop->getRigidBody()->getCenterOfMassPosition().y() - 0.12f;
     }
 
@@ -51,8 +52,14 @@ public:
         mBase->update(elapsedSeconds);
         mTop->update(elapsedSeconds);
 
-        if (mTop->getRigidBody()->getOrientation().angleShortestPath(mOrientation) < 0.01)
+        btQuaternion currentOrientation = mTop->getRigidBody()->getOrientation();
+
+        if (!mLocked && currentOrientation.angleShortestPath(mLockOrientation) < glm::quarter_pi<float>() &&
+           ((mLastOrientation.getAngle() <= mLockOrientation.getAngle() && currentOrientation.getAngle() >= mLockOrientation.getAngle()) ||
+            (mLastOrientation.getAngle() >= mLockOrientation.getAngle() && currentOrientation.getAngle() <= mLockOrientation.getAngle())))
         {
+            mLocked = true;
+            mTop->getRigidBody()->setWorldTransform(to_bullet(mTransform));
             mTop->getRigidBody()->setLinearFactor(btVector3(0, 1, 0));
             mTop->getRigidBody()->setAngularFactor(btVector3(0, 0, 0));
             mTop->getRigidBody()->setAngularVelocity(btVector3(0, 0, 0));
@@ -63,13 +70,18 @@ public:
             mMessageBus->sendMessage(new ActivateScreenMessage(1));
             mMessageSent = true;
         }
+
+        mLastOrientation = currentOrientation;
     }
 
 private:
     MessageBus* mMessageBus;
     MeshNode* mBase;
     MeshNode* mTop;
-    btQuaternion mOrientation;
+    glm::mat4 mTransform;
+    btQuaternion mLockOrientation;
+    btQuaternion mLastOrientation;
     float mLockedInHeight;
+    bool mLocked;
     bool mMessageSent;
 };
