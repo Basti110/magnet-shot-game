@@ -1,15 +1,30 @@
 # GameDevelopment Practical 2019
 
-## Git global setup
+## About
 
-This must be done before your first commit.
+This project is a custom game engine featuring a magnet puzzle game where players use magnetic forces to solve challenging puzzles. The game serves as a showcase for various advanced graphics algorithms and rendering techniques.
 
-```
-git config --global user.name "YOUR NAME"
-git config --global user.email "YOUR.NAME@rwth-aachen.de"
-```
+### Key Features
 
-Do NOT forget to enter your actual name.
+- **Magnetic Physics**: Realistic magnetic field interactions and physics simulation
+- **Advanced Lighting**: Dynamic sun progression with realistic day/night cycles
+- **Shadow Mapping**: Real-time dynamic shadow rendering
+- **Post-Processing Effects**: Bloom effects for enhanced visual quality
+- **Anti-Aliasing**: Smooth edge rendering for crisp visuals
+- **Accurate Physics**: Bullet Physics integration for realistic object interactions
+- **Custom Shaders**: Extensive shader system for various visual effects
+
+### Screenshots
+
+![Showcase 1](imgs/showcase1.png)
+![Showcase 2](imgs/showcase2.png)
+![Showcase 3](imgs/showcase3.png)
+
+### Gameplay Demo
+
+![Gameplay Demo 1](imgs/showcase4.gif)
+![Gameplay Demo 2](imgs/showcase5.gif)
+
 
 ## Building the project (with QtCreator on Linux)
 
